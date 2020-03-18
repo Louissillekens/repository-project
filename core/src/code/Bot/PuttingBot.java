@@ -1,7 +1,6 @@
-package src.Bot;
+package code.Bot;
 
-import Board.PuttingCourse;
-import Board.Vector2d;
+import code.Board.*;
 
 public interface PuttingBot {
 

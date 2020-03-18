@@ -1,8 +1,9 @@
-package src.Physics;
+package code.Physics;
 
-import Board.Friction_function;
-import Board.Height_function;
-import Board.Vector2d;
+
+import code.Board.Friction_function;
+import code.Board.Height_function;
+import code.Board.Vector2d;
 
 public class EulerSolver {
 

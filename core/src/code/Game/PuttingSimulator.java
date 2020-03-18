@@ -1,9 +1,8 @@
-package src.Game;
+package code.Game;
 
-import Board.*;
-
-import Physics.EulerSolver;
-import Physics.PhysicsEngine;
+import code.Board.*;
+import code.Physics.EulerSolver;
+import code.Physics.PhysicsEngine;
 
 public class PuttingSimulator extends EulerSolver {
 

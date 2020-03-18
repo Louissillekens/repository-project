@@ -1,4 +1,4 @@
-package src.Board;
+package code.Board;
 
 public class PuttingCourse{
 

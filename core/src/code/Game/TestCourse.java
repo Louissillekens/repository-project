@@ -1,8 +1,6 @@
-package src.Game;
+package code.Game;
 
-import Board.Ball;
-import Board.PuttingCourse;
-import Board.Vector2d;
+import code.Board.*;
 
 public class TestCourse {
 

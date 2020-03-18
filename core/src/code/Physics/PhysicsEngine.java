@@ -1,4 +1,4 @@
-package src.Physics;
+package code.Physics;
 
 public class PhysicsEngine {
 }
