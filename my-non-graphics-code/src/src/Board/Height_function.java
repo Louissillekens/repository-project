@@ -1,4 +1,4 @@
-package Board;
+package src.Board;
 
 public class Height_function implements Function2d{
 

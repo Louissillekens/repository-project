@@ -1,4 +1,4 @@
-package Physics;
+package src.Physics;
 
 import Board.Friction_function;
 import Board.Height_function;

@@ -1,4 +1,4 @@
-package Bot;
+package src.Bot;
 
 import Board.PuttingCourse;
 import Board.Vector2d;

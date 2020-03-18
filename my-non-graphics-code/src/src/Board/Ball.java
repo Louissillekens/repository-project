@@ -1,4 +1,4 @@
-package Board;
+package src.Board;
 
 /**
  * class Ball describes a ball in the golf simulator

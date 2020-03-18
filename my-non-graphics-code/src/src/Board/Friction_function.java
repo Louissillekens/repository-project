@@ -1,4 +1,4 @@
-package Board;
+package src.Board;
 
 public class Friction_function implements Function2d{
 

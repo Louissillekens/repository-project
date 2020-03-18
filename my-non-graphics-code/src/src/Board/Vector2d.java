@@ -1,4 +1,4 @@
-package Board;
+package src.Board;
 
 public class Vector2d {
 
