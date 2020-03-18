@@ -12,6 +12,7 @@ import com.badlogic.gdx.graphics.*;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g3d.*;
 import com.badlogic.gdx.graphics.g3d.attributes.ColorAttribute;
+import com.badlogic.gdx.graphics.g3d.utils.MeshBuilder;
 import com.badlogic.gdx.graphics.g3d.utils.ModelBuilder;
 import com.badlogic.gdx.math.Vector3;
 
@@ -19,12 +20,12 @@ public class Game extends ApplicationAdapter{
 
 	private PerspectiveCamera camera;
 	private ModelBatch modelbatch;
-	private ModelBuilder modelbuilder;
+	private ModelBuilder modelBuilder;
 	private Model course;
 	private ModelInstance courseInstance;
 	private Environment environment;
 	public static Vector3 origin = new Vector3(0f,0f,0f);
-	private PuttingSimulator simulator;
+	private MeshBuilder meshBuilder;
 
 	@Override
 	public void create () {
@@ -45,9 +46,6 @@ public class Game extends ApplicationAdapter{
 
 		Vector2d start = new Vector2d(1,1);
 		Vector2d hole = new Vector2d(8,8);
-		PuttingCourse game_course = new PuttingCourse(height_map, friction_map, start, hole);
-		PhysicsEngine game_engine = new PhysicsEngine();
-		simulator = new PuttingSimulator(game_course, game_engine);
 
 
 
@@ -63,7 +61,18 @@ public class Game extends ApplicationAdapter{
 		// Near and Far (plane) represent the minimum and maximum ranges of the camera in, um, units
 		camera.near = 0.1f;
 		camera.far = 300.0f;
-		
+
+		// A ModelBuilder can be used to build meshes by hand
+		modelBuilder = new ModelBuilder();
+		modelbatch = new ModelBatch();
+
+		environment = new Environment();
+		environment.set(new ColorAttribute(ColorAttribute.AmbientLight, 0.8f,0.8f,0.8f, 1f));
+
+		meshBuilder = new MeshBuilder();
+		meshBuilder.begin(VertexAttributes.Usage.Position);
+		meshBuilder.part("part", 1);
+
 
 	}
 
