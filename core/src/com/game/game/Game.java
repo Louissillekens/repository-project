@@ -17,7 +17,7 @@ import com.badlogic.gdx.graphics.g3d.utils.MeshPartBuilder;
 import com.badlogic.gdx.graphics.g3d.utils.ModelBuilder;
 import com.badlogic.gdx.math.Vector3;
 
-public class Game extends ApplicationAdapter{
+public class Game extends ApplicationAdapter implements InputProcessor{
 
 	private PerspectiveCamera camera;
 	private ModelBatch modelbatch;
@@ -76,7 +76,7 @@ public class Game extends ApplicationAdapter{
 
 	}
 
-	
+
 
 	@Override
 	public void render () {
@@ -85,4 +85,53 @@ public class Game extends ApplicationAdapter{
 	}
 
 
+	@Override
+	public boolean keyDown(int keycode) {
+
+		if(keycode == Input.Keys.LEFT)
+			camera.translate(1f,0f,0f);
+		if(keycode == Input.Keys.RIGHT)
+			camera.translate(-1f,0f,0f);
+		if(keycode == Input.Keys.UP)
+			camera.translate(0f,1f,0f);
+		if(keycode == Input.Keys.DOWN)
+			camera.translate(0f,-1f,0f);
+
+		return true;
+	}
+
+	@Override
+	public boolean keyUp(int keycode) {
+		return false;
+	}
+
+	@Override
+	public boolean keyTyped(char character) {
+		return false;
+	}
+
+	@Override
+	public boolean touchDown(int screenX, int screenY, int pointer, int button) {
+		return false;
+	}
+
+	@Override
+	public boolean touchUp(int screenX, int screenY, int pointer, int button) {
+		return false;
+	}
+
+	@Override
+	public boolean touchDragged(int screenX, int screenY, int pointer) {
+		return false;
+	}
+
+	@Override
+	public boolean mouseMoved(int screenX, int screenY) {
+		return false;
+	}
+
+	@Override
+	public boolean scrolled(int amount) {
+		return false;
+	}
 }
