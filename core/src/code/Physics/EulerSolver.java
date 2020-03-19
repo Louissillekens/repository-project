@@ -32,7 +32,7 @@ public class EulerSolver {
     }
 
     public void reset_ball() {
-        P.change_both(0,0);
+        P.change_both(100,100);
         V.change_both(0,0);
 
     }
