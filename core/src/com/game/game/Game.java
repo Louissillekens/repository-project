@@ -20,23 +20,16 @@ import com.badlogic.gdx.math.Vector3;
 public class Game extends ApplicationAdapter implements InputProcessor{
 
 	private PerspectiveCamera camera;
-	private ModelBatch modelbatch;
-	private ModelBuilder modelBuilder;
-	private Model course;
-	private ModelInstance courseInstance;
-	private Environment environment;
-	public static Vector3 origin = new Vector3(0f,0f,0f);
-	private MeshBuilder meshBuilder;
 
 	@Override
 	public void create () {
-		
+
 		camera = new PerspectiveCamera(
 				75,
 				Gdx.graphics.getWidth(),
 				Gdx.graphics.getHeight());
 
-		// Move the camera 5 units back along the z-axis and look at the origin
+		// Move the camera 10 units back along the y-axis and look at the origin (above course)
 		camera.position.set(0f,10f,0f);
 		camera.lookAt(0f,0f,0f);
 
