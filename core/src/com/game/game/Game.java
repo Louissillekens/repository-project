@@ -24,10 +24,8 @@ public class Game extends com.badlogic.gdx.Game{
 		camera.setToOrtho(false, 480, 720);
 		batch = new SpriteBatch();
 		bitmapFont = new BitmapFont();
-		
 
 		this.setScreen(myScreen =new GameScreen(this));
-		
 	}
 
 	public void create_ball(){
@@ -41,8 +39,14 @@ public class Game extends com.badlogic.gdx.Game{
 	public void move_ball(double ax, double ay){
 		golfball.set_start_acceleration(ax, ay);
 		//need to add that when the Position of the ball is in the hole that it does something!
-		while(golfball.get_V()!=(0,0) && golfball.get_a()!=(0,0) && golfball.inhole()== false){
-			Thread.sleep(30);
+		while((golfball.get_V().get_x() != 0 && golfball.get_V().get_y() != 0)
+				&& ((golfball.get_a().get_x() != 0 && golfball.get_a().get_y() != 0) && !golfball.inhole())){
+
+			try {
+				Thread.sleep(30);
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
 			golfball.update_all();
 			Vector2d position = golfball.get_P();
 			double x= position.get_x();
