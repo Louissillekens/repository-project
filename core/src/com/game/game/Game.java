@@ -42,8 +42,8 @@ public class Game extends ApplicationAdapter implements InputProcessor{
 
 
 	}
-	public void move_ball(){
-		while(a.get_V()!=(0,0)&&a.get_Vprev()!=(0,0)){
+	public void move_ball() throws InterruptedException {
+		while(a.get_V()!=(0,0)&& a.get_Vprev()!=(0,0)){
 			a.update_all();
 			//somehow make the ball move to it's new coordinates
 			Thread.sleep(30);
