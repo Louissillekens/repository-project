@@ -16,7 +16,7 @@ public class EulerSolver {
     private Friction_function friction_f;
     private double resistance;
     private double height;
-    private final double g = 9.81;
+    private final double g = 9.81;    
 
 
     public void set_step_size(double h) {
@@ -30,6 +30,7 @@ public class EulerSolver {
 
     public void reset_ball() {
         P.change_both(0,0);
+        V.change_both(0,0);
 
     }
 
