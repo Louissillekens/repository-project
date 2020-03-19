@@ -1,13 +1,13 @@
 package code.Board;
 
+import code.Physics.EulerSolver;
+
 /**
  * class Ball describes a ball in the golf simulator
  * defined by a location, mass, and color
  */
-public class Ball {
+public class Ball extends EulerSolver{
 
-    private Vector2d location;
-    private double mass;
     private int color; //int that can be converted to a color in the graphics engine
 
     /**
@@ -15,10 +15,7 @@ public class Ball {
      * @param location location of the ball as Vector2d
      * @param mass mass of the ball given as a double
      */
-    public Ball(Vector2d location, double mass){
-
-        this.location = location;
-        this.mass = mass;
+    public Ball(){
         color = 1; //standard color 1 ---> white
     }
 
@@ -26,17 +23,12 @@ public class Ball {
      * getter for the mass of the ball
      * @return double describing the mass
      */
-    public double getMass(){
-        return mass;
-    }
 
     /**
      * getter for the location of the ball
      * @return Vector2d containing the x and y coordinate of a ball
      */
-    public Vector2d getLocation(){
-        return location;
-    }
+
 
     /**
      * getter for the color of the ball
@@ -59,9 +51,7 @@ public class Ball {
      * will be called regularly when updating where the ball is
      * @param newLocation the location of the ball after method gets executed
      */
-    public void setLocation(Vector2d newLocation){
-        location = newLocation;
-    }
+
 
     //methods like setMass and setColor are not necessary for anything but might be fun to play around with in later phases
     //(at random points in the game the mass of the ball could change to increase difficulty, a color change could happen to indicate this)
@@ -69,8 +59,6 @@ public class Ball {
      * change the mass of the ball
      * @param newMass the mass of the ball after method gets executed
      */
-    public void setMass(double newMass){
-        mass = newMass;
-    }
+
 }
 

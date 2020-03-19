@@ -81,7 +81,7 @@ public class EulerSolver {
         update_V();
         update_a();
     }
-    public Vector2d get_p(){
+    public Vector2d get_P(){
         return P;
     }
     public Vector2d get_V(){
