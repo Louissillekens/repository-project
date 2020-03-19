@@ -102,4 +102,12 @@ public class EulerSolver {
         }
         return hole;
     }
+    public boolean inwater(Vector2d p){
+        boolean water = false;
+        if(height_f.evaluate(p)<0){
+            water = true;
+        }
+        return water;
+        
+    }
 }
