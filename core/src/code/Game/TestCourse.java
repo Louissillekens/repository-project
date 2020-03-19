@@ -2,6 +2,9 @@ package code.Game;
 
 import code.Board.*;
 
+/**
+ * a class used for testing several early development methods before any other ways of testing were accessible to us
+ */
 public class TestCourse {
 
 
@@ -27,7 +30,7 @@ public class TestCourse {
         Vector2d start = new Vector2d(1.5,2);
         Vector2d flag = new Vector2d(2,5);
 
-        Ball ball = new Ball(start, 5);
+        Ball ball = new Ball();
 
         final double gravity = 9.81;
         final double max_velocity = 3;
