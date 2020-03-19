@@ -1,5 +1,8 @@
 package com.game.game;
 
+import code.Board.Function2d;
+import code.Board.Height_function;
+import code.Board.Vector2d;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.GL20;
@@ -19,8 +22,10 @@ public class GameScreen implements Screen {
     private Image ball_img;
     private Image hole_img;
     private Image hole_cirlce_img;
+    private Image water_img;
     private ImageButton take_shot_1;
     private ImageButton take_shot_2;
+    private Function2d height;
 
     public GameScreen(final Game myGame) {
 
@@ -80,6 +85,31 @@ public class GameScreen implements Screen {
         ball_img.setSize(30, 30);
         stage.addActor(ball_img);
     }
+
+    public void draw_water(double[][] height_map) {
+
+        Vector2d p;
+        height = new Height_function(height_map, 1);
+        double step = 0.25;
+        double i = 0;
+        while (i < height_map.length) {
+            double j = 0;
+            while (j < height_map[0].length) {
+                p = new Vector2d(i, j);
+                if (height.evaluate(p) < 0) {
+                    Texture water_texture = new Texture(Gdx.files.internal("water_field.jpg"));
+                    water_texture.setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear);
+                    water_img = new Image(water_texture);
+                    water_img.setPosition((float) i*72, (float) j*108);
+                    water_img.setSize(80, 80);
+                    stage.addActor(water_img);
+                }
+                j+=step;
+            }
+            i+=step;
+        }
+    }
+
 
     @Override
     public void render(float delta) {
