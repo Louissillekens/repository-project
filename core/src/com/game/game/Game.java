@@ -41,7 +41,7 @@ public class Game extends com.badlogic.gdx.Game{
 	public void move_ball(double ax, double ay){
 		golfball.set_start_acceleration(ax, ay);
 		//need to add that when the Position of the ball is in the hole that it does something!
-		while(golfball.get_V()!=(0,0) && golfball.get_a()!=(0,0){
+		while(golfball.get_V()!=(0,0) && golfball.get_a()!=(0,0) && golfball.inhole()== false){
 			Thread.sleep(30);
 			golfball.update_all();
 			Vector2d position = golfball.get_P();

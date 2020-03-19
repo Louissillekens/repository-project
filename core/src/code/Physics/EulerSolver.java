@@ -93,4 +93,13 @@ public class EulerSolver {
     public Vector2d get_a(){
         return a;
     }
+    public boolean inhole(){
+        boolean hole = false;
+        double x = P.get_x();
+        double y = P.get_y();
+        if(x>=800&&x<=950 && y>=500 && y<=650){
+            hole = true;
+        }
+        return hole;
+    }
 }
