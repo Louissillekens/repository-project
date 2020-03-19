@@ -1,17 +1,32 @@
 package code.Board;
 
+
+/**
+ * class that holds the height of the course at multiple points
+ * implements interface Function2d
+ */
 public class Height_function implements Function2d{
 
 
     private double out_of_bounds_value;
     private double[][] heightMap;
 
+    /**
+     * parametric constructor
+     * @param array array that holds the height at various vectors of the course
+     * @param value a value that gives the height everywhere outside the array
+     */
     public Height_function(double[][] array, double value){
 
         heightMap = array;
         out_of_bounds_value = value;
     }
 
+    /**
+     * evaluates a certain vector (finds the value of height at this point, based on the array)
+     * @param p a vector to check height for
+     * @return double value representing the height at point p
+     */
     @Override
     public double evaluate(Vector2d p) {
 
@@ -37,7 +52,11 @@ public class Height_function implements Function2d{
         return ((x_diff + y_diff)/2) * (n2-n1)+n1;
     }
 
-
+    /**
+     * the gradient method finds the slope at given point using derivatives
+     * @param p the vector for which we are looking for the slope
+     * @return the slope of the given point as a vector
+     */
     @Override
     public Vector2d gradient(Vector2d p) {
 

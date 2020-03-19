@@ -7,6 +7,9 @@ import code.Board.Friction_function;
 import code.Board.Height_function;
 import code.Board.Vector2d;
 
+/**
+ * the class that takes care of the physics using the given Euler-equations
+ */
 public class EulerSolver {
 
     private double dt;
@@ -19,18 +22,30 @@ public class EulerSolver {
     private Friction_function friction_f;
     private double resistance;
     private double height;
-    private final double g = 9.81;    
+    private final double g = 9.81;
 
 
+    /**
+     * setter for the step_size
+     * @param h the new step size as double
+     */
     public void set_step_size(double h) {
 
         dt = h;
     }
 
+    /**
+     * set the acceleration we currently have
+     * @param x acceleration on x-axis
+     * @param y acceleration on y-axis
+     */
     public void set_start_acceleration(double x, double y) {
         a.change_both(x, y);
     }
 
+    /**
+     * reset the ball to the starting position
+     */
     public void reset_ball() {
         P.change_both(100,100);
         V.change_both(0,0);

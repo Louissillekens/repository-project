@@ -12,8 +12,6 @@ public class Ball extends EulerSolver{
 
     /**
      * parametric constructor for a ball
-     * @param location location of the ball as Vector2d
-     * @param mass mass of the ball given as a double
      */
     public Ball(){
         color = 1; //standard color 1 ---> white

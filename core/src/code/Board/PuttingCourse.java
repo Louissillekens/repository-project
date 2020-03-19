@@ -1,5 +1,8 @@
 package code.Board;
 
+/**
+ * this class describes a course with all variables that belong to it such as height, friction, location of hole, etc...
+ */
 public class PuttingCourse{
 
     private Function2d height;
@@ -10,7 +13,18 @@ public class PuttingCourse{
     private Vector2d flag;
     private Ball ball;
 
-
+    /**
+     * parametric constructor for a course
+     * @param height_map an array holding the height of the course at certain points
+     * @param friction_map an array holding the friction of the course at certain points
+     * @param start the vector at which the ball spawns
+     * @param flag the location of the hole
+     * @param maximum_velocity maximum speed the ball can reach in this simulation
+     * @param hole_tolerance gives a specification as to how close the ball should be to the hole to count as a win
+     * @param out_of_bounds_height the height for all points outside the array
+     * @param out_of_bounds_friction the friction for all points outside the array
+     * @param ball the ball we use on this map
+     */
     public PuttingCourse(double[][] height_map,  double[][] friction_map, Vector2d start, Vector2d flag, double maximum_velocity,
                          double hole_tolerance, double out_of_bounds_height, double out_of_bounds_friction, Ball ball) {
 
@@ -23,9 +37,15 @@ public class PuttingCourse{
         this.ball = ball;
     }
 
-    //constructor where hole_tolerance, max_speed, ball, and out_of_bounds_values are already defined
-    //only a course has to be given
-    //counts more or less as "default constructor"
+    /**
+     * constructor where hole_tolerance, max_speed, ball, and out_of_bounds_values are already defined
+     * only a course has to be given
+     * counts more or less as "default constructor"
+     * @param height_map the height at certain points put in an array
+     * @param friction_map the friction at certain points put in an array
+     * @param start the location where the ball spawns
+     * @param flag the location of the hole
+     */
     public PuttingCourse(double[][] height_map, double[][] friction_map, Vector2d start, Vector2d flag) {
 
         double out_of_bounds_height = -1;//water around map
@@ -42,45 +62,64 @@ public class PuttingCourse{
     }
 
 
-    // Return an object of type Function2d
-    // Access to the height of a location on the field by doing get_height.evaluate_height(Vector2d p);
+    /**
+     * getter for the height_map
+     * @return the array holding all heights
+     */
     public Function2d get_height() {
 
         return height;
     }
 
+    /**
+     * getter for the friction_map
+     * @return the array holding all friction values
+     */
     public Function2d get_friction(){
         return friction;
     }
 
-    // Return the flag given in the constructor
-    // Access to the position with the Vector2d methods
+    /**
+     * getter for the position of the flag/hole
+     * @return a Vector2d with the location of the flag
+     */
     public Vector2d get_flag_position() {
 
         return flag;
     }
 
-    // Return the given start vector in the constructor
-    // Access to the position with the Vector2d methods
+    /**
+     * getter for the start position
+     * @return a Vector2d with the location of the start
+     */
     public Vector2d get_start_position() {
 
         return start;
     }
 
 
-    // Return the maximum velocity of the start vector
+    /**
+     * Return the maximum velocity to be reached on this course
+     * @return a Vector2d holding the max_speed possible
+     */
     public double get_maximum_velocity() {
 
         return maximum_velocity;
     }
 
-    // Return the winning tolerance of the hole
+    /**
+     * getter for the winning tolerance of the hole
+     * @return a double value (in meters) holding the max distance of the hole that is considered a "win"
+     */
     public double get_hole_tolerance() {
 
         return hole_tolerance;
     }
 
-
+    /**
+     * getter for the ball
+     * @return an object of type Ball
+     */
     public Ball getBall(){
         return ball;
     }
