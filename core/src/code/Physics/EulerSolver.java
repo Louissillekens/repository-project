@@ -13,6 +13,7 @@ public class EulerSolver {
     private Vector2d P;
     private Vector2d Pprev;
     private Vector2d V;
+    private Vector2d Vprev;
     private Vector2d a;
     private Height_function height_f;
     private Friction_function friction_f;
@@ -46,6 +47,7 @@ public class EulerSolver {
     }
 
     public void update_V() {
+        Vprev = V;
         double ax = a.get_x();
         double ay = a.get_y();
         double Vx = V.get_x();
@@ -81,5 +83,14 @@ public class EulerSolver {
     }
     public Vector2d get_p(){
         return P;
+    }
+    public Vector2d get_V(){
+        return V;
+    }
+    public Vector2d get_Vprev(){
+        return Vprev;
+    }
+    public Vector2d get_a(){
+        return a;
     }
 }
