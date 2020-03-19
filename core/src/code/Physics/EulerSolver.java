@@ -1,6 +1,8 @@
 package code.Physics;
 
 
+import com.badlogic.gdx.math.Vector2;
+
 import code.Board.Friction_function;
 import code.Board.Height_function;
 import code.Board.Vector2d;
@@ -76,5 +78,8 @@ public class EulerSolver {
         update_P();
         update_V();
         update_a();
+    }
+    public Vector2d get_p(){
+        return P;
     }
 }

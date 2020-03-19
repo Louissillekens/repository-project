@@ -23,21 +23,6 @@ public class PuttingSimulator extends EulerSolver {
         this.engine = engine;
     }
 
-    public void set_ball_position(Vector2d p) {
-
-        Vector2d np = new Vector2d(p.get_x(), p.get_y());
-        course.getBall().setLocation(p);
-    }
-
-    public Vector2d get_ball_position() {
-
-        return course.getBall().getLocation();
-    }
-
-    public void take_shot(Vector2d initial_ball_acceleration){
-        acceleration = initial_ball_acceleration;
-    }
-
     public void take_shot_mode2(File file){
 
         double x_velocity = 0;
