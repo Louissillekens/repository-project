@@ -30,47 +30,19 @@ public class Game extends ApplicationAdapter implements InputProcessor{
 
 	@Override
 	public void create () {
-
-		double[][] height_map = new double[10][10];
-		for(int i = 0 ; i < height_map.length ; i++){
-			for(int j = 0 ; j < height_map[0].length ; j++){
-				height_map[i][j] = 1;
-			}
-		}
-
-		double[][] friction_map = new double[10][10];
-		for(int i = 0 ; i < friction_map.length ; i++){
-			for(int j = 0 ; j < friction_map[0].length ; j++){
-				friction_map[i][j] = 0.131;
-			}
-		}
-
-		Vector2d start = new Vector2d(1,1);
-		Vector2d hole = new Vector2d(8,8);
-
-
-
+		
 		camera = new PerspectiveCamera(
 				75,
 				Gdx.graphics.getWidth(),
 				Gdx.graphics.getHeight());
 
 		// Move the camera 5 units back along the z-axis and look at the origin
-		camera.position.set(0f,0f,7f);
+		camera.position.set(0f,10f,0f);
 		camera.lookAt(0f,0f,0f);
 
 		// Near and Far (plane) represent the minimum and maximum ranges of the camera in, um, units
 		camera.near = 0.1f;
 		camera.far = 300.0f;
-
-		// A ModelBuilder can be used to build meshes by hand
-		modelBuilder = new ModelBuilder();
-		modelbatch = new ModelBatch();
-
-		environment = new Environment();
-		environment.set(new ColorAttribute(ColorAttribute.AmbientLight, 0.8f,0.8f,0.8f, 1f));
-
-		meshBuilder = new MeshBuilder();
 
 
 
