@@ -63,6 +63,13 @@ public class Game extends com.badlogic.gdx.Game{
 			double y = position.get_y();
 			myScreen.draw_ball(x, y);
 		}
+		if(golfball.inhole() == true){
+			//display course complete
+		}else if(golfball.inwater()==true){
+			golfball.reset_ball();
+		}else{
+			//swing again
+		}
 	}
 
 	/**
