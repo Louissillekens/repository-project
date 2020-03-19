@@ -36,7 +36,7 @@ public class PuttingCourse{
         this.start = start;
 
         //standard values like in the project manual
-        ball = new Ball(start, 45.93);
+        ball = new Ball();
         maximum_velocity = 3;
         hole_tolerance = 0.2;
     }
