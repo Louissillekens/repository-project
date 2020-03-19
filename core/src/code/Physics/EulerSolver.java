@@ -21,22 +21,17 @@ public class EulerSolver {
     private double height;
     private final double g = 9.81;    
 
-
-    public void set_step_size(double h) {
-
-        dt = h;
-    }
-
+//depends on the power of the swing and sets everything in motion
     public void set_start_acceleration(double x, double y) {
         a.change_both(x, y);
     }
-
+//puts the ball at the starting position and changes velocity to 0
     public void reset_ball() {
         P.change_both(100,100);
         V.change_both(0,0);
 
     }
-
+//this updates the position P depending on speed V and dt split out into x and y
     public void update_P() {
         Pprev = P;
         double Px = P.get_x();
@@ -45,7 +40,7 @@ public class EulerSolver {
         double Vy = V.get_y();
         P.change_both(Px+Vx*dt, Py+Vy*dt);
     }
-
+//updates the Velocity based on the acceleration and dt and split out into x and y
     public void update_V() {
         Vprev = V;
         double ax = a.get_x();
@@ -54,7 +49,7 @@ public class EulerSolver {
         double Vy = V.get_y();
         V.change_both(Vx+ax*dt, Vy+ay*dt);
     }
-
+//updates acceleration based on the height difference and friction of the ground, also split out into x and y
     public void update_a() {
         double ax = a.get_x();
         double ay = a.get_y();
@@ -64,23 +59,25 @@ public class EulerSolver {
 
         a.change_both(ax, ay);
     }
-
+//simple function to get the resistance based on the coordinates
     public double get_resistance(double x, double y) {
 
         Vector2d p = new Vector2d(x, y);
         return friction_f.evaluate(p);
     }
-
+//simple function to get the height based on the coordinates
     public double get_height(double x, double y) {
 
         Vector2d p = new Vector2d(x, y);
         return height_f.evaluate(p);
     }
+// updating the values will never happen without needing to update all of them, might as well combine them.
     public void update_all(){
         update_P();
         update_V();
         update_a();
     }
+//some simple getters
     public Vector2d get_P(){
         return P;
     }
@@ -93,6 +90,7 @@ public class EulerSolver {
     public Vector2d get_a(){
         return a;
     }
+//check if the ball is in the area of the hole so we know to stop the ball from rolling further
     public boolean inhole(){
         boolean hole = false;
         double x = P.get_x();
@@ -102,6 +100,7 @@ public class EulerSolver {
         }
         return hole;
     }
+//checks if the ball is in the water
     public boolean inwater(Vector2d p){
         boolean water = false;
         if(height_f.evaluate(p)<0){
