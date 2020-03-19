@@ -13,6 +13,7 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g3d.*;
 import com.badlogic.gdx.graphics.g3d.attributes.ColorAttribute;
 import com.badlogic.gdx.graphics.g3d.utils.MeshBuilder;
+import com.badlogic.gdx.graphics.g3d.utils.MeshPartBuilder;
 import com.badlogic.gdx.graphics.g3d.utils.ModelBuilder;
 import com.badlogic.gdx.math.Vector3;
 
@@ -70,10 +71,43 @@ public class Game extends ApplicationAdapter{
 		environment.set(new ColorAttribute(ColorAttribute.AmbientLight, 0.8f,0.8f,0.8f, 1f));
 
 		meshBuilder = new MeshBuilder();
-		meshBuilder.begin(VertexAttributes.Usage.Position);
-		meshBuilder.part("part", 1);
 
 
+
+	}
+
+	public static void buildTerrain(MeshPartBuilder b){
+		int gridWidth=50;
+		int gridDepth=50;
+		float scale = 1f;
+		Vector3 pos1,pos2,pos3,pos4;
+		Vector3 nor1,nor2,nor3,nor4;
+		MeshPartBuilder.VertexInfo v1,v2,v3,v4;
+		for(int i=-gridWidth/2;i<gridWidth/2;i++){
+			for(int k=-gridDepth/2;k<gridDepth/2;k++){
+				pos1 = new Vector3 (i,(float)(Math.sin(i)+Math.sin(k))/3f,k);
+				pos2 = new Vector3 (i,(float)(Math.sin(i)+Math.sin(k+1))/3f,k+1);
+				pos3 = new Vector3 (i+1,(float)(Math.sin(i+1)+Math.sin(k+1))/3f,k+1);
+				pos4 = new Vector3 (i+1,(float)(Math.sin(i+1)+Math.sin(k))/3f,k);
+
+				nor1 = (new Vector3((float)-Math.cos(i)/3f,1,0).add(new Vector3(0,1,(float)-Math.cos(k)/3f)));
+				nor2 = (new Vector3((float)-Math.cos(i)/3f,1,0).add(new Vector3(0,1,(float)-Math.cos(k+1)/3f)));
+				nor3 = (new Vector3((float)-Math.cos(i+1)/3f,1,0).add(new Vector3(0,1,(float)-Math.cos(k+1)/3f)));
+				nor4 = (new Vector3((float)-Math.cos(i+1)/3f,1,0).add(new Vector3(0,1,(float)-Math.cos(k)/3f)));
+
+				v1 = new MeshPartBuilder.VertexInfo().setPos(pos1).setNor(nor1).setCol(null).setUV(0.5f, 0.0f);
+				v2 = new MeshPartBuilder.VertexInfo().setPos(pos2).setNor(nor2).setCol(null).setUV(0.0f, 0.0f);
+				v3 = new MeshPartBuilder.VertexInfo().setPos(pos3).setNor(nor3).setCol(null).setUV(0.0f, 0.5f);
+				v4 = new MeshPartBuilder.VertexInfo().setPos(pos4).setNor(nor4).setCol(null).setUV(0.5f, 0.5f);
+
+				b.rect(v1, v2, v3, v4);
+			}
+		}
+
+		//nor2.sub(pos1).crs(nor4.sub(pos1)).toString();
+		//System.out.println(nor2.toString());
+
+//		VertexInfo v5 = new VertexInfo().setPos(1, 0, 0).setNor(0, 1, 0).setCol(null).setUV(0.5f, 0.0f);
 	}
 
 	@Override
