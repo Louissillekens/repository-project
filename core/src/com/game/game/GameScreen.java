@@ -35,13 +35,18 @@ public class GameScreen implements Screen {
         background.setSize(Game.WIDTH, Game.HEIGHT);
         stage.addActor(background);
 
-        Texture ball_texture = new Texture(Gdx.files.internal("Ball.jpg"));
-        ball_texture.setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear);
-        ball_img = new Image(ball_texture);
-        // add the position from the ball vector constructor
-        ball_img.setPosition(100, 100);
-        ball_img.setSize(30, 30);
-        stage.addActor(ball_img);
+        public void draw_ball(double x , double y){
+            float xx = (float)x;
+            float yy = (float)y;
+            Texture ball_texture = new Texture(Gdx.files.internal("Ball.jpg"));
+            ball_texture.setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear);
+            ball_img = new Image(ball_texture);
+            // add the position from the ball vector constructor
+            ball_img.setPosition(xx, yy);
+            ball_img.setSize(30, 30);
+            stage.addActor(ball_img);
+        }
+
 
         Texture hole_texture = new Texture(Gdx.files.internal("hole.jpg"));
         hole_texture.setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear);
