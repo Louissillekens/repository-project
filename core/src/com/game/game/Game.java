@@ -1,21 +1,61 @@
 package com.game.game;
 
-import code.Board.PuttingCourse;
-import code.Board.Vector2d;
-import code.Game.PuttingSimulator;
-import code.Physics.PhysicsEngine;
-import com.badlogic.gdx.ApplicationAdapter;
-import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.Input;
-import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.graphics.*;
+import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.badlogic.gdx.graphics.g3d.*;
-import com.badlogic.gdx.graphics.g3d.attributes.ColorAttribute;
-import com.badlogic.gdx.graphics.g3d.utils.MeshBuilder;
-import com.badlogic.gdx.graphics.g3d.utils.MeshPartBuilder;
-import com.badlogic.gdx.graphics.g3d.utils.ModelBuilder;
-import com.badlogic.gdx.math.Vector3;
+
+public class Game extends com.badlogic.gdx.Game{
+
+	public static final String TITLE = "Crazy Putting";
+	public static final int WIDTH = 1080;
+	public static final int HEIGHT = 720;
+
+	public OrthographicCamera camera;
+	public SpriteBatch batch;
+
+	public BitmapFont bitmapFont;
+
+	@Override
+	public void create () {
+
+		camera = new OrthographicCamera();
+		camera.setToOrtho(false, 480, 720);
+		batch = new SpriteBatch();
+		bitmapFont = new BitmapFont();
+
+		this.setScreen(new GameScreen(this));
+	}
+
+	@Override
+	public void render() {
+
+		super.render();
+	}
+
+	@Override
+	public void dispose() {
+		batch.dispose();
+	}
+}
+/*
+package com.game.game;
+
+		import code.Board.PuttingCourse;
+		import code.Board.Vector2d;
+		import code.Game.PuttingSimulator;
+		import code.Physics.PhysicsEngine;
+		import com.badlogic.gdx.ApplicationAdapter;
+		import com.badlogic.gdx.Gdx;
+		import com.badlogic.gdx.Input;
+		import com.badlogic.gdx.InputProcessor;
+		import com.badlogic.gdx.graphics.*;
+		import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+		import com.badlogic.gdx.graphics.g3d.*;
+		import com.badlogic.gdx.graphics.g3d.attributes.ColorAttribute;
+		import com.badlogic.gdx.graphics.g3d.utils.MeshBuilder;
+		import com.badlogic.gdx.graphics.g3d.utils.MeshPartBuilder;
+		import com.badlogic.gdx.graphics.g3d.utils.ModelBuilder;
+		import com.badlogic.gdx.math.Vector3;
 
 public class Game extends ApplicationAdapter implements InputProcessor{
 
@@ -108,4 +148,4 @@ public class Game extends ApplicationAdapter implements InputProcessor{
 	public boolean scrolled(int amount) {
 		return false;
 	}
-}
+}*/

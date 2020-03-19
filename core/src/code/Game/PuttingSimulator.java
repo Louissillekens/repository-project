@@ -45,6 +45,6 @@ public class PuttingSimulator extends EulerSolver {
             e.printStackTrace();
         }
         Vector2d p = new Vector2d(x_velocity, y_velocity);
-        take_shot(p);
+        //take_shot(p);
     }
 }

@@ -7,6 +7,13 @@ import com.game.game.Game;
 public class DesktopLauncher {
 	public static void main (String[] arg) {
 		LwjglApplicationConfiguration config = new LwjglApplicationConfiguration();
+		config.title = Game.TITLE;
+		config.width = Game.WIDTH;
+		config.height = Game.HEIGHT;
+		config.backgroundFPS = 60;
+		config.foregroundFPS = 60;
+		config.resizable = false;
 		new LwjglApplication(new Game(), config);
 	}
 }
+
