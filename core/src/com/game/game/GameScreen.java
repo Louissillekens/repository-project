@@ -1,9 +1,8 @@
 package com.game.game;
 
-import code.Board.Function2d;
-import code.Board.Height_function;
-import code.Board.Vector2d;
+import code.Board.*;
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Input;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Texture;
@@ -26,7 +25,26 @@ public class GameScreen implements Screen {
     private ImageButton take_shot_1;
     private ImageButton take_shot_2;
     private Function2d height;
+    private PuttingCourse test;
+    private Vector2d start = new Vector2d(1.5,2);
+    private Vector2d flag = new Vector2d(2,5);
+    private Ball ball = new Ball();
+    private double out_of_bounds_height = 1; //outside of the array the height is just 1
+    private double out_of_bounds_friction = 0.131;//outside the array the friction is just 0.131
+    final double max_velocity = 3;
+    final double hole_tolerance = 0.02;
+    private double[][] height_map = {{1   , 1.2 , 1.3 , 1.3 , 1.1 , 1   , 0   , 1  },
+                                     {1.05, 1.15, 1.2 , 1.2 , 1.1 , 0.9 , 0.55, 0  },
+                                     {1.1 , 1.2 , -1.2 , -1.25, 1.34, 1   , 0.33, 0.1},
+                                     {1.43, 1.23, -1.18, 0.9 , 0.4 , 0   ,0.4 ,1.2}};
 
+    double[][] friction_map = new double[10][10];
+
+
+    /**
+     * parametric constructor
+     * @param Game object
+     */
     public GameScreen(final Game myGame) {
 
         this.myGame = myGame;
@@ -44,7 +62,6 @@ public class GameScreen implements Screen {
         Texture hole_texture = new Texture(Gdx.files.internal("hole.jpg"));
         hole_texture.setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear);
         hole_img = new Image(hole_texture);
-        // add the position from the hole vector
         hole_img.setPosition(800, 500);
         hole_img.setSize(150, 150);
         stage.addActor(hole_img);
@@ -52,9 +69,7 @@ public class GameScreen implements Screen {
         Texture hole_circle_texture = new Texture(Gdx.files.internal("hole_tolerance.jpg"));
         hole_circle_texture.setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear);
         hole_cirlce_img = new Image(hole_circle_texture);
-        // add the same position as the hole
         hole_cirlce_img.setPosition(800, 500);
-        // add the tolerance size from the putting course constructor
         hole_cirlce_img.setSize(150, 150);
         stage.addActor(hole_cirlce_img);
 
@@ -73,7 +88,15 @@ public class GameScreen implements Screen {
         take_shot_2.setPosition(50, 520);
         take_shot_2.setSize(250, 100);
         stage.addActor(take_shot_2);
+
+        draw_water(height_map);
+        draw_ball(50, 50);
     }
+
+    /**
+     * void method that draw a ball on the field
+     * @param x and y values used for the location of the ball
+     */
     public void draw_ball(double x , double y){
         float xx = (float)x;
         float yy = (float)y;
@@ -86,6 +109,10 @@ public class GameScreen implements Screen {
         stage.addActor(ball_img);
     }
 
+    /**
+     * void method that draw water fields according to the height of this one
+     * @param 2d array that contains the height at each location
+     */
     public void draw_water(double[][] height_map) {
 
         Vector2d p;
@@ -111,6 +138,10 @@ public class GameScreen implements Screen {
     }
 
 
+    /**
+     * libGDX method
+     * @param float delta
+     */
     @Override
     public void render(float delta) {
 
@@ -121,45 +152,75 @@ public class GameScreen implements Screen {
 
         stage.draw();
 
-        myGame.batch.begin();
-        //myGame.bitmapFont.draw(myGame.batch, "hello", 120, 120);
-        myGame.batch.end();
+        for(int i = 0 ; i < friction_map.length ; i++){
+            for(int j = 0 ; j < friction_map[0].length ; j++){
+                friction_map[i][j] = 0.131; //basic value for the friction
+            }
+        }
+
+        if (Gdx.input.isKeyJustPressed(Input.Keys.ENTER)) {
+            test = new PuttingCourse(height_map, friction_map, start, flag, max_velocity, hole_tolerance, out_of_bounds_height, out_of_bounds_friction, ball);
+        }
     }
 
+    /**
+     * libGDX method
+     * @param float delta
+     */
     public void update(float delta) {
 
         stage.act(delta);
     }
 
+    /**
+     * libGDX method
+     * @param int width and int height of the window
+     */
     @Override
     public void resize(int width, int height) {
 
         stage.getViewport().update(width, height, false);
     }
 
+    /**
+     * libGDX method
+     */
     @Override
     public void show() {
 
     }
 
+    /**
+     * libGDX method
+     */
     @Override
     public void pause() {
 
     }
 
+    /**
+     * libGDX method
+     */
     @Override
     public void resume() {
 
     }
 
+    /**
+     * libGDX method
+     */
     @Override
     public void dispose() {
 
     }
 
+    /**
+     * libGDX method
+     */
     @Override
     public void hide() {
 
     }
 }
+
 
