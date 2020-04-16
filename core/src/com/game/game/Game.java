@@ -1,5 +1,6 @@
 package com.game.game;
 
+import code.Screens.IntroScreen;
 import com.badlogic.gdx.graphics.*;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
@@ -14,7 +15,7 @@ public class Game extends com.badlogic.gdx.Game{
 	public SpriteBatch batch;
 
 	public BitmapFont bitmapFont;
-	public GameScreen myScreen;
+	public IntroScreen myScreen;
 	public Ball golfball;
 
 	/**
@@ -28,7 +29,7 @@ public class Game extends com.badlogic.gdx.Game{
 		batch = new SpriteBatch();
 		bitmapFont = new BitmapFont();
 
-		this.setScreen(myScreen =new GameScreen(this));
+		this.setScreen(myScreen = new IntroScreen(this));
 	}
 
 	/**
@@ -37,14 +38,14 @@ public class Game extends com.badlogic.gdx.Game{
 	public void create_ball(){
 		golfball.reset_ball();
 		Vector2d position = golfball.get_P();
-		double x= position.get_x();
+		double x = position.get_x();
 		double y = position.get_y();
-		myScreen.draw_ball(x, y);
+		//myScreen.draw_ball(x, y);
 	}
 
 	/**
 	 * void method to move the ball
-	 * @param double ax and ay that correspond to the acceleration
+	 * @param ax and ay that correspond to the acceleration
 	 */
 	public void move_ball(double ax, double ay){
 		golfball.set_start_acceleration(ax, ay);
@@ -61,14 +62,7 @@ public class Game extends com.badlogic.gdx.Game{
 			Vector2d position = golfball.get_P();
 			double x= position.get_x();
 			double y = position.get_y();
-			myScreen.draw_ball(x, y);
-		}
-		if(golfball.inhole() == true){
-			//display course complete
-		}else if(golfball.inwater()==true){
-			golfball.reset_ball();
-		}else{
-			//swing again
+			//myScreen.draw_ball(x, y);
 		}
 	}
 

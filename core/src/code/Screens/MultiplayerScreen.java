@@ -1,4 +1,4 @@
-package com.game.game;
+package code.Screens;
 
 import code.Board.*;
 import com.badlogic.gdx.Gdx;
@@ -7,13 +7,18 @@ import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.ui.ImageButton;
+import com.badlogic.gdx.scenes.scene2d.ui.Skin;
+import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
+import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.viewport.StretchViewport;
+import com.game.game.Game;
 
-public class GameScreen implements Screen {
+public class MultiplayerScreen implements Screen {
 
     private final Game myGame;
     private Stage stage;
@@ -22,30 +27,20 @@ public class GameScreen implements Screen {
     private Image hole_img;
     private Image hole_cirlce_img;
     private Image water_img;
-    private ImageButton take_shot_1;
-    private ImageButton take_shot_2;
+    private Skin skin;
+    private TextButton take_shot_1;
+    private TextButton take_shot_2;
+    private TextButton backButton;
     private Function2d height;
-    private PuttingCourse test;
     private Vector2d start = new Vector2d(1.5,2);
     private Vector2d flag = new Vector2d(2,5);
     private Ball ball = new Ball();
-    private double out_of_bounds_height = 1; //outside of the array the height is just 1
-    private double out_of_bounds_friction = 0.131;//outside the array the friction is just 0.131
-    final double max_velocity = 3;
-    final double hole_tolerance = 0.02;
-    private double[][] height_map = {{1   , 1.2 , 1.3 , 1.3 , 1.1 , 1   , 0   , 1  },
-                                     {1.05, 1.15, 1.2 , 1.2 , 1.1 , 0.9 , 0.55, 0  },
-                                     {1.1 , 1.2 , -1.2 , -1.25, 1.34, 1   , 0.33, 0.1},
-                                     {1.43, 1.23, -1.18, 0.9 , 0.4 , 0   ,0.4 ,1.2}};
-
-    double[][] friction_map = new double[10][10];
-
 
     /**
      * parametric constructor
-     * @param Game object
+     * @param myGame object
      */
-    public GameScreen(final Game myGame) {
+    public MultiplayerScreen(final Game myGame) {
 
         this.myGame = myGame;
         this.stage = new Stage(new StretchViewport(Game.WIDTH, Game.HEIGHT, myGame.camera));
@@ -57,7 +52,6 @@ public class GameScreen implements Screen {
         background.setPosition(0, 0);
         background.setSize(Game.WIDTH, Game.HEIGHT);
         stage.addActor(background);
-
 
         Texture hole_texture = new Texture(Gdx.files.internal("hole.jpg"));
         hole_texture.setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear);
@@ -73,23 +67,44 @@ public class GameScreen implements Screen {
         hole_cirlce_img.setSize(150, 150);
         stage.addActor(hole_cirlce_img);
 
-        Texture button_1_texture = new Texture(Gdx.files.internal("take_shot_1.jpg"));
-        TextureRegion button_1_region = new TextureRegion(button_1_texture);
-        TextureRegionDrawable button_1_drawable = new TextureRegionDrawable(button_1_region);
-        take_shot_1 = new ImageButton(button_1_drawable);
-        take_shot_1.setPosition(50, 600);
-        take_shot_1.setSize(250, 100);
+        skin = new Skin(Gdx.files.internal("uiskin.json"));
+
+        take_shot_1 = new TextButton("Take shot mode 1", skin);
+        take_shot_1.setPosition(40, 600);
+        take_shot_1.setSize(150, 40);
         stage.addActor(take_shot_1);
 
-        Texture button_2_texture = new Texture(Gdx.files.internal("take_shot_2.jpg"));
-        TextureRegion button_2_region = new TextureRegion(button_2_texture);
-        TextureRegionDrawable button_2_drawable = new TextureRegionDrawable(button_2_region);
-        take_shot_2 = new ImageButton(button_2_drawable);
-        take_shot_2.setPosition(50, 520);
-        take_shot_2.setSize(250, 100);
+        take_shot_2 = new TextButton("Take shot mode 2", skin);
+        take_shot_2.setPosition(40, 550);
+        take_shot_2.setSize(150, 40);
         stage.addActor(take_shot_2);
 
-        draw_water(height_map);
+        backButton = new TextButton("Back", skin);
+        backButton.setPosition(40, 650);
+        backButton.setSize(60, 40);
+        stage.addActor(backButton);
+
+        class BackButtonListener extends ChangeListener {
+
+            private Game game;
+            private Screen screen;
+
+            public BackButtonListener(final Game game, Screen screen) {
+
+                this.game = game;
+                this.screen = screen;
+            }
+
+            @Override
+            public void changed(ChangeEvent event, Actor actor) {
+
+                this.game.setScreen(new GameModeScreen(this.game));
+                this.screen.dispose();
+            }
+        }
+        backButton.addListener(new BackButtonListener(myGame, this));
+
+        // draw_water(height_map);
         draw_ball(50, 50);
     }
 
@@ -111,7 +126,7 @@ public class GameScreen implements Screen {
 
     /**
      * void method that draw water fields according to the height of this one
-     * @param 2d array that contains the height at each location
+     * @param height_map that contains the height at each location
      */
     public void draw_water(double[][] height_map) {
 
@@ -140,7 +155,7 @@ public class GameScreen implements Screen {
 
     /**
      * libGDX method
-     * @param float delta
+     * @param delta
      */
     @Override
     public void render(float delta) {
@@ -151,7 +166,7 @@ public class GameScreen implements Screen {
         update(delta);
 
         stage.draw();
-
+/*
         for(int i = 0 ; i < friction_map.length ; i++){
             for(int j = 0 ; j < friction_map[0].length ; j++){
                 friction_map[i][j] = 0.131; //basic value for the friction
@@ -159,13 +174,13 @@ public class GameScreen implements Screen {
         }
 
         if (Gdx.input.isKeyJustPressed(Input.Keys.ENTER)) {
-            test = new PuttingCourse(height_map, friction_map, start, flag, max_velocity, hole_tolerance, out_of_bounds_height, out_of_bounds_friction, ball);
+             test = new PuttingCourse(height_map, friction_map, start, flag, max_velocity, hole_tolerance, out_of_bounds_height, out_of_bounds_friction, ball);
         }
+        */
     }
-
     /**
      * libGDX method
-     * @param float delta
+     * @param delta
      */
     public void update(float delta) {
 
@@ -174,7 +189,7 @@ public class GameScreen implements Screen {
 
     /**
      * libGDX method
-     * @param int width and int height of the window
+     * @param width and int height of the window
      */
     @Override
     public void resize(int width, int height) {
