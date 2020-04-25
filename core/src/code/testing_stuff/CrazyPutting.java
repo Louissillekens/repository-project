@@ -1,3 +1,4 @@
+/*
 package code.testing_stuff;
 
 import com.badlogic.gdx.ApplicationListener;
@@ -15,9 +16,11 @@ import com.badlogic.gdx.graphics.g3d.environment.DirectionalLight;
 import com.badlogic.gdx.graphics.g3d.utils.MeshPartBuilder;
 import com.badlogic.gdx.graphics.g3d.utils.MeshPartBuilder.VertexInfo;
 import com.badlogic.gdx.graphics.g3d.utils.ModelBuilder;
+import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -42,7 +45,7 @@ public class CrazyPutting implements ApplicationListener {
     @Override
     public void create() {
 
-        FunctionParser.parse("sin(x)+sin(y)");
+        // FunctionParser.parse("sin(x)+sin(y)");
 
         Map< String,Double> hm = new HashMap<String,Double>();
         hm.put("x", 3.14);
@@ -116,26 +119,32 @@ public class CrazyPutting implements ApplicationListener {
     public static void buildTerrain(MeshPartBuilder b){
         int gridWidth=50;
         int gridDepth=50;
-        float scale = 1f;
         Vector3 pos1,pos2,pos3,pos4;
         Vector3 nor1,nor2,nor3,nor4;
         VertexInfo v1,v2,v3,v4;
         for(int i=-gridWidth/2;i<gridWidth/2;i++){
             for(int k=-gridDepth/2;k<gridDepth/2;k++){
+
                 pos1 = new Vector3 (i,(float)(Math.sin(i)+Math.sin(k))/3f,k);
                 pos2 = new Vector3 (i,(float)(Math.sin(i)+Math.sin(k+1))/3f,k+1);
                 pos3 = new Vector3 (i+1,(float)(Math.sin(i+1)+Math.sin(k+1))/3f,k+1);
                 pos4 = new Vector3 (i+1,(float)(Math.sin(i+1)+Math.sin(k))/3f,k);
 
-                nor1 = (new Vector3((float)-Math.cos(i)/3f,1,0).add(new Vector3(0,1,(float)-Math.cos(k)/3f)));
-                nor2 = (new Vector3((float)-Math.cos(i)/3f,1,0).add(new Vector3(0,1,(float)-Math.cos(k+1)/3f)));
-                nor3 = (new Vector3((float)-Math.cos(i+1)/3f,1,0).add(new Vector3(0,1,(float)-Math.cos(k+1)/3f)));
-                nor4 = (new Vector3((float)-Math.cos(i+1)/3f,1,0).add(new Vector3(0,1,(float)-Math.cos(k)/3f)));
+                nor1 = new Vector3((float)-Math.cos(i)/3f,1,(float)-Math.cos(k)/3f);
+                nor2 = new Vector3((float)-Math.cos(i)/3f, 1,(float)-Math.cos(k+1)/3f);
+                nor3 = new Vector3((float)-Math.cos(i+1)/3f,1,(float)-Math.cos(k+1)/3f);
+                nor4 = new Vector3((float)-Math.cos(i+1)/3f,1,(float)-Math.cos(k)/3f);
 
-                v1 = new VertexInfo().setPos(pos1).setNor(nor1).setCol(null).setUV(0.5f, 0.0f);
-                v2 = new VertexInfo().setPos(pos2).setNor(nor2).setCol(null).setUV(0.0f, 0.0f);
-                v3 = new VertexInfo().setPos(pos3).setNor(nor3).setCol(null).setUV(0.0f, 0.5f);
-                v4 = new VertexInfo().setPos(pos4).setNor(nor4).setCol(null).setUV(0.5f, 0.5f);
+                v1 = new VertexInfo().setPos(pos1).setNor(nor1).setCol(null).setUV(null);
+                v2 = new VertexInfo().setPos(pos2).setNor(nor2).setCol(null).setUV(null);
+                v3 = new VertexInfo().setPos(pos3).setNor(nor3).setCol(null).setUV(null);
+                v4 = new VertexInfo().setPos(pos4).setNor(nor4).setCol(null).setUV(null);
+
+                System.out.println(v1.position);
+                System.out.println(v2.position);
+                System.out.println(v3.position);
+                System.out.println(v4.position);
+                System.out.println();
 
                 b.rect(v1, v2, v3, v4);
             }
@@ -194,7 +203,7 @@ public class CrazyPutting implements ApplicationListener {
         //modelBatch.render(boxInstance, environment);
         modelBatch.render(ballInstance, environment);
         modelBatch.render(shadowInstance, environment);
-        for(int i=0;i<100;i++)
+        for(int i=0;i<1;i++)
             modelBatch.render(rectInstance[i], environment);
 
         modelBatch.end();
@@ -212,3 +221,4 @@ public class CrazyPutting implements ApplicationListener {
     public void resume() {
     }
 }
+*/

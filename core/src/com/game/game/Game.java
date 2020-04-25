@@ -1,10 +1,13 @@
 package com.game.game;
 
 import code.Screens.IntroScreen;
+import code.Screens.PuttingGame;
 import com.badlogic.gdx.graphics.*;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import code.Board.*;
+import com.badlogic.gdx.graphics.g3d.ModelInstance;
+
 public class Game extends com.badlogic.gdx.Game{
 
 	public static final String TITLE = "Crazy Putting";

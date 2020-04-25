@@ -4,6 +4,7 @@ import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.Screen;
+import com.badlogic.gdx.backends.lwjgl.LwjglApplication;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
@@ -96,8 +97,10 @@ public class GameModeScreen extends ApplicationAdapter implements Screen {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
 
-                this.game.setScreen(new SinglePlayerScreen(this.game));
-                this.screen.dispose();
+                //this.game.setScreen(new SinglePlayerScreen(this.game));
+                //this.screen.dispose();
+
+                new LwjglApplication(new PuttingGame());
             }
         }
         singlePlayer.addListener(new SinglePlayerListener(myGame, this));
