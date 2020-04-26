@@ -1,18 +1,35 @@
-package Physics;
+package code.Physics;
 
-import Board.Friction_function;
-import Board.Height_function;
-import Board.Vector2d;
+import code.Board.Friction_function;
+import code.Board.Height_function;
+import code.Board.Vector2d;
+
 public class Rungekuttasolver{
     double g = 9.81;
     double mu;
     double x;
     double y;
 
+    public Rungekuttasolver(){
+        //TODO make this constructor
+    }
+
     //needs to be linked to the game to know the x and y values
     void updatecoordinates(){
         x= getx();
         y= gety();
+    }
+
+    public double getx(){
+        return x;
+    }
+
+    public double gety(){
+        return y;
+    }
+
+    public double getmu(double x, double y){
+        return mu;//TODO (why does this need x and y)
     }
 
     //needs to use a method that sets mu based on the position
@@ -21,11 +38,10 @@ public class Rungekuttasolver{
     }
     //these calculate the x and y acceleration values
     double xii(double x, double y, double xi, double yi){
-        return hx(x,y) - (mu * g* xi)/(sqrt(xi^2+yi^2));
+        return hx(x,y) - (mu * g* xi)/(sqrt((xi*xi)+(yi*yi)));
     }
-    double yii(double x, double y, double xi, double yi){
-        return hy(x,y) - (mu * g* yi)/(sqrt(xi^2+yi^2));
-    }
+    double yii(double x, double y, double xi, double yi){ return hy(x,y) - (mu * g* yi)/(sqrt((xi*xi)+(yi*yi))); }
+
     //in these next 2 methods h(x,y) is a method that returns the height of the ball with an x and y input and these methods return the velocities in both x and y directions
     double dzdx(double x, double y, double dx){
         return ((h(x+dx,y)-h(x+y))/dx);
@@ -34,12 +50,16 @@ public class Rungekuttasolver{
         return ((h(x,y+dy)-h(x+y))/dy);
     }
     double[] Rungakutta(double x0, double y0, double x, double n){
-        int h=((x-x0)/n);
+        double h = ((x-x0)/n);
         Rungakuttasolver x = new Rungakuttasolver();
-        double k1;
-        double k2;
-        double k3;
-        double k4;
+        double k1x;
+        double k1y;
+        double k2x;
+        double k2y;
+        double k3x;
+        double k3y;
+        double k4x;
+        double k4y;
         double yr = y0;
         double xr = x0;
         for(int i =0;i<n;i++){
