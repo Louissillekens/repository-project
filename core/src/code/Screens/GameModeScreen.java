@@ -19,6 +19,9 @@ import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.utils.viewport.StretchViewport;
 import com.game.game.Game;
 
+/**
+ * class GameModeScreen this class implements the screen on which to play our game
+ */
 public class GameModeScreen extends ApplicationAdapter implements Screen {
 
     private final com.game.game.Game myGame;
@@ -36,7 +39,12 @@ public class GameModeScreen extends ApplicationAdapter implements Screen {
     private TextButton botVSplayer;
     private TextButton botVSbot;
 
+    /**
+     * a parametric constructor that takes a Game and makes all visuals for the course
+     * @param myGame the game for which to make the GUI
+     */
     public GameModeScreen(final Game myGame) {
+
 
         this.myGame = myGame;
         this.stage = new Stage(new StretchViewport(Game.WIDTH, Game.HEIGHT, myGame.camera));
@@ -187,6 +195,9 @@ public class GameModeScreen extends ApplicationAdapter implements Screen {
     }
 
     @Override
+    /**
+     * a method that renders the GUI based on a float
+     */
     public void render(float delta) {
 
         Gdx.gl.glClearColor(.25f, .25f, .25f, 1f);
