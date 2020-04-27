@@ -6,7 +6,6 @@ import code.Board.Vector2d;
 
 public class Rungekuttasolver{
     double g = 9.81;
-    double mu;
     double x;
     double y;
 
@@ -29,18 +28,16 @@ public class Rungekuttasolver{
     }
 
     public double getmu(double x, double y){
-        return mu;//TODO (why does this need x and y)
+        return mu;//TODO (why does this need x and y) : because it needs the resistance at the position the balls it at.
     }
 
-    //needs to use a method that sets mu based on the position
-    void updatemu(x,y){
-        mu = getmu(x,y);
-    }
     //these calculate the x and y acceleration values
     double xii(double x, double y, double xi, double yi){
-        return hx(x,y) - (mu * g* xi)/(sqrt((xi*xi)+(yi*yi)));
+        return hx(x,y) - (getmu(x,y) * g* xi)/(sqrt((xi*xi)+(yi*yi)));
     }
-    double yii(double x, double y, double xi, double yi){ return hy(x,y) - (mu * g* yi)/(sqrt((xi*xi)+(yi*yi))); }
+    double yii(double x, double y, double xi, double yi){ 
+        return hy(x,y) - (getmu(x,y) * g* yi)/(sqrt((xi*xi)+(yi*yi)));
+     }
 
     //in these next 2 methods h(x,y) is a method that returns the height of the ball with an x and y input and these methods return the velocities in both x and y directions
     double dzdx(double x, double y, double dx){
