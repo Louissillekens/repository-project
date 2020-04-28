@@ -28,16 +28,18 @@ public class PuttingGame implements ApplicationListener{
     private ModelInstance ballInstance;
     private float ballSize = 0.2f;
 
-    // Instance rectangle for the field
-    private Model rectangle;
-    private ModelInstance[] rectangleInstance;
-
-    // Instance vectors used for rotation
-    private static Vector3 vector1;
-    private static Vector3 vector2;
+    // Instance slopeModel for the field
+    private Model flatField;
+    private ModelInstance[] fieldInstance;
+    private Model slopeModel;
+    private ModelInstance[] slopeInstance;
 
     // Instance for the height
     private static double[][] heightStorage;
+
+    // Instance vector for the camera
+    private static Vector3 vector1;
+    private static Vector3 vector2;
 
     @Override
     public void create() {
@@ -50,6 +52,11 @@ public class PuttingGame implements ApplicationListener{
 
         modelBatch = new ModelBatch();
         modelBuilder = new ModelBuilder();
+
+        flatField = modelBuilder.createBox(50, 1, 50,
+                new Material(ColorAttribute.createDiffuse(Color.BLUE)),
+                VertexAttributes.Usage.Position | VertexAttributes.Usage.Normal
+        );
 
         //environment = new Environment();
         //environment.set(new ColorAttribute(ColorAttribute.AmbientLight, 0.8f,0.8f,0.8f,1f));
@@ -66,13 +73,14 @@ public class PuttingGame implements ApplicationListener{
                     VertexAttributes.Usage.Position | VertexAttributes.Usage.Normal,
                     new Material(ColorAttribute.createDiffuse(Color.GREEN)));
             buildTerrain(meshPartBuilder);
-        rectangle = modelBuilder.end();
+        slopeModel = modelBuilder.end();
 
-        rectangleInstance = new ModelInstance [100];
-
+        fieldInstance = new ModelInstance[100];
+        slopeInstance = new ModelInstance[100];
         for(int i=0;i<10;i++){
             for(int k=0;k<10;k++) {
-                rectangleInstance[i*10+k] = new ModelInstance(rectangle, -i*50, 0, -k*50);
+                fieldInstance[i*10+k] = new ModelInstance(flatField, -i*50, -1, -k*50);
+                slopeInstance[i*10+k] = new ModelInstance(slopeModel, -i*50, 0, -k*50);
             }
         }
 
@@ -91,6 +99,7 @@ public class PuttingGame implements ApplicationListener{
         MeshPartBuilder.VertexInfo v1,v2,v3,v4;
         for(int i=-gridWidth/2;i<gridWidth/2;i++)
             for (int j = -gridDepth / 2; j < gridDepth / 2; j++) {
+
                 pos1 = new Vector3(i, (float) (Math.sin(i) + Math.sin(j)) / 3f, j);
                 pos2 = new Vector3(i, (float) (Math.sin(i) + Math.sin(j + 1)) / 3f, j + 1);
                 pos3 = new Vector3(i + 1, (float) (Math.sin(i + 1) + Math.sin(j + 1)) / 3f, j + 1);
@@ -131,19 +140,21 @@ public class PuttingGame implements ApplicationListener{
         camera.update();
             modelBatch.begin(camera);
             modelBatch.render(ballInstance);
-            //for (int i = 0; i < 1; i++) {
-              //  modelBatch.render(rectangleInstance[i], environment);
+            //for (int i = 0; i < 100; i++) {
+              //  modelBatch.render(fieldInstance[i], environment);
+              //  modelBatch.render(slopeInstance[i], environment);
             //}
-            modelBatch.render(rectangleInstance[0], environment);
+        modelBatch.render(fieldInstance[0], environment);
+        modelBatch.render(slopeInstance[0], environment);
         modelBatch.end();
 
         if(Gdx.input.isKeyPressed(Input.Keys.LEFT)) {
             camera.lookAt(0,0,0);
-            camera.rotateAround(new Vector3(0f, 0f, 0f), new Vector3(0f, 1f, 0f), -1f);
+            camera.rotateAround(vector1 = new Vector3(0f, 0f, 0f), vector2 = new Vector3(0f, 1f, 0f), -1f);
         }
         if(Gdx.input.isKeyPressed(Input.Keys.RIGHT)) {
             camera.lookAt(0,0,0);
-            camera.rotateAround(new Vector3(0f, 0f, 0f), new Vector3(0f, 1f, 0f), 1f);
+            camera.rotateAround(vector1 = new Vector3(0f, 0f, 0f), vector2 = new Vector3(0f, 1f, 0f), 1f);
         }
         if(Gdx.input.isKeyPressed(Input.Keys.UP)) {
             camera.lookAt(0,0,0);
