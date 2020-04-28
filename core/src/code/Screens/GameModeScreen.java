@@ -1,5 +1,9 @@
 package code.Screens;
 
+import code.OldImplementationGDX.BotScreen;
+import code.OldImplementationGDX.BotVSbotScreen;
+import code.OldImplementationGDX.BotVSplayerScreen;
+import code.OldImplementationGDX.MultiplayerScreen;
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
@@ -7,16 +11,12 @@ import com.badlogic.gdx.Screen;
 //import com.badlogic.gdx.backends.lwjgl.LwjglApplication;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.g2d.BitmapFont;
-import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Stage;
-import com.badlogic.gdx.scenes.scene2d.ui.Button;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
-import com.badlogic.gdx.utils.viewport.StretchViewport;
 import com.game.game.Game;
 
 /**
@@ -41,13 +41,13 @@ public class GameModeScreen extends ApplicationAdapter implements Screen {
 
     /**
      * a parametric constructor that takes a Game and makes all visuals for the course
-     * @param myGame the game for which to make the GUI
+     * @param game the game for which to make the GUI
      */
-    public GameModeScreen(final Game myGame) {
+    public GameModeScreen(final Game game) {
 
 
-        this.myGame = myGame;
-        this.stage = new Stage(new StretchViewport(Game.WIDTH, Game.HEIGHT, myGame.camera));
+        this.myGame = game;
+        this.stage = new Stage();
         Gdx.input.setInputProcessor(stage);
 
         bgTexture = new Texture(Gdx.files.internal("IntroBackground.png"));
@@ -95,6 +95,7 @@ public class GameModeScreen extends ApplicationAdapter implements Screen {
 
             private Game game;
             private Screen screen;
+            private String gameName = "SinglePlayer";
 
             public SinglePlayerListener(final Game game, Screen screen) {
 
@@ -105,18 +106,17 @@ public class GameModeScreen extends ApplicationAdapter implements Screen {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
 
-                //this.game.setScreen(new SinglePlayerScreen(this.game));
-                //this.screen.dispose();
-
-               // new LwjglApplication(new PuttingGame());
+                this.game.setScreen(new PuttingGameScreen(myGame, new GameMode(gameName)));
+                this.screen.dispose();
             }
         }
-        singlePlayer.addListener(new SinglePlayerListener(myGame, this));
+        singlePlayer.addListener(new SinglePlayerListener(game, this));
 
         class MultiplayerListener extends ChangeListener {
 
             private Game game;
             private Screen screen;
+            private String gameName = "MultiPlayer";
 
             public MultiplayerListener(final Game game, Screen screen) {
 
@@ -127,16 +127,17 @@ public class GameModeScreen extends ApplicationAdapter implements Screen {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
 
-                this.game.setScreen(new MultiplayerScreen(this.game));
+                this.game.setScreen(new PuttingGameScreen(myGame, new GameMode(gameName)));
                 this.screen.dispose();
             }
         }
-        multiplayer.addListener(new MultiplayerListener(myGame, this));
+        multiplayer.addListener(new MultiplayerListener(game, this));
 
         class BotListener extends ChangeListener {
 
             private Game game;
             private Screen screen;
+            private String gameName = "Bot";
 
             public BotListener(final Game game, Screen screen) {
 
@@ -147,16 +148,17 @@ public class GameModeScreen extends ApplicationAdapter implements Screen {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
 
-                this.game.setScreen(new BotScreen(this.game));
+                this.game.setScreen(new PuttingGameScreen(myGame, new GameMode(gameName)));
                 this.screen.dispose();
             }
         }
-        bot.addListener(new BotListener(myGame, this));
+        bot.addListener(new BotListener(game, this));
 
         class BotVSplayerListener extends ChangeListener {
 
             private Game game;
             private Screen screen;
+            private String gameName = "BotVSplayer";
 
             public BotVSplayerListener(final Game game, Screen screen) {
 
@@ -167,16 +169,17 @@ public class GameModeScreen extends ApplicationAdapter implements Screen {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
 
-                this.game.setScreen(new BotVSplayerScreen(this.game));
+                this.game.setScreen(new PuttingGameScreen(myGame, new GameMode(gameName)));
                 this.screen.dispose();
             }
         }
-        botVSplayer.addListener(new BotVSplayerListener(myGame, this));
+        botVSplayer.addListener(new BotVSplayerListener(game, this));
 
         class BotVSbotListener extends ChangeListener {
 
             private Game game;
             private Screen screen;
+            private String gameName = "BotVSbot";
 
             public BotVSbotListener(final Game game, Screen screen) {
 
@@ -187,11 +190,11 @@ public class GameModeScreen extends ApplicationAdapter implements Screen {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
 
-                this.game.setScreen(new BotVSbotScreen(this.game));
+                this.game.setScreen(new PuttingGameScreen(myGame, new GameMode(gameName)));
                 this.screen.dispose();
             }
         }
-        botVSbot.addListener(new BotVSbotListener(myGame, this));
+        botVSbot.addListener(new BotVSbotListener(game, this));
     }
 
     @Override

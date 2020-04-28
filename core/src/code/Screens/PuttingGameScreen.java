@@ -3,6 +3,7 @@ package code.Screens;
 import com.badlogic.gdx.ApplicationListener;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
+import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.PerspectiveCamera;
@@ -13,8 +14,18 @@ import com.badlogic.gdx.graphics.g3d.environment.DirectionalLight;
 import com.badlogic.gdx.graphics.g3d.utils.MeshPartBuilder;
 import com.badlogic.gdx.graphics.g3d.utils.ModelBuilder;
 import com.badlogic.gdx.math.Vector3;
+import com.badlogic.gdx.scenes.scene2d.Actor;
+import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.scenes.scene2d.ui.Skin;
+import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
+import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
+import com.badlogic.gdx.utils.viewport.StretchViewport;
+import com.game.game.Game;
 
-public class PuttingGame implements ApplicationListener{
+public class PuttingGameScreen implements Screen {
+
+    private Game game;
+    private Stage stage;
 
     // Instance for the scene
     private PerspectiveCamera camera;
@@ -41,12 +52,28 @@ public class PuttingGame implements ApplicationListener{
     private static Vector3 vector1;
     private static Vector3 vector2;
 
-    @Override
-    public void create() {
+    // Instance for the time between two frame
+    private final float delta = 1/60f;
+
+    private GameMode gameMode;
+
+    private TextButton backButton;
+    private Skin skin;
+
+    public PuttingGameScreen(final Game game, GameMode gameMode) {
+
+        this.game = game;
+        this.gameMode = gameMode;
+
+        this.createField();
+        this.render(delta);
+    }
+
+    public void createField() {
 
         camera = new PerspectiveCamera(75, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
-        camera.position.set(3f,3f,3f);
-        camera.lookAt(0f,0f,0f);
+        camera.position.set(3f, 3f, 3f);
+        camera.lookAt(0f, 0f, 0f);
         camera.near = 0.1f;
         camera.far = 400f;
 
@@ -62,25 +89,24 @@ public class PuttingGame implements ApplicationListener{
         //environment.set(new ColorAttribute(ColorAttribute.AmbientLight, 0.8f,0.8f,0.8f,1f));
 
         // Creation of the ball
-        ball = modelBuilder.createSphere(ballSize,ballSize,ballSize,10,10,
+        ball = modelBuilder.createSphere(ballSize, ballSize, ballSize, 10, 10,
                 new Material(ColorAttribute.createDiffuse(Color.WHITE)),
-                VertexAttributes.Usage.Position|VertexAttributes.Usage.Normal);
+                VertexAttributes.Usage.Position | VertexAttributes.Usage.Normal);
         ballInstance = new ModelInstance(ball, 0, 0.1f, 0);
 
-
         modelBuilder.begin();
-            meshPartBuilder = modelBuilder.part("grid", GL20.GL_TRIANGLES,
-                    VertexAttributes.Usage.Position | VertexAttributes.Usage.Normal,
-                    new Material(ColorAttribute.createDiffuse(Color.GREEN)));
-            buildTerrain(meshPartBuilder);
+        meshPartBuilder = modelBuilder.part("grid", GL20.GL_TRIANGLES,
+                VertexAttributes.Usage.Position | VertexAttributes.Usage.Normal,
+                new Material(ColorAttribute.createDiffuse(Color.GREEN)));
+        buildTerrain(meshPartBuilder);
         slopeModel = modelBuilder.end();
 
         fieldInstance = new ModelInstance[100];
         slopeInstance = new ModelInstance[100];
-        for(int i=0;i<10;i++){
-            for(int k=0;k<10;k++) {
-                fieldInstance[i*10+k] = new ModelInstance(flatField, -i*50, -1, -k*50);
-                slopeInstance[i*10+k] = new ModelInstance(slopeModel, -i*50, 0, -k*50);
+        for (int i = 0; i < 10; i++) {
+            for (int k = 0; k < 10; k++) {
+                fieldInstance[i * 10 + k] = new ModelInstance(flatField, -i * 50, -1, -k * 50);
+                slopeInstance[i * 10 + k] = new ModelInstance(slopeModel, -i * 50, 0, -k * 50);
             }
         }
 
@@ -131,21 +157,21 @@ public class PuttingGame implements ApplicationListener{
     }
 
     @Override
-    public void render() {
+    public void render(float delta) {
 
         Gdx.gl.glViewport(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
         Gdx.gl.glClearColor(0, 0, 0, 1);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT);
 
         camera.update();
-            modelBatch.begin(camera);
+        modelBatch.begin(camera);
             modelBatch.render(ballInstance);
             //for (int i = 0; i < 100; i++) {
-              //  modelBatch.render(fieldInstance[i], environment);
-              //  modelBatch.render(slopeInstance[i], environment);
+            //  modelBatch.render(fieldInstance[i], environment);
+            //  modelBatch.render(slopeInstance[i], environment);
             //}
-        modelBatch.render(fieldInstance[0], environment);
-        modelBatch.render(slopeInstance[0], environment);
+            modelBatch.render(fieldInstance[0], environment);
+            modelBatch.render(slopeInstance[0], environment);
         modelBatch.end();
 
         if(Gdx.input.isKeyPressed(Input.Keys.LEFT)) {
@@ -168,6 +194,14 @@ public class PuttingGame implements ApplicationListener{
                 camera.translate(0, 0.1f, 0);
             }
         }
+        if(Gdx.input.isKeyPressed(Input.Keys.B)) {
+            this.game.setScreen(new GameModeScreen(this.game));
+        }
+    }
+
+    @Override
+    public void show() {
+
     }
 
     @Override
@@ -182,6 +216,11 @@ public class PuttingGame implements ApplicationListener{
 
     @Override
     public void resume() {
+
+    }
+
+    @Override
+    public void hide() {
 
     }
 

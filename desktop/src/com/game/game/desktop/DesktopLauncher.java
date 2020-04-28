@@ -1,6 +1,5 @@
 package com.game.game.desktop;
 
-import code.Screens.PuttingGame;
 import com.badlogic.gdx.backends.lwjgl.LwjglApplication;
 import com.badlogic.gdx.backends.lwjgl.LwjglApplicationConfiguration;
 import com.game.game.Game;
@@ -15,6 +14,6 @@ public class DesktopLauncher {
 		config.backgroundFPS = 60;
 		config.foregroundFPS = 60;
 		config.resizable = false;
-		new LwjglApplication(new PuttingGame(), config);
+		new LwjglApplication(new Game(), config);
 	}
 }

@@ -1,6 +1,7 @@
-package code.Screens;
+package code.OldImplementationGDX;
 
 import code.Board.*;
+import code.Screens.GameModeScreen;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.Screen;
@@ -18,7 +19,7 @@ import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.viewport.StretchViewport;
 import com.game.game.Game;
 
-public class SinglePlayerScreen implements Screen {
+public class BotScreen implements Screen {
 
     private final Game myGame;
     private Stage stage;
@@ -40,10 +41,10 @@ public class SinglePlayerScreen implements Screen {
      * parametric constructor
      * @param myGame object
      */
-    public SinglePlayerScreen(final Game myGame) {
+    public BotScreen(final Game myGame) {
 
         this.myGame = myGame;
-        this.stage = new Stage(new StretchViewport(Game.WIDTH, Game.HEIGHT, myGame.camera));
+        this.stage = new Stage();
         Gdx.input.setInputProcessor(stage);
 
         Texture bg_texture = new Texture(Gdx.files.internal("ground.jpg"));
@@ -237,4 +238,5 @@ public class SinglePlayerScreen implements Screen {
 
     }
 }
+
 

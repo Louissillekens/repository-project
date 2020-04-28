@@ -1,6 +1,7 @@
-package code.Screens;
+package code.OldImplementationGDX;
 
 import code.Board.*;
+import code.Screens.GameModeScreen;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.Screen;
@@ -43,7 +44,7 @@ public class BotVSplayerScreen implements Screen {
     public BotVSplayerScreen(final Game myGame) {
 
         this.myGame = myGame;
-        this.stage = new Stage(new StretchViewport(Game.WIDTH, Game.HEIGHT, myGame.camera));
+        this.stage = new Stage();
         Gdx.input.setInputProcessor(stage);
 
         Texture bg_texture = new Texture(Gdx.files.internal("ground.jpg"));
