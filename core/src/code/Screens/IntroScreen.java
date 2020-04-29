@@ -1,22 +1,18 @@
 package code.Screens;
 
-import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.*;
-import com.badlogic.gdx.graphics.g2d.BitmapFont;
-import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.game.game.Game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
-import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
-import com.badlogic.gdx.utils.viewport.StretchViewport;
 
-public class IntroScreen extends ApplicationAdapter implements Screen {
+public class IntroScreen implements Screen {
 
     private final com.game.game.Game myGame;
-    //private Stage stage;
+
+    // Instances for the background and title images + textures
+    // You can find the path to them in the assets folder
     private Image background;
     private Texture bgTexture;
     private Image title;
@@ -30,29 +26,18 @@ public class IntroScreen extends ApplicationAdapter implements Screen {
         this.camera = new OrthographicCamera();
         this.camera.setToOrtho(false, Game.WIDTH, Game.HEIGHT);
         this.myGame = myGame;
-        //this.stage = new Stage();
-        //Gdx.input.setInputProcessor(stage);
 
         bgTexture = new Texture(Gdx.files.internal("IntroBackground.png"));
         bgTexture.setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear);
         background = new Image(bgTexture);
-        //background.setPosition(0, 0);
-        //background.setSize(com.game.game.Game.WIDTH, com.game.game.Game.HEIGHT);
-        //stage.addActor(background);
 
         titleTexture = new Texture(Gdx.files.internal("Title.png"));
         titleTexture.setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear);
         title = new Image(titleTexture);
-        //title.setPosition(100, 330);
-        //title.setSize(600, 150);
-        //stage.addActor(title);
 
         subTitleTexture = new Texture(Gdx.files.internal("SubTitle.png"));
         subTitleTexture.setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear);
         subTitle = new Image(subTitleTexture);
-        //subTitle.setPosition(100, 200);
-        //subTitle.setSize(500, 100);
-        //stage.addActor(subTitle);
     }
 
     @Override
@@ -61,11 +46,7 @@ public class IntroScreen extends ApplicationAdapter implements Screen {
         Gdx.gl.glClearColor(.25f, .25f, .25f, 1f);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
-        // update(delta);
-
         this.camera.update();
-
-        // stage.draw();
 
         this.myGame.batch.begin();
 
@@ -81,15 +62,9 @@ public class IntroScreen extends ApplicationAdapter implements Screen {
         }
     }
 
-    public void update(float delta) {
-
-        // stage.act(delta);
-    }
-
     @Override
     public void resize(int width, int height) {
 
-        // stage.getViewport().update(width, height, false);
     }
 
     @Override

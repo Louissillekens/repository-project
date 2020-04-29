@@ -1,14 +1,8 @@
 package code.Screens;
 
-import code.OldImplementationGDX.BotScreen;
-import code.OldImplementationGDX.BotVSbotScreen;
-import code.OldImplementationGDX.BotVSplayerScreen;
-import code.OldImplementationGDX.MultiplayerScreen;
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.Input;
 import com.badlogic.gdx.Screen;
-//import com.badlogic.gdx.backends.lwjgl.LwjglApplication;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.scenes.scene2d.Actor;
@@ -22,17 +16,21 @@ import com.game.game.Game;
 /**
  * class GameModeScreen this class implements the screen on which to play our game
  */
-public class GameModeScreen extends ApplicationAdapter implements Screen {
+public class GameModeScreen implements Screen {
 
     private final com.game.game.Game myGame;
     private Stage stage;
+
+    // Instances for the background and title images + textures
     private Image background;
     private Texture bgTexture;
     private Image gameModeImage;
     private Texture gameModeTexture;
 
+    // Package with the design used for the buttons
     private Skin skin;
 
+    // Instances for the different game modes buttons
     private TextButton singlePlayer;
     private TextButton multiplayer;
     private TextButton bot;
@@ -44,7 +42,6 @@ public class GameModeScreen extends ApplicationAdapter implements Screen {
      * @param game the game for which to make the GUI
      */
     public GameModeScreen(final Game game) {
-
 
         this.myGame = game;
         this.stage = new Stage();
@@ -91,13 +88,15 @@ public class GameModeScreen extends ApplicationAdapter implements Screen {
         botVSbot.setSize(200, 60);
         stage.addActor(botVSbot);
 
-        class SinglePlayerListener extends ChangeListener {
+        // Every inner class are called when a button is pressed
+        // It changes the actual screen to the game screen with selected game mode
+        class Single_Player_Listener extends ChangeListener {
 
             private Game game;
             private Screen screen;
-            private String gameName = "SinglePlayer";
+            private String gameName = "Single_Player";
 
-            public SinglePlayerListener(final Game game, Screen screen) {
+            private Single_Player_Listener(final Game game, Screen screen) {
 
                 this.game = game;
                 this.screen = screen;
@@ -110,15 +109,15 @@ public class GameModeScreen extends ApplicationAdapter implements Screen {
                 this.screen.dispose();
             }
         }
-        singlePlayer.addListener(new SinglePlayerListener(game, this));
+        singlePlayer.addListener(new Single_Player_Listener(game, this));
 
-        class MultiplayerListener extends ChangeListener {
+        class Multi_Player_Listener extends ChangeListener {
 
             private Game game;
             private Screen screen;
-            private String gameName = "MultiPlayer";
+            private String gameName = "Multi_Player";
 
-            public MultiplayerListener(final Game game, Screen screen) {
+            private Multi_Player_Listener(final Game game, Screen screen) {
 
                 this.game = game;
                 this.screen = screen;
@@ -131,15 +130,15 @@ public class GameModeScreen extends ApplicationAdapter implements Screen {
                 this.screen.dispose();
             }
         }
-        multiplayer.addListener(new MultiplayerListener(game, this));
+        multiplayer.addListener(new Multi_Player_Listener(game, this));
 
-        class BotListener extends ChangeListener {
+        class Bot_Listener extends ChangeListener {
 
             private Game game;
             private Screen screen;
             private String gameName = "Bot";
 
-            public BotListener(final Game game, Screen screen) {
+            private Bot_Listener(final Game game, Screen screen) {
 
                 this.game = game;
                 this.screen = screen;
@@ -152,15 +151,15 @@ public class GameModeScreen extends ApplicationAdapter implements Screen {
                 this.screen.dispose();
             }
         }
-        bot.addListener(new BotListener(game, this));
+        bot.addListener(new Bot_Listener(game, this));
 
-        class BotVSplayerListener extends ChangeListener {
+        class Bot_VS_player_Listener extends ChangeListener {
 
             private Game game;
             private Screen screen;
-            private String gameName = "BotVSplayer";
+            private String gameName = "Bot_VS_Player";
 
-            public BotVSplayerListener(final Game game, Screen screen) {
+            private Bot_VS_player_Listener(final Game game, Screen screen) {
 
                 this.game = game;
                 this.screen = screen;
@@ -173,15 +172,15 @@ public class GameModeScreen extends ApplicationAdapter implements Screen {
                 this.screen.dispose();
             }
         }
-        botVSplayer.addListener(new BotVSplayerListener(game, this));
+        botVSplayer.addListener(new Bot_VS_player_Listener(game, this));
 
-        class BotVSbotListener extends ChangeListener {
+        class Bot_VS_Bot_Listener extends ChangeListener {
 
             private Game game;
             private Screen screen;
-            private String gameName = "BotVSbot";
+            private String gameName = "Bot_VS_Bot";
 
-            public BotVSbotListener(final Game game, Screen screen) {
+            private Bot_VS_Bot_Listener(final Game game, Screen screen) {
 
                 this.game = game;
                 this.screen = screen;
@@ -194,38 +193,21 @@ public class GameModeScreen extends ApplicationAdapter implements Screen {
                 this.screen.dispose();
             }
         }
-        botVSbot.addListener(new BotVSbotListener(game, this));
+        botVSbot.addListener(new Bot_VS_Bot_Listener(game, this));
     }
 
     @Override
-    /**
-     * a method that renders the GUI based on a float
-     */
     public void render(float delta) {
 
         Gdx.gl.glClearColor(.25f, .25f, .25f, 1f);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
-        update(delta);
-
-        super.render();
         stage.draw();
-
-        if (Gdx.input.isKeyJustPressed(Input.Keys.ENTER)) {
-            //myGame.setScreen(new GameScreen(this.myGame));
-            dispose();
-        }
-    }
-
-    public void update(float delta) {
-
-        stage.act(delta);
     }
 
     @Override
     public void resize(int width, int height) {
 
-        stage.getViewport().update(width, height, false);
     }
 
     @Override
