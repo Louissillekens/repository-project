@@ -104,7 +104,7 @@ public class PuttingGameScreen implements Screen {
         ball = modelBuilder.createSphere(ballSize, ballSize, ballSize, 10, 10,
                 new Material(ColorAttribute.createDiffuse(Color.WHITE)),
                 VertexAttributes.Usage.Position | VertexAttributes.Usage.Normal);
-        ballInstance = new ModelInstance(ball, 0, (float) (getHeight(0,0)), 0);
+        ballInstance = new ModelInstance(ball, 0, (float) (getHeight(0,0))+(ballSize/2), 0);
 
         // Adding an environment which is used for the luminosity of the frame
         environment = new Environment();
