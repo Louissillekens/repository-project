@@ -78,16 +78,10 @@ public class PuttingGameScreen implements Screen {
         modelBuilder = new ModelBuilder();
 
         // Creation of a blue flat field that corresponds to the water (need to verify the height of this field)
-        flatField = modelBuilder.createBox(50, 1, 50,
+        flatField = modelBuilder.createBox(50, 1f, 50,
                 new Material(ColorAttribute.createDiffuse(Color.BLUE)),
                 VertexAttributes.Usage.Position | VertexAttributes.Usage.Normal
         );
-
-        // Creation of the ball
-        ball = modelBuilder.createSphere(ballSize, ballSize, ballSize, 10, 10,
-                new Material(ColorAttribute.createDiffuse(Color.WHITE)),
-                VertexAttributes.Usage.Position | VertexAttributes.Usage.Normal);
-        ballInstance = new ModelInstance(ball, 0, 0.1f, 0);
 
         // Adding all the mesh (green triangle) to the method that build the field
         modelBuilder.begin();
@@ -101,15 +95,27 @@ public class PuttingGameScreen implements Screen {
         slopeInstance = new ModelInstance[100];
         for (int i = 0; i < 10; i++) {
             for (int k = 0; k < 10; k++) {
-                fieldInstance[i * 10 + k] = new ModelInstance(flatField, -i * 50, -1, -k * 50);
+                fieldInstance[i * 10 + k] = new ModelInstance(flatField, -i * 50, -1f, -k * 50);
                 slopeInstance[i * 10 + k] = new ModelInstance(slopeModel, -i * 50, 0, -k * 50);
             }
         }
+
+        // Creation of the ball
+        ball = modelBuilder.createSphere(ballSize, ballSize, ballSize, 10, 10,
+                new Material(ColorAttribute.createDiffuse(Color.WHITE)),
+                VertexAttributes.Usage.Position | VertexAttributes.Usage.Normal);
+        ballInstance = new ModelInstance(ball, 0, (float) (getHeight(0,0)), 0);
 
         // Adding an environment which is used for the luminosity of the frame
         environment = new Environment();
         environment.set(new ColorAttribute(ColorAttribute.AmbientLight, 0.2f, 0.2f, 0.2f, 1.f));
         environment.add(new DirectionalLight().set(0.8f, 0.8f, 0.8f, -1f, -1.0f, 1f));
+    }
+
+    // Method that defines the function we use to create the slope of the field
+    public static float defineFunction(double i, double j) {
+
+        return (float) ( Math.sin(i) + Math.sin(j) );
     }
 
     // Method that build the 3D field from a mesh
@@ -122,23 +128,37 @@ public class PuttingGameScreen implements Screen {
         Vector3 pos1,pos2,pos3,pos4;
         Vector3 nor1,nor2,nor3,nor4;
         MeshPartBuilder.VertexInfo v1,v2,v3,v4;
-        for(int i=-gridWidth/2;i<gridWidth/2;i++)
+        for(int i = -gridWidth/2; i < gridWidth/2; i++) {
             for (int j = -gridDepth / 2; j < gridDepth / 2; j++) {
 
+                /*
                 pos1 = new Vector3(i, (float) (Math.sin(i) + Math.sin(j)) / 3f, j);
                 pos2 = new Vector3(i, (float) (Math.sin(i) + Math.sin(j + 1)) / 3f, j + 1);
                 pos3 = new Vector3(i + 1, (float) (Math.sin(i + 1) + Math.sin(j + 1)) / 3f, j + 1);
                 pos4 = new Vector3(i + 1, (float) (Math.sin(i + 1) + Math.sin(j)) / 3f, j);
+                */
 
-                heightStorage[((int) pos1.x)+25][((int) pos1.z)+25] = pos1.y;
-                heightStorage[((int) pos2.x)+25][((int) pos2.z)+25] = pos2.y;
-                heightStorage[((int) pos3.x)+25][((int) pos3.z)+25] = pos3.y;
-                heightStorage[((int) pos4.x)+25][((int) pos4.z)+25] = pos4.y;
+                pos1 = new Vector3(i, defineFunction(i, j) / 3, j);
+                pos2 = new Vector3(i, defineFunction(i, j + 1) / 3, j+1);
+                pos3 = new Vector3(i+1, defineFunction(i + 1, j + 1) / 3, j+1);
+                pos4 = new Vector3(i+1, defineFunction(i + 1, j) / 3, j);
 
+                heightStorage[((int) pos1.x) + 25][((int) pos1.z) + 25] = pos1.y;
+                heightStorage[((int) pos2.x) + 25][((int) pos2.z) + 25] = pos2.y;
+                heightStorage[((int) pos3.x) + 25][((int) pos3.z) + 25] = pos3.y;
+                heightStorage[((int) pos4.x) + 25][((int) pos4.z) + 25] = pos4.y;
+
+                /*
                 nor1 = new Vector3((float) -Math.cos(i) / 3f, 1, (float) -Math.cos(j) / 3f);
                 nor2 = new Vector3((float) -Math.cos(i) / 3f, 1, (float) -Math.cos(j + 1) / 3f);
                 nor3 = new Vector3((float) -Math.cos(i + 1) / 3f, 1, (float) -Math.cos(j + 1) / 3f);
                 nor4 = new Vector3((float) -Math.cos(i + 1) / 3f, 1, (float) -Math.cos(j) / 3f);
+                */
+
+                nor1 = new Vector3(-defineFunction(i, 0) / 3, 1, -defineFunction(0, j) / 3);
+                nor2 = new Vector3(-defineFunction(i, 0) / 3, 1, -defineFunction(0, j + 1) / 3);
+                nor3 = new Vector3(-defineFunction(i + 1, 0) / 3, 1, -defineFunction(0, j + 1) / 3);
+                nor4 = new Vector3(-defineFunction(i + 1, 0) / 3, 1, -defineFunction(0, j) / 3);
 
                 v1 = new MeshPartBuilder.VertexInfo().setPos(pos1).setNor(nor1).setCol(null).setUV(0.5f, 0.0f);
                 v2 = new MeshPartBuilder.VertexInfo().setPos(pos2).setNor(nor2).setCol(null).setUV(0.0f, 0.0f);
@@ -146,7 +166,9 @@ public class PuttingGameScreen implements Screen {
                 v4 = new MeshPartBuilder.VertexInfo().setPos(pos4).setNor(nor4).setCol(null).setUV(0.5f, 0.5f);
 
                 b.rect(v1, v2, v3, v4);
+
             }
+        }
     }
 
     // Method to get the value of the height y at a certain point (x, z)
