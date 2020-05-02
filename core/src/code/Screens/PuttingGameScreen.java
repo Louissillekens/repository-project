@@ -108,8 +108,8 @@ public class PuttingGameScreen implements Screen {
 
         // Adding an environment which is used for the luminosity of the frame
         environment = new Environment();
-        environment.set(new ColorAttribute(ColorAttribute.AmbientLight, 0.2f, 0.2f, 0.2f, 1.f));
-        environment.add(new DirectionalLight().set(0.8f, 0.8f, 0.8f, -1f, -1.0f, 1f));
+        environment.set(new ColorAttribute(ColorAttribute.AmbientLight, 0.3f, 0.3f, 0.3f, 1.f));
+        environment.add(new DirectionalLight().set(0.6f, 0.6f, 0.6f, -1f, -1.0f, 1f));
     }
 
     // Method that defines the function we use to create the slope of the field
@@ -216,7 +216,7 @@ public class PuttingGameScreen implements Screen {
         }
         if(Gdx.input.isKeyPressed(Input.Keys.UP)) {
             camera.lookAt(0,0,0);
-            if ((camera.position.y > 1)) {
+            if ((camera.position.y > 2)) {
                 camera.translate(0, -0.1f, 0);
             }
         }
