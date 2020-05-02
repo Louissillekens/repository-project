@@ -10,10 +10,13 @@ public class Rungekuttasolver{
    double dy = 0.01;
    double dt = 0.01;
    double mu;
-   double vx=0;
+   double vx=20;
    double vy=0;   
-   double x;
-   double y;
+   double x = 0;
+   double y = 0;
+   public static void main(String args[]){
+   }
+
    public void setStartAcceleration(){
        ax = 50;
        ay = 50;
@@ -62,7 +65,7 @@ public class Rungekuttasolver{
        double changeInAY= getFHeightY(x,y)+getFFrictionY(x,y):
        return changeinAY;
    }
-   public void RK4X(double x, double y){
+   public void RK4(double vx, double vy){
     double k1x = vx;
     double k1y = vy;
     double k1vx = getFHeightX(x,y) + getFFrictionX(x,y);
