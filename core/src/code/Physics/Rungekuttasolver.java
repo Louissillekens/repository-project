@@ -1,79 +1,89 @@
-/*package code.Physics;
+package code.Physics;
 
 import code.Board.Friction_function;
 import code.Board.Height_function;
 import code.Board.Vector2d;
 
 public class Rungekuttasolver{
-    double g = 9.81;
-    double x;
-    double y;
+   double g= 9.81;
+   double dx = 0.01;
+   double dy = 0.01;
+   double dt = 0.01;
+   double mu;
+   double vx=0;
+   double vy=0;   
+   double x;
+   double y;
+   public void setStartAcceleration(){
+       ax = 50;
+       ay = 50;
+   }
+   public boolean hasBallStopped(){
+       boolean stopped =false;
+       if(vx==0 && vy==0 && ax==0 && ay == 0){
+           stopped = true;
+       }
+       return stopped;
+   }
+   public double getHeight(double x, double y){
+       //TO DO: make height change based on coordinates
+       double height =1;
+       return height;
+   }
+   public double getResistance(double x, double y){
+       //TO DO: make reistance change based on coordinates
+       double resistance = 1;
+       return resistance;
+   }
+   //alternatively I could make an updateheight function that calculates x and y and stores them instead of 2 different methods  that return x and y, same for the resistance getters!
+   public double getFHeightX(double x, double y){
+       double height_acceleration = (g*((getHeight(x+dx,y)-getHeight(x,y))/dx))*-1;
+       return height_acceleration;
+   }
+   public double getFHeightY(double x, double y){
+       double height_acceleration = (g*((getHeight(x,y+dy)-getHeight(x,y))/dx))*-1;
+       return height_acceleration;
+   }
+   public double getFFrictionX(double x, double y){
+       mu = (getResistance(x,y));
+       double resistance_acceleration = (mu*g*(vx/sqrt(vx*vx+vy*vy)))*-1
+       return resistance_acceleration;
+   }
+   public double getFFrictionY(double x, double y){
+       mu = (getResistance(x,y));
+       double resistance_acceleration = (mu*g*(vy/sqrt(vx*vx+vy*vy)))*-1
+       return resistance_acceleration;
+   }
+   public double combineHeightFrictionX(double x, double y){
+       double changeInAX= getFHeightX(x,y)+getFFrictionX(x,y);
+       return changeInAX;
+   }
+   public double combineHeightFrictionY(double x, double y){
+       double changeInAY= getFHeightY(x,y)+getFFrictionY(x,y):
+       return changeinAY;
+   }
+   public void RK4X(double x, double y){
+    double k1x = vx;
+    double k1y = vy;
+    double k1vx = getFHeightX(x,y) + getFFrictionX(x,y);
+    double k1vy = getFHeightY(x,y) + getFFrictionY(x,y);
+    double k2x = vx +(dt*k1vx)/2;
+    double k2y = vy +(dt*k1vy)/2;
+    double k2vx = getFHeightX(x+(k1x*dt)/2,y+(k1y*dt)/2) + getFFrictionX(x+(k1x*dt)/2,y+(k1y*dt)/2);
+    double k2vy = getFHeightY(x+(k1x*dt)/2,y+(k1y*dt)/2) + getFFrictionY(x+(k1x*dt)/2,y+(k1y*dt)/2);
+    double k3x = vx +(dt*k2vx)/2;
+    double k3y = vy +(dt*k2vy)/2;
+    double k3vx = getFHeightX(x+(k2x*dt)/2,y+(k2y*dt)/2) + getFFrictionX(x+(k2x*dt)/2,y+(k2y*dt)/2);
+    double k3vy = getFHeightY(x+(k2x*dt)/2,y+(k2y*dt)/2) + getFFrictionY(x+(k2x*dt)/2,y+(k2y*dt)/2);
+    double k4x = vx +dt*k3vx;
+    double k4y = vy +dt*k3vy;
+    double k4vx = getFHeightX(x+(k3x*dt),y+(k3y*dt)) + getFFrictionX(x+(k3x*dt),y+(k3y*dt));
+    double k4vy = getFHeightY(x+(k3x*dt),y+(k3y*dt)) + getFFrictionY(x+(k3x*dt),y+(k3y*dt));
+    vx = vx + 1/6*dt(k1vx+2*k2vx+2*k3vx+k4vx);
+    vy = vy + 1/6*dt(k1vy+2*k2vy+2*k3vy+k4vy);
+    x = x + 1/6*dt(k1x+2*k2x+2*k3x+k4x);
+    y = y + 1/6*dt(k1y+2*k2y+2*k3y+k4y);
+   }
 
-    public Rungekuttasolver(){
-        //TODO make this constructor
-    }
 
-    //needs to be linked to the game to know the x and y values
-    void updatecoordinates(){
-        x= getx();
-        y= gety();
-    }
-
-    public double getx(){
-        return x;
-    }
-
-    public double gety(){
-        return y;
-    }
-
-    public double getmu(double x, double y){
-        return mu;//TODO (why does this need x and y) : because it needs the resistance at the position the balls it at.
-    }
-
-    //these calculate the x and y acceleration values
-    double xii(double x, double y, double xi, double yi){
-        return hx(x,y) - (getmu(x,y) * g* xi)/(sqrt((xi*xi)+(yi*yi)));
-    }
-    double yii(double x, double y, double xi, double yi){ 
-        return hy(x,y) - (getmu(x,y) * g* yi)/(sqrt((xi*xi)+(yi*yi)));
-     }
-
-    //in these next 2 methods h(x,y) is a method that returns the height of the ball with an x and y input and these methods return the velocities in both x and y directions
-    double dzdx(double x, double y, double dx){
-        return ((h(x+dx,y)-h(x+y))/dx);
-    }
-    double dzdy(double x, double y, double dy){
-        return ((h(x,y+dy)-h(x+y))/dy);
-    }
-    double[] Rungakutta(double x0, double y0, double x, double n){
-        double h = ((x-x0)/n);
-        Rungakuttasolver x = new Rungakuttasolver();
-        double k1x;
-        double k1y;
-        double k2x;
-        double k2y;
-        double k3x;
-        double k3y;
-        double k4x;
-        double k4y;
-        double yr = y0;
-        double xr = x0;
-        for(int i =0;i<n;i++){
-            k1x = h*(x.dzdx(x0,yr,h));
-            k1y = h*(x.dzdy(xr,y0,h));
-            k2x = h*(x.dzdx(x0+0.5*h,yr+0.5*k1x,h));
-            k2y = h*(x.dzdy(xr+0.5*k1y,y+0.5*h,h));
-            k3x = h*(x.dzdx(x0+0.5*h,yr+0.5*k2x,h));
-            k3y = h*(x.dzdy(xr+0.5*k2y,y+0.5*h,h));
-            k4x = h*(x.dzdx(x0+h,yr+k3x,h));
-            k4y = h*(x.dzdy(xr+k3y,y0+h,h));
-            yr=yr + (1/6)*(k1x+2*k2x+2*k3x+k4x);
-            xr=xr + (1/6)*(k1y+2*k2y+2*k3y+k4y);
-            x0=x0+h;
-            y0=y0+h;
-        }
-        double[] estimate = {xr,yr};
-        return estimate;
-    }
-}*/
+}
