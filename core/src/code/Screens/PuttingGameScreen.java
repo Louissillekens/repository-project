@@ -53,7 +53,7 @@ public class PuttingGameScreen implements Screen {
     private GameMode gameMode;
 
 
-    // Constructor that creates the 3D field +  corresponding game mode
+    // Constructor that creates the 3D field + corresponding game mode
     public PuttingGameScreen(final Game game, GameMode gameMode) {
 
         this.game = game;
@@ -115,7 +115,12 @@ public class PuttingGameScreen implements Screen {
     // Method that defines the function we use to create the slope of the field
     public static float defineFunction(double i, double j) {
 
-        return (float) ( Math.sin(i) + Math.sin(j) );
+        float field1 = (float) ( Math.sin(i) + Math.sin(j) )/3;
+        float field2 = (float) (Math.sin(i))/3;
+        float field3 = (float) (Math.atan(i) + Math.atan(j))/2;
+        float field4 = (float) (0);
+
+        return field3;
     }
 
     // Method that build the 3D field from a mesh
@@ -138,10 +143,10 @@ public class PuttingGameScreen implements Screen {
                 pos4 = new Vector3(i + 1, (float) (Math.sin(i + 1) + Math.sin(j)) / 3f, j);
                 */
 
-                pos1 = new Vector3(i, defineFunction(i, j) / 3, j);
-                pos2 = new Vector3(i, defineFunction(i, j + 1) / 3, j+1);
-                pos3 = new Vector3(i+1, defineFunction(i + 1, j + 1) / 3, j+1);
-                pos4 = new Vector3(i+1, defineFunction(i + 1, j) / 3, j);
+                pos1 = new Vector3(i, defineFunction(i, j), j);
+                pos2 = new Vector3(i, defineFunction(i, j + 1), j+1);
+                pos3 = new Vector3(i+1, defineFunction(i + 1, j + 1), j+1);
+                pos4 = new Vector3(i+1, defineFunction(i + 1, j), j);
 
                 heightStorage[((int) pos1.x) + 25][((int) pos1.z) + 25] = pos1.y;
                 heightStorage[((int) pos2.x) + 25][((int) pos2.z) + 25] = pos2.y;
@@ -155,10 +160,10 @@ public class PuttingGameScreen implements Screen {
                 nor4 = new Vector3((float) -Math.cos(i + 1) / 3f, 1, (float) -Math.cos(j) / 3f);
                 */
 
-                nor1 = new Vector3(-defineFunction(i, 0) / 3, 1, -defineFunction(0, j) / 3);
-                nor2 = new Vector3(-defineFunction(i, 0) / 3, 1, -defineFunction(0, j + 1) / 3);
-                nor3 = new Vector3(-defineFunction(i + 1, 0) / 3, 1, -defineFunction(0, j + 1) / 3);
-                nor4 = new Vector3(-defineFunction(i + 1, 0) / 3, 1, -defineFunction(0, j) / 3);
+                nor1 = new Vector3(-defineFunction(i, 0), 1, -defineFunction(0, j));
+                nor2 = new Vector3(-defineFunction(i, 0), 1, -defineFunction(0, j + 1));
+                nor3 = new Vector3(-defineFunction(i + 1, 0), 1, -defineFunction(0, j + 1));
+                nor4 = new Vector3(-defineFunction(i + 1, 0), 1, -defineFunction(0, j));
 
                 v1 = new MeshPartBuilder.VertexInfo().setPos(pos1).setNor(nor1).setCol(null).setUV(0.5f, 0.0f);
                 v2 = new MeshPartBuilder.VertexInfo().setPos(pos2).setNor(nor2).setCol(null).setUV(0.0f, 0.0f);
@@ -220,9 +225,13 @@ public class PuttingGameScreen implements Screen {
                 camera.translate(0, 0.1f, 0);
             }
         }
-        // Key pressed input be back on the game mode screen
+        // Key pressed input to be back on the game mode screen
         if(Gdx.input.isKeyPressed(Input.Keys.B)) {
             this.game.setScreen(new GameModeScreen(this.game));
+        }
+        // Key pressed input to quit
+        if(Gdx.input.isKeyPressed(Input.Keys.Q)) {
+            Gdx.app.exit();
         }
     }
 
