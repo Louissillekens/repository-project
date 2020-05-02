@@ -17,19 +17,11 @@ public class Rungekuttasolver{
 
    public static void main(String args[]){
        Rungekuttasolver solver = new Rungekuttasolver();
-       solver.RK4(5,5);//just testing if it might work with actual numbers as input
-       solver.RK4(solver.getVX(), solver.getVY());
-       solver.RK4(solver.getVX(), solver.getVY());
-       solver.RK4(solver.getVX(), solver.getVY());
-       solver.RK4(solver.getVX(), solver.getVY());
-       solver.RK4(solver.getVX(), solver.getVY());
-       solver.RK4(solver.getVX(), solver.getVY());
-       solver.RK4(solver.getVX(), solver.getVY());
-       solver.RK4(solver.getVX(), solver.getVY());
-       solver.RK4(solver.getVX(), solver.getVY());
+       solver.RK4(50,0);//just testing if it might work with actual numbers as input
 
-       System.out.println(solver.getX());
-       System.out.println(solver.getY());
+       System.out.println("the x and y coordinates are:");
+       System.out.println("x: "+solver.getX());
+       System.out.println("y: "+solver.getY());
    }
 
 
@@ -98,6 +90,30 @@ public class Rungekuttasolver{
     vy = vy + 1/6*dt*(k1vy+2*k2vy+2*k3vy+k4vy);
     x = x + 1/6*dt*(k1x+2*k2x+2*k3x+k4x);
     y = y + 1/6*dt*(k1y+2*k2y+2*k3y+k4y);
+
+
+    //test to find where the error is
+
+       System.out.println(k1x);
+       System.out.println(k1y);
+       System.out.println(k1vx);
+       System.out.println(k1vy);
+       System.out.println(k2x);
+       System.out.println(k2y);
+       System.out.println(k2vx);
+       System.out.println(k2vy);
+       System.out.println(k3x);
+       System.out.println(k3y);
+       System.out.println(k3vx);
+       System.out.println(k3vy);
+       System.out.println(k4x);
+       System.out.println(k4y);
+       System.out.println(k4vx);
+       System.out.println(k4vy);
+       System.out.println(vx);
+       System.out.println(vy);
+       System.out.println(x);
+       System.out.println(y);
    }
 
    public double getVX(){
