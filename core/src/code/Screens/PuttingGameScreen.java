@@ -119,8 +119,9 @@ public class PuttingGameScreen implements Screen {
         float field2 = (float) (Math.sin(i))/3;
         float field3 = (float) (Math.atan(i) + Math.atan(j))/2;
         float field4 = (float) (0);
+        float ripple = (float) ((0.55)+Math.sin((0.4)*(Math.pow(i,2)+Math.pow(j,2))/10));
 
-        return field3;
+        return ripple;
     }
 
     // Method that build the 3D field from a mesh
