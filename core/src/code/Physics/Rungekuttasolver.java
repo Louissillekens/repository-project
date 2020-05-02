@@ -14,19 +14,28 @@ public class Rungekuttasolver{
    double vy=0;   
    double x = 0;
    double y = 0;
+
    public static void main(String args[]){
-       RK4(vx,vy);
-       System.out.println(x);
-       System.out.println(y);
+       Rungekuttasolver solver = new Rungekuttasolver();
+       solver.RK4(5,5);//just testing if it might work with actual numbers as input
+       solver.RK4(solver.getVX(), solver.getVY());
+       solver.RK4(solver.getVX(), solver.getVY());
+       solver.RK4(solver.getVX(), solver.getVY());
+       solver.RK4(solver.getVX(), solver.getVY());
+       solver.RK4(solver.getVX(), solver.getVY());
+       solver.RK4(solver.getVX(), solver.getVY());
+       solver.RK4(solver.getVX(), solver.getVY());
+       solver.RK4(solver.getVX(), solver.getVY());
+       solver.RK4(solver.getVX(), solver.getVY());
+
+       System.out.println(solver.getX());
+       System.out.println(solver.getY());
    }
 
-   public void setStartAcceleration(){
-       ax = 50;
-       ay = 50;
-   }
+
    public boolean hasBallStopped(){
        boolean stopped =false;
-       if(vx==0 && vy==0 && ax==0 && ay == 0){
+       if(vx==0 && vy==0 /*&& ax==0 && ay == 0*/){
            stopped = true;
        }
        return stopped;
@@ -52,12 +61,12 @@ public class Rungekuttasolver{
    }
    public double getFFrictionX(double x, double y){
        mu = (getResistance(x,y));
-       double resistance_acceleration = (mu*g*(vx/sqrt(vx*vx+vy*vy)))*-1
+       double resistance_acceleration = (mu*g*(vx/Math.sqrt(vx*vx+vy*vy)))*-1;
        return resistance_acceleration;
    }
    public double getFFrictionY(double x, double y){
        mu = (getResistance(x,y));
-       double resistance_acceleration = (mu*g*(vy/sqrt(vx*vx+vy*vy)))*-1
+       double resistance_acceleration = (mu*g*(vy/Math.sqrt(vx*vx+vy*vy)))*-1;
        return resistance_acceleration;
    }
    public double combineHeightFrictionX(double x, double y){
@@ -65,8 +74,8 @@ public class Rungekuttasolver{
        return changeInAX;
    }
    public double combineHeightFrictionY(double x, double y){
-       double changeInAY= getFHeightY(x,y)+getFFrictionY(x,y):
-       return changeinAY;
+       double changeInAY= getFHeightY(x,y)+getFFrictionY(x,y);
+       return changeInAY;
    }
    public void RK4(double vx, double vy){
     double k1x = vx;
@@ -85,11 +94,26 @@ public class Rungekuttasolver{
     double k4y = vy +dt*k3vy;
     double k4vx = getFHeightX(x+(k3x*dt),y+(k3y*dt)) + getFFrictionX(x+(k3x*dt),y+(k3y*dt));
     double k4vy = getFHeightY(x+(k3x*dt),y+(k3y*dt)) + getFFrictionY(x+(k3x*dt),y+(k3y*dt));
-    vx = vx + 1/6*dt(k1vx+2*k2vx+2*k3vx+k4vx);
-    vy = vy + 1/6*dt(k1vy+2*k2vy+2*k3vy+k4vy);
-    x = x + 1/6*dt(k1x+2*k2x+2*k3x+k4x);
-    y = y + 1/6*dt(k1y+2*k2y+2*k3y+k4y);
+    vx = vx + 1/6*dt*(k1vx+2*k2vx+2*k3vx+k4vx);
+    vy = vy + 1/6*dt*(k1vy+2*k2vy+2*k3vy+k4vy);
+    x = x + 1/6*dt*(k1x+2*k2x+2*k3x+k4x);
+    y = y + 1/6*dt*(k1y+2*k2y+2*k3y+k4y);
    }
 
+   public double getVX(){
+       return vx;
+   }
+
+   public double getVY(){
+       return vy;
+   }
+
+   public double getX(){
+       return x;
+   }
+
+   public double getY(){
+       return y;
+   }
 
 }
