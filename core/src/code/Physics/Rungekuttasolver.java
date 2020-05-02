@@ -15,6 +15,9 @@ public class Rungekuttasolver{
    double x = 0;
    double y = 0;
    public static void main(String args[]){
+       RK4(vx,vy);
+       System.out.println(x);
+       System.out.println(y);
    }
 
    public void setStartAcceleration(){
