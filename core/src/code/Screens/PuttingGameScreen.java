@@ -61,9 +61,10 @@ public class PuttingGameScreen implements Screen {
     private int numberOfFields;
 
     //these variables are to decide the shot_speed
-    private double shot_Power = 1;//m/s
     private final double POWER_INCREMENT = 0.01;//m/s
     private final double MAX_SPEED = 3;//for now the max speed is 3 (should be possible to change per course)
+    private final double STARTING_SHOT_POWER = 0;
+    private double shot_Power = STARTING_SHOT_POWER;//m/s
 
 
     // Constructor that creates the 3D field + corresponding game mode
@@ -283,11 +284,19 @@ public class PuttingGameScreen implements Screen {
         return shot_Power;
     }
 
+    public void setShot_Power(double power){
+        shot_Power = power;
+    }
+
     public double getPOWER_INCREMENT(){
         return POWER_INCREMENT;
     }
 
     public double getMAX_SPEED(){
         return MAX_SPEED;
+    }
+
+    public double getSTARTING_SHOT_POWER(){
+        return STARTING_SHOT_POWER;
     }
 }

@@ -61,13 +61,16 @@ public class InputHandler {
             System.out.println("shot power now at: " + gamescreen.getShot_Power());
         }
         //key input to take shot
-        if(Gdx.input.isKeyPressed(Input.Keys.SPACE)){
+        if(Gdx.input.isKeyJustPressed(Input.Keys.SPACE)){
             double x_direction = gamescreen.getCamera().direction.x;
             double y_direction = gamescreen.getCamera().direction.y;
             double power = gamescreen.getShot_Power();
             //TODO make code to take shot based on ball class
             /*gamescreen.ball.hit(stuff here that uses power and angle of camera)*/
+
             System.out.println("shot taken with power: " + power + " and x_direction: " + x_direction + " and y_direction: " + y_direction);
+            //reset the power
+            gamescreen.setShot_Power(gamescreen.getSTARTING_SHOT_POWER());
         }
 
 
