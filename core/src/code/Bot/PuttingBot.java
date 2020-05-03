@@ -19,7 +19,7 @@ public class PuttingBot {
     static int angleRange = 360; //OPTIMISATION by reducing the range of angles (no opposite kick)
     static int velocityRange = 20;
     static final double [] flagPos = {15,30};
-    static final double tolerance = 0.9;
+    static final double tolerance = 0.2;
 
     static double [][] population = new double[populationAmount][3]; //3 being Angle, Velocity and fitness
 
@@ -155,6 +155,11 @@ public class PuttingBot {
             population[populationAmount-1-i] = crossover(population[selected[i]], population[selected[i+1]]);
         }
 
+        selected = SUS();
+        for (int i = 0; i < selected.length; i++){
+            population[populationAmount-1-susNumber-i] = mutation(population[selected[i]]);
+        }
+
     }
 
     static double [] crossover(double [] parent1, double [] parent2){
@@ -164,9 +169,8 @@ public class PuttingBot {
 
     static double [] mutation(double [] individual){
 
-        for (int i = 0; i < 2; i++){
-            individual[i] = individual[i]*random(1-mutationRate, 1+mutationRate,2);
-        }
+        individual = new double[] {random(0, angleRange, 2), random(0, velocityRange, 2), 0};
+
         return individual;
     }
 
@@ -190,7 +194,7 @@ public class PuttingBot {
 
         //print2D(population);
 
-        System.out.println("Best option = Angle:" + population[0][0] + ", Velocity: " + population[0][0]);
+        System.out.println("Best option found, not optimal = Angle:" + population[0][0] + ", Velocity: " + population[0][0]);
         System.out.println("Final position of: " + Arrays.toString(RK4(population[0])));
         System.out.println("Extra info: " + Arrays.toString(population[0]));
     }
