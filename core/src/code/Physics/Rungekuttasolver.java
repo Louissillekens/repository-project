@@ -17,7 +17,7 @@ public class Rungekuttasolver{
 
    public static void main(String args[]){
        Rungekuttasolver solver = new Rungekuttasolver();
-       solver.RK4(50,0);//just testing if it might work with actual numbers as input
+       solver.RK4(50,10);//just testing if it might work with actual numbers as input
 
        System.out.println("the x and y coordinates are:");
        System.out.println("x: "+solver.getX());
