@@ -11,17 +11,20 @@ import java.util.Comparator;
 //For the moment it's a stand alone code using the Runge Kutter for fitness
 public class PuttingBot {
     //Hyperparameters
-    static final int populationAmount = 500;
-    static final int generations = 100;
-    static final double  mutationRate = 0.1;
-    static final int susCrossover = 50; //EVEN NUMBER! Number of selections in 1 spin
-    static final int susMutation = (int)mutationRate*populationAmount; //EVEN NUMBER! Number of selections in 1 spin
+    static final int populationAmount = 300;
+    static final int generations = 200;
+    static final double  mutationRate = 0.3;
+    static final int susCrossover = 100; //EVEN NUMBER, >= populationAmount/2,  Number of selections in 1 spin
+    static final int susMutation = (int)(mutationRate*populationAmount); //EVEN NUMBER! Number of selections in 1 spin
+    static final int sf = 8;
 
 
-    static int angleRange = 360; //OPTIMISATION by reducing the range of angles (no opposite kick)
-    static int velocityRange = 20;
+    static final int [] angleRange = {-90,90}; //OPTIMISATION by reducing the range of angles (no opposite kick)
+    static final int velocityRange = 15;
     static final double [] flagPos = {15,30};
-    static final double tolerance = 0.2;
+    static final double tolerance = 0.3;
+    static long start = 0;
+    static long stop = 0;
 
     static double [][] population = new double[populationAmount][3]; //3 being Angle, Velocity and fitness
 
@@ -58,9 +61,9 @@ public class PuttingBot {
             for (int j=0; j < population[i].length; j++){
 
                 if (j == 0){    //Angle
-                    population[i][j] = random(0, angleRange, 2);
+                    population[i][j] = random(angleRange[0], angleRange[1], sf);
                 }else if (j == 1){  //Velocity
-                    population[i][j] = random(0, velocityRange, 2);
+                    population[i][j] = random(0, velocityRange, sf);
                 }else{  //Fitness
                     population[i][j] = 0;
                 }
@@ -97,8 +100,12 @@ public class PuttingBot {
 
             //If in hole
             if (populationTemp[i][2] <= tolerance){ //Means we're in the diameter of the flag
+                stop = System.currentTimeMillis();
+
                 System.out.println("OPTIMAL option = Angle: " + populationTemp[i][0] + ", Velocity: " + populationTemp[i][1]);
                 System.out.println("Final position of: " + Arrays.toString(RK4(populationTemp[i])));
+                System.out.println("Extra info: " + Arrays.toString(populationTemp[i]));
+                System.out.println("Time elapsed: " + (stop-start)/1000);
                 System.exit(0);
             }
 
@@ -174,8 +181,7 @@ public class PuttingBot {
     //change individuals to random numbers to increase diversity of the population
     static double [] mutation(double [] individual){
 
-        individual = new double[] {random(0, angleRange, 2), random(0, velocityRange, 2), 0};
-
+        individual = new double[] {random(angleRange[0], angleRange[1], sf), random(0, velocityRange, sf), 0};
         return individual;
     }
 
@@ -187,6 +193,8 @@ public class PuttingBot {
     }
 
     public static void main(String[] args) {
+        start = System.currentTimeMillis();
+
         initialisation();
 
         for (int i = 0; i < generations; i++){
@@ -198,9 +206,11 @@ public class PuttingBot {
         sort(population);
 
         //print2D(population);
+        stop = System.currentTimeMillis();
 
-        System.out.println("Best option found, not optimal = Angle:" + population[0][0] + ", Velocity: " + population[0][0]);
+        System.out.println("Best option found, not optimal = Angle:" + population[0][0] + ", Velocity: " + population[0][1]);
         System.out.println("Final position of: " + Arrays.toString(RK4(population[0])));
         System.out.println("Extra info: " + Arrays.toString(population[0]));
+        System.out.println("Time elapsed: " + (stop-start)/1000 + "s.");
     }
 }
