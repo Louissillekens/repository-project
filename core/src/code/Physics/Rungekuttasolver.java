@@ -18,7 +18,7 @@ public class Rungekuttasolver{
 
     public static void main(String args[]){
         Rungekuttasolver solver = new Rungekuttasolver();
-        solver.setValues(0,0,-7.189096596989119,-1.2676316969685923);
+        solver.setValues(0,0,3.9726,8.519);
         for(int i=0; i<6000; i++){
             solver.RK4();
         }
