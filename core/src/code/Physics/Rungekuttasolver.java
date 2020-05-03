@@ -19,7 +19,7 @@ public class Rungekuttasolver{
    public static void main(String args[]){
        Rungekuttasolver solver = new Rungekuttasolver();
        solver.setValues(0,0,50,20);
-       for(int i=0; i<10000; i++){
+       for(int i=0; i<8000; i++){
        solver.RK4();
        }
        System.out.println("the x and y coordinates are:");
@@ -48,7 +48,7 @@ public class Rungekuttasolver{
    }
    public double getResistance(double x, double y){
        //TO DO: make reistance change based on coordinates
-       double resistance = 0.001;
+       double resistance = 0.13;
        return resistance;
    }
    //alternatively I could make an updateheight function that calculates x and y and stores them instead of 2 different methods  that return x and y, same for the resistance getters!
@@ -62,12 +62,10 @@ public class Rungekuttasolver{
    }
    public double getFFrictionX(double vx, double vy){
        double resistance_acceleration = ( getResistance(x,y)*g*(vx/Math.sqrt((vx*vx)+(vy*vy))) )*-1;
-       resistance_acceleration = -3;
        return resistance_acceleration;
    }
    public double getFFrictionY(double vx, double vy){
        double resistance_acceleration = ( getResistance(x,y)*g*(vy/Math.sqrt(vx*vx+vy*vy)) )*-1;
-       resistance_acceleration = -3;
        return resistance_acceleration;
    }
    public double combineHeightFrictionX(double x, double y){
@@ -79,26 +77,30 @@ public class Rungekuttasolver{
        return changeInAY;
    }
    public void RK4(){
-    double k1x = x;
-    double k1y = y;
-    double k1vx =vx+ getFHeightX(x,y) + getFFrictionX(vx,vy);
-    double k1vy =vy+ getFHeightY(x,y) + getFFrictionY(vx,vy);
-    double k2x = x +(dt*k1vx)/2;
-    double k2y = y +(dt*k1vy)/2;
-    double k2vx =vx+ getFHeightX(x+(k1x*dt)/2,y+(k1y*dt)/2) + getFFrictionX(x+(k1x*dt)/2,y+(k1y*dt)/2);
-    double k2vy =vy+ getFHeightY(x+(k1x*dt)/2,y+(k1y*dt)/2) + getFFrictionY(x+(k1x*dt)/2,y+(k1y*dt)/2);
-    double k3x = x +(dt*k2vx)/2;
-    double k3y = y +(dt*k2vy)/2;
-    double k3vx =vx+ getFHeightX(x+(k2x*dt)/2,y+(k2y*dt)/2) + getFFrictionX(x+(k2x*dt)/2,y+(k2y*dt)/2);
-    double k3vy =vy+ getFHeightY(x+(k2x*dt)/2,y+(k2y*dt)/2) + getFFrictionY(x+(k2x*dt)/2,y+(k2y*dt)/2);
-    double k4x = x +dt*k3vx;
-    double k4y = y +dt*k3vy;
-    double k4vx =vx+ getFHeightX(x+(k3x*dt),y+(k3y*dt)) + getFFrictionX(x+(k3x*dt),y+(k3y*dt));
-    double k4vy =vy+ getFHeightY(x+(k3x*dt),y+(k3y*dt)) + getFFrictionY(x+(k3x*dt),y+(k3y*dt));
-    double vxa = vx - onesixth*dt*(k1vx+2*k2vx+2*k3vx+k4vx);
-    double vya = vy - onesixth*dt*(k1vy+2*k2vy+2*k3vy+k4vy);
-    double xa = x+onesixth*dt*(k1x+2*k2x+2*k3x+k4x);
-    double ya = y+onesixth*dt*(k1y+2*k2y+2*k3y+k4y);
+    double k1x  = vx;
+    double k1y  = vy;
+    double k1vx = getFHeightX(x,y) + getFFrictionX(vx,vy);
+    double k1vy = getFHeightY(x,y) + getFFrictionY(vx,vy);
+
+    double k2x  = vx + 0.5*dt*k1vx;
+    double k2y  = vy + 0.5*dt*k1vy;
+    double k2vx = getFHeightX(x+0.5*dt*k1x, y+0.5*dt*k1y) + getFFrictionX(vx+0.5*dt*k1vx, vy+0.5*dt*k1vy);
+    double k2vy = getFHeightY(x+0.5*dt*k1x, y+0.5*dt*k1y) + getFFrictionY(vx+0.5*dt*k1vx, vy+0.5*dt*k1vy);
+
+    double k3x  = vx + 0.5*dt*k2vx;
+    double k3y  = vy + 0.5*dt*k2vy;
+    double k3vx = getFHeightX(x+0.5*dt*k2x, y+0.5*dt*k2y) + getFFrictionX(vx+0.5*dt*k2vx, vy+0.5*dt*k2vy);
+    double k3vy = getFHeightY(x+0.5*dt*k2x, y+0.5*dt*k2y) + getFFrictionY(vx+0.5*dt*k2vx, vy+0.5*dt*k2vy);
+
+    double k4x  = vx + dt*k3vx;
+    double k4y  = vy + dt*k3vy;
+    double k4vx = getFHeightX(x+dt*k3x, y+dt*k3y) + getFFrictionX(vx+dt*k3vx, vy+dt*k3vy);
+    double k4vy = getFHeightY(x+dt*k3x, y+dt*k3y) + getFFrictionY(vx+dt*k3vx, vy+dt*k3vy);
+
+    double vxa  = vx + onesixth*dt*(k1vx +2*k2vx +2*k3vx +k4vx);
+    double vya  = vy + onesixth*dt*(k1vy +2*k2vy +2*k3vy +k4vy);
+    double xa   = x  + onesixth*dt*(k1x  +2*k2x  +2*k3x  +k4x );
+    double ya   = y  + onesixth*dt*(k1y  +2*k2y  +2*k3y  +k4y );
     setValues(xa,ya,vxa,vya);
 /*
     //test to find where the error is
