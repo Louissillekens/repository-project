@@ -2,16 +2,78 @@ package code.Bot;
 
 import code.Board.*;
 
-/**
- * interface for any and all bots to be made in the future
- */
-public interface PuttingBot {
+import java.math.BigDecimal;
+import java.math.MathContext;
+import java.util.Arrays;
+import java.util.Comparator;
 
-    /**
-     * method that chooses the velocity of the ball based on given course and ball_position
-     * @param course the course on which the bot operates
-     * @param ball_position the position of the ball on which the bot operates
-     * @return the velocity in the form of a Vector2d object
-     */
-    Vector2d shot_velocity(PuttingCourse course, Vector2d ball_position);
+//For the moment it's a stand alone code using the Runge Kutter for fitness
+public class PuttingBot {
+    //Hyperparameters
+    static int populationAmount = 10;
+    double mutationRate = 0.1;
+
+    static int angleRange = 360; //OPTIMISATION by reducing the range of angles (no opposite kick)
+    static int velocityRange = 20;
+
+    static double [][] population = new double[populationAmount][3]; //3 being Angle, Velocity and fitness
+
+
+
+    //Generates a random double between 2 numberes and rounded to n-sf
+    static double random(int firstN, int secondN, int sf){
+
+        //Generate a random number in the range
+        double randomN =  (Math.random()*(secondN-firstN))+firstN;
+
+        //Significant figures rounding
+        BigDecimal bd = new BigDecimal(randomN);
+        bd = bd.round(new MathContext(sf));
+        double roundN = bd.doubleValue();
+
+        return roundN;
+    }
+
+    //Initialisation of the empty population array
+    static void initialisation(){
+
+        for (int i=0; i < population.length; i++){
+            for (int j=0; j < population[i].length; j++){
+
+                if (j == 0){    //Angle
+                    population[i][j] = random(0, angleRange, 2);
+                }else if (j == 1){  //Velocity
+                    population[i][j] = random(0, velocityRange, 2);
+                }else{  //Fitness
+                    population[i][j] = random(0,10,1);
+                }
+            }
+        }
+    }
+
+    //Sort the fitness values
+    static void sort(double [][] array){
+
+        Arrays.sort(array, new Comparator<double[]>() {
+            @Override
+            public int compare(double[] o1, double[] o2) {
+                return Double.compare(o2[2], o1[2]);
+            }
+        });
+    }
+
+    //prints a 2D array
+    static void print2D(double [][] array){
+        for (double [] i: array){
+            System.out.println(Arrays.toString(i));
+        }
+    }
+
+    public static void main(String[] args) {
+        initialisation();
+
+        sort(population);
+        print2D(population);
+    }
+
 }
