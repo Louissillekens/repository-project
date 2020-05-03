@@ -1,38 +1,53 @@
 package code.Board;
 
 import code.Physics.EulerSolver;
+import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.VertexAttributes;
+import com.badlogic.gdx.graphics.g3d.Material;
+import com.badlogic.gdx.graphics.g3d.Model;
+import com.badlogic.gdx.graphics.g3d.ModelInstance;
+import com.badlogic.gdx.graphics.g3d.attributes.ColorAttribute;
+import com.badlogic.gdx.graphics.g3d.utils.ModelBuilder;
 
 /**
  * class Ball describes a ball in the golf simulator
  * defined by a location, mass, and color
  */
-public class Ball extends EulerSolver{
+public class Ball {
 
-    private int color; //int that can be converted to a color in the graphics engine
+    private ModelBuilder modelBuilder;
+
+    private Model ball;
+    private ModelInstance ballInstance;
+    private float ballSize;
+    private float xCurrent;
+    private float zCurrent;
 
     /**
      * parametric constructor for a ball
      */
-    public Ball(){
-        color = 1; //standard color 1 ---> white
+    public Ball(Model ball, ModelInstance ballInstance, float ballSize, float xCurrent, float zCurrent) {
+
+        this.ball = ball;
+        this.ballInstance = ballInstance;
+        this.ballSize = ballSize;
+        this.xCurrent = xCurrent;
+        this.zCurrent = zCurrent;
+    }
+
+    // isHit() method to only check the first shoot (at location (0,y,0))
+    // Need to update that in the future (when the ball can move)
+    public boolean isHit() {
+
+        if (xCurrent != 0f && zCurrent != 0f) {
+            return true;
+        }
+        else {
+            return false;
+        }
     }
 
 
-    /**
-     * getter for the color of the ball
-     * @return int later to be mapped to a color
-     */
-    public int getColor(){
-        return color;
-    }
-
-    /**
-     * change the color of the ball
-     * @param newColor the color of the ball after method gets executed
-     */
-    public void setColor(int newColor){
-        color = newColor;
-    }
 
 }
 
