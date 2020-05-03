@@ -17,6 +17,9 @@ public class PuttingBot {
 
     static int angleRange = 360; //OPTIMISATION by reducing the range of angles (no opposite kick)
     static int velocityRange = 20;
+    static final int xFlag = 50;
+    static final int yFlag = 20;
+    static final double errorDia = 0.2;
 
     static double [][] population = new double[populationAmount][3]; //3 being Angle, Velocity and fitness
 
@@ -71,9 +74,12 @@ public class PuttingBot {
 
         for (int i = 0; i < populationTemp.length; i++){
 
+            //Convert degrees to radians, radians is the argument for Math.sin or Math.cos
+            double angle = (populationTemp[i][0]*Math.PI)/180;
+
             //Split the velocity vector into x,y components
-            double vxi = (populationTemp[i][1])*Math.cos(populationTemp[i][0]);
-            double vyi = (populationTemp[i][1])*Math.sin(populationTemp[i][0]);
+            double vxi = (populationTemp[i][1])*Math.cos(angle);
+            double vyi = (populationTemp[i][1])*Math.sin(angle);
 
             System.out.println( Arrays.toString(populationTemp[i]) + ": X: " + vxi + ", Y " + vyi);
 
