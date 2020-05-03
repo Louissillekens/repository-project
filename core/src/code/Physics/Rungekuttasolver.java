@@ -94,26 +94,26 @@ public class Rungekuttasolver{
 
     //test to find where the error is
 
-       System.out.println(k1x);
-       System.out.println(k1y);
-       System.out.println(k1vx);
-       System.out.println(k1vy);
-       System.out.println(k2x);
-       System.out.println(k2y);
-       System.out.println(k2vx);
-       System.out.println(k2vy);
-       System.out.println(k3x);
-       System.out.println(k3y);
-       System.out.println(k3vx);
-       System.out.println(k3vy);
-       System.out.println(k4x);
-       System.out.println(k4y);
-       System.out.println(k4vx);
-       System.out.println(k4vy);
-       System.out.println(vx);
-       System.out.println(vy);
-       System.out.println(x);
-       System.out.println(y);
+       System.out.println("k1x"+k1x);
+       System.out.println("k1y"+k1y);
+       System.out.println("k1vx"+k1vx);
+       System.out.println("k1vy"+k1vy);
+       System.out.println("k2x"+k2x);
+       System.out.println("k2y"+k2y);
+       System.out.println("k2vx"+k2vx);
+       System.out.println("k2vt"+k2vy);
+       System.out.println("k3x"+k3x);
+       System.out.println("k3y"+k3y);
+       System.out.println("k3vx"+k3vx);
+       System.out.println("k3vy"+k3vy);
+       System.out.println("k4x"+k4x);
+       System.out.println("k4y"+k4y);
+       System.out.println("k4vx"+k4vx);
+       System.out.println("k4vy"+k4vy);
+       System.out.println("vx"+vx);
+       System.out.println("vy"+vy);
+       System.out.println("x"+x);
+       System.out.println("y"+y);
    }
 
    public double getVX(){
