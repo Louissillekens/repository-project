@@ -100,12 +100,12 @@ public class Rungekuttasolver{
     double k4y = y +dt*k3vy;
     double k4vx =vx+ getFHeightX(x+(k3x*dt),y+(k3y*dt)) + getFFrictionX(x+(k3x*dt),y+(k3y*dt));
     double k4vy =vy+ getFHeightY(x+(k3x*dt),y+(k3y*dt)) + getFFrictionY(x+(k3x*dt),y+(k3y*dt));
-    double vxa = onesixth*dt*(k1vx+2*k2vx+2*k3vx+k4vx);
+    double vxa = vx - onesixth*dt*(k1vx+2*k2vx+2*k3vx+k4vx);
     //System.out.println(vxa);
-    double vya =  onesixth*dt*(k1vy+2*k2vy+2*k3vy+k4vy);
+    double vya = vy - onesixth*dt*(k1vy+2*k2vy+2*k3vy+k4vy);
     //System.out.println(vya);
-    double xa = onesixth*dt*(k1x+2*k2x+2*k3x+k4x);
-    double ya = onesixth*dt*(k1y+2*k2y+2*k3y+k4y);
+    double xa = x+onesixth*dt*(k1x+2*k2x+2*k3x+k4x);
+    double ya = y+onesixth*dt*(k1y+2*k2y+2*k3y+k4y);
     setValues(xa,ya,vxa,vya);
 /*
     //test to find where the error is
