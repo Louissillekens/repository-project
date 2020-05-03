@@ -19,7 +19,7 @@ public class Rungekuttasolver{
    public static void main(String args[]){
        Rungekuttasolver solver = new Rungekuttasolver();
        solver.setValues(0,0,50,20);
-       for(int i=0; i<1; i++){
+       for(int i=0; i<10000; i++){
        solver.RK4();
        }
        System.out.println("the x and y coordinates are:");
