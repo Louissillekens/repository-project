@@ -6,6 +6,9 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.math.Vector3;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
+
 public class InputHandler {
 
     /**
@@ -46,16 +49,19 @@ public class InputHandler {
 
         //key input for deciding the amount of power to strike the ball with
         if(Gdx.input.isKeyPressed(Input.Keys.W)){
-
+            //round the shot power to two decimal places to avoid errors where the power would get above max power
+            double exact_shot_power = round(gamescreen.getShot_Power(), 2);
+            gamescreen.setShot_Power(exact_shot_power);
             if(gamescreen.getShot_Power() < gamescreen.getMAX_SPEED() - gamescreen.getPOWER_INCREMENT()){
                 gamescreen.IncrementShotPower(1);
             }
             System.out.println("shot power now at: " + gamescreen.getShot_Power());
         }
         if(Gdx.input.isKeyPressed(Input.Keys.S)){
+            //round the shot power to two decimal places to avoid errors where the power would get below 0
+            double exact_shot_power = round(gamescreen.getShot_Power(), 2);
+            gamescreen.setShot_Power(exact_shot_power);
             if(gamescreen.getShot_Power() > 0 + gamescreen.getPOWER_INCREMENT()){
-                //TODO fix bug that could happen when the ball moves slower than the increment (ball speed could become negative)
-                //TODO should not be able to arise when our starting speed keeps to the rules but just to be sure
                 gamescreen.IncrementShotPower(-1);
             }
             System.out.println("shot power now at: " + gamescreen.getShot_Power());
@@ -72,7 +78,19 @@ public class InputHandler {
             //reset the power
             gamescreen.setShot_Power(gamescreen.getSTARTING_SHOT_POWER());
         }
+    }
 
+    /**
+     * this simple method can round a number to a number of decimal places
+     * @param value the value we wish to round
+     * @param places the places after the comma to round to
+     * @return the rounded value
+     */
+    private static double round(double value, int places) {
+        if (places < 0) throw new IllegalArgumentException();
 
+        BigDecimal bd = new BigDecimal(Double.toString(value));
+        bd = bd.setScale(places, RoundingMode.HALF_UP);
+        return bd.doubleValue();
     }
 }
