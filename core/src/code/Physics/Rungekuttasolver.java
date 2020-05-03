@@ -18,7 +18,7 @@ public class Rungekuttasolver{
 
     public static void main(String args[]){
         Rungekuttasolver solver = new Rungekuttasolver();
-        solver.setValues(0,0,50,20);
+        solver.setValues(0,0,-8.762329885747654,8.198876445790209);
         for(int i=0; i<6000; i++){
             solver.RK4();
         }
@@ -126,12 +126,12 @@ public class Rungekuttasolver{
        System.out.println("k4y"+k4y);
        System.out.println("k4vx"+k4vx);
        System.out.println("k4vy"+k4vy);
-              */
+
         System.out.println("vx"+vx);
         System.out.println("vy"+vy);
         System.out.println("x"+x);
         System.out.println("y"+y);
-
+*/
     }
 
     public double getVX(){

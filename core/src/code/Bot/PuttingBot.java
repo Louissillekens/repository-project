@@ -73,12 +73,14 @@ public class PuttingBot {
 
             //Split the velocity vector into x,y components
             double vxi = (populationTemp[i][1])*Math.cos(populationTemp[i][0]);
-            double vyi = (populationTemp[i][1])*Math.cos(populationTemp[i][0]);
+            double vyi = (populationTemp[i][1])*Math.sin(populationTemp[i][0]);
+
+            System.out.println( Arrays.toString(populationTemp[i]) + ": X: " + vxi + ", Y " + vyi);
 
             Rungekuttasolver rk = new Rungekuttasolver();
             double results[] = rk.startRK4(0,0, vxi, vyi);
 
-            System.out.println(results[0] + " - " + results[1]);
+            System.out.println("X-pos: " + results[0] + ", Y-pos: " + results[1]);
 
 
             if (populationTemp[i][2] == -1){ //Fitness == 0 means we found the good combination
@@ -105,9 +107,9 @@ public class PuttingBot {
 
     public static void main(String[] args) {
         initialisation();
-        print2D(population);
+        //print2D(population);
         fitness();
-        sort(population);
+       // sort(population);
 
         /*for (int i = 0; i < generations; i++){
             fitness();
