@@ -1,8 +1,8 @@
 package code.Bot;
 
-import code.Board.*;
 import code.Physics.Rungekuttasolver;
 
+import java.lang.reflect.Array;
 import java.math.BigDecimal;
 import java.math.MathContext;
 import java.util.Arrays;
@@ -11,18 +11,17 @@ import java.util.Comparator;
 //For the moment it's a stand alone code using the Runge Kutter for fitness
 public class PuttingBot {
     //Hyperparameters
-    static final int populationAmount = 100;
+    static final int populationAmount = 500;
     static final int generations = 100;
     static final double  mutationRate = 0.9;
-    static final int susNumber = 4; //EVEN NUMBER! Number of selections in 1 spin
+    static final int susNumber = 50; //EVEN NUMBER! Number of selections in 1 spin
 
     static int angleRange = 360; //OPTIMISATION by reducing the range of angles (no opposite kick)
     static int velocityRange = 20;
     static final double [] flagPos = {15,30};
-    static final double tolerance = 0.2;
+    static final double tolerance = 0.9;
 
     static double [][] population = new double[populationAmount][3]; //3 being Angle, Velocity and fitness
-
 
 
     //Generates a random double between 2 numberes and rounded to n-sf
@@ -67,6 +66,19 @@ public class PuttingBot {
         }
     }
 
+    //Executes the RK4 class giving baack the position of the ball
+    static double[] RK4(double [] individual){
+        //Convert degrees to radians, radians is the argument for Math.sin or Math.cos
+        double angle = (individual[0]*Math.PI)/180;
+
+        //Split the velocity vector into x,y components
+        double vxi = (individual[1])*Math.cos(angle);
+        double vyi = (individual[1])*Math.sin(angle);
+
+        Rungekuttasolver rk = new Rungekuttasolver();
+        return  rk.startRK4(0,0, vxi, vyi);
+    }
+
     //Fitness of the population, returns the same array with their respective fitness
     static void fitness(){
 
@@ -74,17 +86,7 @@ public class PuttingBot {
 
         for (int i = 0; i < populationTemp.length; i++){
 
-            //Convert degrees to radians, radians is the argument for Math.sin or Math.cos
-            double angle = (populationTemp[i][0]*Math.PI)/180;
-
-            //Split the velocity vector into x,y components
-            double vxi = (populationTemp[i][1])*Math.cos(angle);
-            double vyi = (populationTemp[i][1])*Math.sin(angle);
-
-            Rungekuttasolver rk = new Rungekuttasolver();
-            double results[] = rk.startRK4(0,0, vxi, vyi);
-
-            //System.out.println("X-pos: " + results[0] + ", Y-pos: " + results[1]);
+            double results[] = RK4(populationTemp[i]);
 
             //Calculate the fitness by the distance between the flag and the ball
             double fitnessCalc = Math.sqrt(Math.pow((flagPos[0] - results[0]), 2) + (Math.pow((flagPos[1] - results[1]), 2)));
@@ -93,7 +95,8 @@ public class PuttingBot {
 
             //If in hole
             if (populationTemp[i][2] <= tolerance){ //Means we're in the diameter of the flag
-                System.out.println("FINAL = Angle: " + populationTemp[i][0] + ", Velocity: " + populationTemp[i][1]);
+                System.out.println("OPTIMAL option = Angle: " + populationTemp[i][0] + ", Velocity: " + populationTemp[i][1]);
+                System.out.println("Final position of: " + Arrays.toString(RK4(populationTemp[i])));
                 System.exit(0);
             }
 
@@ -146,13 +149,18 @@ public class PuttingBot {
     }
 
     static void selection(){
-        for (int i = 0; i < population.length/2; i++){
-            population[population.length/2+i] = mutation(population[i]);
+        int [] selected = SUS();
+
+        for (int i = 0; i < selected.length; i=i+2){
+            population[populationAmount-1-i] = crossover(population[selected[i]], population[selected[i+1]]);
         }
 
     }
 
-    static void crossover(double [] parent1, double [] parent2){}
+    static double [] crossover(double [] parent1, double [] parent2){
+        double[] child = {parent1[0],parent2[1], 0};
+        return child;
+    }
 
     static double [] mutation(double [] individual){
 
@@ -176,9 +184,14 @@ public class PuttingBot {
             fitness();
             sort(population);
             selection(); //Includes the mutation & crossover + updates the population
-            print2D(population);
         }
+        fitness();
+        sort(population);
 
+        //print2D(population);
 
+        System.out.println("Best option = Angle:" + population[0][0] + ", Velocity: " + population[0][0]);
+        System.out.println("Final position of: " + Arrays.toString(RK4(population[0])));
+        System.out.println("Extra info: " + Arrays.toString(population[0]));
     }
 }
