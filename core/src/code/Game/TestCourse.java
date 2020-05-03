@@ -30,17 +30,10 @@ public class TestCourse {
         Vector2d start = new Vector2d(1.5,2);
         Vector2d flag = new Vector2d(2,5);
 
-        Ball ball = new Ball();
 
         final double gravity = 9.81;
         final double max_velocity = 3;
         final double hole_tolerance = 0.02;
 
-        PuttingCourse test = new PuttingCourse(height_map, friction_map, start, flag, max_velocity, hole_tolerance, out_of_bounds_height, out_of_bounds_friction, ball);
-
-        System.out.println("height at start: " + test.get_height().evaluate(start));
-        System.out.println("friction at start: " + test.get_friction().evaluate(start));
-        Vector2d p = test.get_height().gradient(start);
-        System.out.println("the gradient at the start is a vector with x at: " + p.get_x() + " and y at: " + p.get_y());
     }
 }

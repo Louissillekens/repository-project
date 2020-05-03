@@ -35,7 +35,6 @@ public class BotScreen implements Screen {
     private Function2d height;
     private Vector2d start = new Vector2d(1.5,2);
     private Vector2d flag = new Vector2d(2,5);
-    private Ball ball = new Ball();
 
     /**
      * parametric constructor

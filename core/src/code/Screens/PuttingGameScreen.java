@@ -1,6 +1,7 @@
 package code.Screens;
 
 import code.Controller.InputHandler;
+import code.Board.Ball;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.Screen;
@@ -30,9 +31,12 @@ public class PuttingGameScreen implements Screen {
     private MeshPartBuilder meshPartBuilder;
 
     // Instance for the ball in the game
-    private Model ball;
+    private Ball ball;
+    private Model ballModel;
     private ModelInstance ballInstance;
     private float ballSize = 0.2f;
+    private float xPosition = 0;
+    private float zPosition = 0;
 
     // Instance for the 3D field
     private Model flatField;
@@ -115,10 +119,10 @@ public class PuttingGameScreen implements Screen {
         }
 
         // Creation of the ball
-        ball = modelBuilder.createSphere(ballSize, ballSize, ballSize, 10, 10,
+        ballModel = modelBuilder.createSphere(ballSize, ballSize, ballSize, 10, 10,
                 new Material(ColorAttribute.createDiffuse(Color.WHITE)),
                 VertexAttributes.Usage.Position | VertexAttributes.Usage.Normal);
-        ballInstance = new ModelInstance(ball, 0, (getHeight(0,0, fieldModel))+(ballSize/2), 0);
+        ballInstance = new ModelInstance(ballModel, xPosition, (getHeight(0,0, fieldModel))+(ballSize/2), zPosition);
 
         // Adding an environment which is used for the luminosity of the frame
         environment = new Environment();
