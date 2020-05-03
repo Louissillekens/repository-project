@@ -60,42 +60,35 @@ public class Rungekuttasolver{
        double height_acceleration = (g*((getHeight(x,y+dy)-getHeight(x,y))/dx))*-1;
        return height_acceleration;
    }
-   public double getFFrictionX(double vx, double vy){
+   public double getFFrictionX(double vx, double vy, double x, double y){
        double resistance_acceleration = ( getResistance(x,y)*g*(vx/Math.sqrt((vx*vx)+(vy*vy))) )*-1;
        return resistance_acceleration;
    }
-   public double getFFrictionY(double vx, double vy){
+   public double getFFrictionY(double vx, double vy, double x, double y){
        double resistance_acceleration = ( getResistance(x,y)*g*(vy/Math.sqrt(vx*vx+vy*vy)) )*-1;
        return resistance_acceleration;
    }
-   public double combineHeightFrictionX(double x, double y){
-       double changeInAX= getFHeightX(x,y)+getFFrictionX(x,y);
-       return changeInAX;
-   }
-   public double combineHeightFrictionY(double x, double y){
-       double changeInAY= getFHeightY(x,y)+getFFrictionY(x,y);
-       return changeInAY;
-   }
+
    public void RK4(){
     double k1x  = vx;
     double k1y  = vy;
-    double k1vx = getFHeightX(x,y) + getFFrictionX(vx,vy);
-    double k1vy = getFHeightY(x,y) + getFFrictionY(vx,vy);
+    double k1vx = getFHeightX(x,y) + getFFrictionX(vx,vy,x,y);
+    double k1vy = getFHeightY(x,y) + getFFrictionY(vx,vy,x,y);
 
     double k2x  = vx + 0.5*dt*k1vx;
     double k2y  = vy + 0.5*dt*k1vy;
-    double k2vx = getFHeightX(x+0.5*dt*k1x, y+0.5*dt*k1y) + getFFrictionX(vx+0.5*dt*k1vx, vy+0.5*dt*k1vy);
-    double k2vy = getFHeightY(x+0.5*dt*k1x, y+0.5*dt*k1y) + getFFrictionY(vx+0.5*dt*k1vx, vy+0.5*dt*k1vy);
+    double k2vx = getFHeightX(x+0.5*dt*k1x, y+0.5*dt*k1y) + getFFrictionX(vx+0.5*dt*k1vx, vy+0.5*dt*k1vy,x+0.5*dt*k1x, y+0.5*dt*k1y);
+    double k2vy = getFHeightY(x+0.5*dt*k1x, y+0.5*dt*k1y) + getFFrictionY(vx+0.5*dt*k1vx, vy+0.5*dt*k1vy,x+0.5*dt*k1x, y+0.5*dt*k1y);
 
     double k3x  = vx + 0.5*dt*k2vx;
     double k3y  = vy + 0.5*dt*k2vy;
-    double k3vx = getFHeightX(x+0.5*dt*k2x, y+0.5*dt*k2y) + getFFrictionX(vx+0.5*dt*k2vx, vy+0.5*dt*k2vy);
-    double k3vy = getFHeightY(x+0.5*dt*k2x, y+0.5*dt*k2y) + getFFrictionY(vx+0.5*dt*k2vx, vy+0.5*dt*k2vy);
+    double k3vx = getFHeightX(x+0.5*dt*k2x, y+0.5*dt*k2y) + getFFrictionX(vx+0.5*dt*k2vx, vy+0.5*dt*k2vy,x+0.5*dt*k2x, y+0.5*dt*k2y);
+    double k3vy = getFHeightY(x+0.5*dt*k2x, y+0.5*dt*k2y) + getFFrictionY(vx+0.5*dt*k2vx, vy+0.5*dt*k2vy,x+0.5*dt*k2x, y+0.5*dt*k2y);
 
     double k4x  = vx + dt*k3vx;
     double k4y  = vy + dt*k3vy;
-    double k4vx = getFHeightX(x+dt*k3x, y+dt*k3y) + getFFrictionX(vx+dt*k3vx, vy+dt*k3vy);
-    double k4vy = getFHeightY(x+dt*k3x, y+dt*k3y) + getFFrictionY(vx+dt*k3vx, vy+dt*k3vy);
+    double k4vx = getFHeightX(x+dt*k3x, y+dt*k3y) + getFFrictionX(vx+dt*k3vx, vy+dt*k3vy,x+dt*k3x, y+dt*k3y);
+    double k4vy = getFHeightY(x+dt*k3x, y+dt*k3y) + getFFrictionY(vx+dt*k3vx, vy+dt*k3vy,x+dt*k3x, y+dt*k3y);
 
     double vxa  = vx + onesixth*dt*(k1vx +2*k2vx +2*k3vx +k4vx);
     double vya  = vy + onesixth*dt*(k1vy +2*k2vy +2*k3vy +k4vy);
