@@ -11,6 +11,7 @@ import java.util.Comparator;
 public class PuttingBot {
     //Hyperparameters
     static int populationAmount = 10;
+    static int generations = 10;
     double mutationRate = 0.1;
 
     static int angleRange = 360; //OPTIMISATION by reducing the range of angles (no opposite kick)
@@ -34,6 +35,17 @@ public class PuttingBot {
         return roundN;
     }
 
+    //Sort the fitness values
+    static void sort(double [][] array){
+
+        Arrays.sort(array, new Comparator<double[]>() {
+            @Override
+            public int compare(double[] o1, double[] o2) {
+                return Double.compare(o2[2], o1[2]);
+            }
+        });
+    }
+
     //Initialisation of the empty population array
     static void initialisation(){
 
@@ -51,16 +63,31 @@ public class PuttingBot {
         }
     }
 
-    //Sort the fitness values
-    static void sort(double [][] array){
+    //Fitness of the population, returns the same array with their respective fitness
+    static void fitness(){
 
-        Arrays.sort(array, new Comparator<double[]>() {
-            @Override
-            public int compare(double[] o1, double[] o2) {
-                return Double.compare(o2[2], o1[2]);
+        double [][] populationTemp = population; //make a copy of the original population array
+
+        for (int i = 0; i < populationTemp.length; i++){
+
+
+
+            if (populationTemp[i][2] == 0){ //Fitness == 0 means we found the good combination
+                System.out.println("Angle: " + populationTemp[i][0] + "Velocity: " + populationTemp[i][1]);
             }
-        });
+
+        }
+
+        population = populationTemp; //Updates the new population with it's corresponding fitness values
     }
+
+    static void selection(){
+        
+    }
+
+    static void crossover(){}
+
+    static void mutation(){}
 
     //prints a 2D array
     static void print2D(double [][] array){
@@ -72,7 +99,12 @@ public class PuttingBot {
     public static void main(String[] args) {
         initialisation();
 
-        sort(population);
+        for (int i = 0; i < generations; i++){
+            fitness();
+            sort(population);
+            selection(); //Includes the mutation & crossover + updates the population
+        }
+
         print2D(population);
     }
 
