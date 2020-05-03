@@ -1,5 +1,6 @@
 package code.Screens;
 
+import code.Controller.InputHandler;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.Screen;
@@ -43,8 +44,8 @@ public class PuttingGameScreen implements Screen {
     private static double[][] heightStorage;
 
     // Instance vector for the camera
-    private static Vector3 vector1;
-    private static Vector3 vector2;
+    public static Vector3 vector1;
+    public static Vector3 vector2;
 
     // Instance for the time between two frame
     private final float delta = 1/60f;
@@ -54,6 +55,11 @@ public class PuttingGameScreen implements Screen {
 
     private static float[] fieldArray;
     private int numberOfFields;
+
+    //these variables are to decide the shot_speed
+    private double shot_Power = 1;//m/s
+    private final double POWER_INCREMENT = 0.01;//m/s
+    private final double MAX_SPEED = 3;//for now the max speed is 3 (should be possible to change per course)
 
 
     // Constructor that creates the 3D field + corresponding game mode
@@ -223,35 +229,7 @@ public class PuttingGameScreen implements Screen {
             //modelBatch.render(slopeInstance[0], environment);
         modelBatch.end();
 
-        // Some key pressed input to rotate the camera and also zoom in zoom out
-        if(Gdx.input.isKeyPressed(Input.Keys.LEFT)) {
-            camera.lookAt(0,0,0);
-            camera.rotateAround(vector1 = new Vector3(0f, 0f, 0f), vector2 = new Vector3(0f, 1f, 0f), -1f);
-        }
-        if(Gdx.input.isKeyPressed(Input.Keys.RIGHT)) {
-            camera.lookAt(0,0,0);
-            camera.rotateAround(vector1 = new Vector3(0f, 0f, 0f), vector2 = new Vector3(0f, 1f, 0f), 1f);
-        }
-        if(Gdx.input.isKeyPressed(Input.Keys.UP)) {
-            camera.lookAt(0,0,0);
-            if ((camera.position.y > 2)) {
-                camera.translate(0, -0.1f, 0);
-            }
-        }
-        if(Gdx.input.isKeyPressed(Input.Keys.DOWN)) {
-            camera.lookAt(0,0,0);
-            if (camera.position.y < 15) {
-                camera.translate(0, 0.1f, 0);
-            }
-        }
-        // Key pressed input to be back on the game mode screen
-        if(Gdx.input.isKeyPressed(Input.Keys.B)) {
-            this.game.setScreen(new GameModeScreen(this.game));
-        }
-        // Key pressed input to quit
-        if(Gdx.input.isKeyPressed(Input.Keys.Q)) {
-            Gdx.app.exit();
-        }
+        InputHandler.checkForInput(this);
     }
 
     @Override
@@ -283,5 +261,29 @@ public class PuttingGameScreen implements Screen {
     public void dispose() {
 
         modelBatch.dispose();
+    }
+
+    public PerspectiveCamera getCamera(){
+        return camera;
+    }
+
+    public Game getGame(){
+        return game;
+    }
+
+    public void IncrementShotPower(int amount){
+        shot_Power += amount*POWER_INCREMENT;
+    }
+
+    public double getShot_Power(){
+        return shot_Power;
+    }
+
+    public double getPOWER_INCREMENT(){
+        return POWER_INCREMENT;
+    }
+
+    public double getMAX_SPEED(){
+        return MAX_SPEED;
     }
 }
