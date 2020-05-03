@@ -13,8 +13,10 @@ public class PuttingBot {
     //Hyperparameters
     static final int populationAmount = 500;
     static final int generations = 100;
-    static final double  mutationRate = 0.9;
-    static final int susNumber = 50; //EVEN NUMBER! Number of selections in 1 spin
+    static final double  mutationRate = 0.1;
+    static final int susCrossover = 50; //EVEN NUMBER! Number of selections in 1 spin
+    static final int susMutation = (int)mutationRate*populationAmount; //EVEN NUMBER! Number of selections in 1 spin
+
 
     static int angleRange = 360; //OPTIMISATION by reducing the range of angles (no opposite kick)
     static int velocityRange = 20;
@@ -107,7 +109,7 @@ public class PuttingBot {
 
     //Stochastic Universal Sampling selection
     //http://puzzloq.blogspot.com/2013/03/stochastic-universal-sampling.html
-    static int [] SUS(){
+    static int [] SUS(int susNumber){
 
         // Calculate total fitness of population
         double f = 0.0;
@@ -149,24 +151,27 @@ public class PuttingBot {
     }
 
     static void selection(){
-        int [] selected = SUS();
 
+        int [] selected = SUS(susCrossover);
         for (int i = 0; i < selected.length; i=i+2){
             population[populationAmount-1-i] = crossover(population[selected[i]], population[selected[i+1]]);
         }
 
-        selected = SUS();
+        selected = SUS(susMutation);
         for (int i = 0; i < selected.length; i++){
-            population[populationAmount-1-susNumber-i] = mutation(population[selected[i]]);
+            population[populationAmount-1-susCrossover-i] = mutation(population[selected[i]]);
         }
-
     }
 
+    //Crossover to keep similarities, but increase variety
     static double [] crossover(double [] parent1, double [] parent2){
+
         double[] child = {parent1[0],parent2[1], 0};
+
         return child;
     }
 
+    //change individuals to random numbers to increase diversity of the population
     static double [] mutation(double [] individual){
 
         individual = new double[] {random(0, angleRange, 2), random(0, velocityRange, 2), 0};
