@@ -19,7 +19,7 @@ public class Rungekuttasolver{
    public static void main(String args[]){
        Rungekuttasolver solver = new Rungekuttasolver();
        solver.setValues(0,0,50,20);
-       for(int i=0; i<100; i++){
+       for(int i=0; i<1; i++){
        solver.RK4();
        }
        System.out.println("the x and y coordinates are:");
@@ -79,13 +79,13 @@ public class Rungekuttasolver{
        return changeInAY;
    }
    public void RK4(){
-       System.out.println(onesixth);
-       System.out.println(vx);
-       System.out.println(vy);
+      // System.out.println(onesixth);
+       //System.out.println(vx);
+       //System.out.println(vy);
     double k1x = x;
     double k1y = y;
-    System.out.println("heightx1"+ getFHeightX(x,y) + "heighty1"+getFHeightY(x,y));
-    System.out.println("frictx1"+ getFFrictionX(x,y) + "fricty1"+getFFrictionY(x,y));
+    //System.out.println("heightx1"+ getFHeightX(x,y) + "heighty1"+getFHeightY(x,y));
+    //System.out.println("frictx1"+ getFFrictionX(x,y) + "fricty1"+getFFrictionY(x,y));
     double k1vx =vx+ getFHeightX(x,y) + getFFrictionX(vx,vy);
     double k1vy =vy+ getFHeightY(x,y) + getFFrictionY(vx,vy);
     double k2x = x +(dt*k1vx)/2;
@@ -101,9 +101,9 @@ public class Rungekuttasolver{
     double k4vx =vx+ getFHeightX(x+(k3x*dt),y+(k3y*dt)) + getFFrictionX(x+(k3x*dt),y+(k3y*dt));
     double k4vy =vy+ getFHeightY(x+(k3x*dt),y+(k3y*dt)) + getFFrictionY(x+(k3x*dt),y+(k3y*dt));
     double vxa = onesixth*dt*(k1vx+2*k2vx+2*k3vx+k4vx);
-    System.out.println(vxa);
+    //System.out.println(vxa);
     double vya =  onesixth*dt*(k1vy+2*k2vy+2*k3vy+k4vy);
-    System.out.println(vya);
+    //System.out.println(vya);
     double xa = onesixth*dt*(k1x+2*k2x+2*k3x+k4x);
     double ya = onesixth*dt*(k1y+2*k2y+2*k3y+k4y);
     setValues(xa,ya,vxa,vya);
