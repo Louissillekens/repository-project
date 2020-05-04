@@ -11,7 +11,7 @@ import java.util.Comparator;
 public class PuttingBotv1 {
     //Hyperparameters
     static final int populationAmount = 300; //amount of individuals in 1 generation
-    static final int generations = 200; //amount of generations
+    static final int generations = 70; //amount of generations
     static final double  mutationRate = 0.34; //probability that an iindividual will mutate
     static final double crossoverRate = 0.4; //under 0.5, will replace from bottom to up fitness. half max
 
@@ -23,7 +23,7 @@ public class PuttingBotv1 {
 
 
     static double [] velocityRange = {0, 15}; //OPTIMISATION by reducing the range of angles (no opposite kick)
-    static final double [] flagPos = {50,50};
+    static final double [] flagPos = {15,15};
     static final double tolerance = 0.02;
     static final int sf = 8;
     static double [] angleRange = {-90,90}; //OPTIMISATION by reducing the range of angles (no opposite kick)
