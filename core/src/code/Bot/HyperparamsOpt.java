@@ -17,7 +17,7 @@ public class HyperparamsOpt {
     static int roundsPerParam;
     static  int reducerThreshold; //wich generation the optimisation starts
 
-    static int success = 0;
+    static int success;
 
 
     static final int susCrossover = (int)(crossoverRate*populationAmount); //EVEN NUMBER, >= populationAmount/2,  Number of selections in 1 spin
@@ -33,8 +33,6 @@ public class HyperparamsOpt {
     static final double tolerance = 0.05;
     static final int sf = 8;
     static int [] angleRange = {-90,90}; //OPTIMISATION by reducing the range of angles (no opposite kick)
-    static long start = 0;
-    static long stop = 0;
 
     HyperparamsOpt(int populationAmount, double mutationRate, double crossoverRate, int reducerThreshold, int generations, int roundsPerParam){
         this.populationAmount = populationAmount;
@@ -87,7 +85,7 @@ public class HyperparamsOpt {
         }
     }
 
-    //Executes the RK4 class giving baack the position of the ball
+    //Executes the RK4 class giving back the position of the ball
     static double[] RK4(double [] individual){
         //Convert degrees to radians, radians is the argument for Math.sin or Math.cos
         double angle = (individual[0]*Math.PI)/180;
@@ -117,7 +115,7 @@ public class HyperparamsOpt {
             //If in hole
             if (populationTemp[i][2] <= tolerance){ //Means we're in the diameter of the flag
                 success++;
-                return;
+                System.out.println("inside " + success);
             }
 
         }
@@ -216,6 +214,7 @@ public class HyperparamsOpt {
     }
 
     public int start(){
+        success = 0;
 
         for (int ii = 0; ii < roundsPerParam; ii++) {
 
@@ -228,6 +227,9 @@ public class HyperparamsOpt {
 
             for (int i = 0; i < generations; i++) {
                 fitness();
+                if (success >= 3){
+                    break;
+                }
                 sort(population);
                 selection(); //Includes the mutation & crossover + updates the population
                 if (i == reducerThreshold) {
@@ -236,8 +238,8 @@ public class HyperparamsOpt {
             }
             fitness();
         }
-        return success;
 
+        return success;
     }
 }
 
