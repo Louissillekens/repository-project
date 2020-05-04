@@ -99,9 +99,10 @@ public class PuttingGameScreen implements Screen {
 
         // Different pair of 2 fields can be played together
         // int fieldModel is used to select which terrain we want to apply
-        int fieldModel = 1;
+        int fieldModel = 3;
 
         numberOfFields = 2;
+
         fieldInstance = new ModelInstance[numberOfFields];
         slopeInstance = new ModelInstance[numberOfFields];
 
