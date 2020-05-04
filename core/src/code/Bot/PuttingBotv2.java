@@ -10,7 +10,7 @@ import java.util.Comparator;
 //For the moment it's a stand alone code using the Runge Kutter for fitness
 public class PuttingBotv2 {
     //Hyperparameters
-    static final int populationAmount = 300; //amount of individuals in 1 generation
+    static final int populationAmount = 100; //amount of individuals in 1 generation
     static final int generations = 100; //amount of generations
     static final double  mutationRate = 0.34; //probability that an individual will mutate
     static final double crossoverRate = 0.4; //UNDER 0.5, will replace from bottom to up fitness. half max
@@ -25,12 +25,14 @@ public class PuttingBotv2 {
     //Positions & Velocities
     static double [] angleRange = {-90,90}; //OPTIMISATION by reducing the range of angles (no opposite kick)
     static double [] velocityRange = {0, 15}; //OPTIMISATION by reducing the range of angles (no opposite kick)
-    static final double [] flagPos = {35.5,24.5};
+
+    //will need to calc the height at the end to put the ball at the exact pos
+    static final double [] flagPos = {20,20};
     static final int [] startingPos = {0,0};
 
     //Others
-    static final double tolerance = 0.02;
-    static final int sf = 8;
+    static final double tolerance = 0.2;
+    static final int sf = 6;
     static int countRangeReducerCycles;
 
     //Timers
@@ -196,13 +198,13 @@ public class PuttingBotv2 {
         return individual;
     }
 
-
     //Checks if an optimisation is needed
     static void optimisationCheck(int currentGen){
 
         double decreaseIntervalOfOptimisation = 0.5; //30-15-7-3
 
-        reducerThreshold = (int) (reducerThreshold + (reducerThreshold/countRangeReducerCycles)*decreaseIntervalOfOptimisation); //stop at current gen + half of it
+        //updates the range more regularly as we evolve in the ga
+        reducerThreshold = (int) (currentGen + (currentGen/countRangeReducerCycles)*decreaseIntervalOfOptimisation); //stop at current gen + half of it
 
         //do not launch a range reduction directly at the first optimisation
         if (countRangeReducerCycles != 1) {
@@ -210,16 +212,8 @@ public class PuttingBotv2 {
             velocityReducer = Math.pow(velocityReducer, 2);
         }
 
-        //make the range smaller as we evolve in the ga
-        if ((reducerThreshold - reducerThreshold *0.5 )> 1){
-            reducerThreshold =  (int) (reducerThreshold - reducerThreshold *0.5);
-        }
-
-
         optimisationYield();
         countRangeReducerCycles++;
-
-        //print2D(population);
 
     }
 
@@ -271,6 +265,10 @@ public class PuttingBotv2 {
 
         initialisation();
 
+        int intelComparator = 6; //how many fitness to compare
+        double [][] intelArray = new double[intelComparator-1][3]; //array that stores the best individuals of 5 gen
+        int  counter = 0;
+
         for (int i = 0; i < generations; i++){
 
             System.out.println("Generation: " + i);
@@ -281,11 +279,11 @@ public class PuttingBotv2 {
 
             System.out.println(Arrays.toString(population[0]) + "  " + Arrays.toString(population[1]) + "  " + Arrays.toString(population[2]));
 
+            //Interval optimisation
             if (i != 0 && i % reducerThreshold == 0){
                 countRangeReducerCycles++;
                 optimisationCheck(i);
             }
-
         }
 
         fitness();
