@@ -1,7 +1,7 @@
 package code.Screens;
 
 import code.Controller.InputHandler;
-import code.Board.Ball;
+import code.Physics.Rungekuttasolver;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.Screen;
@@ -31,21 +31,15 @@ public class PuttingGameScreen implements Screen {
     private MeshPartBuilder meshPartBuilder;
 
     // Instance for the ball in the game
-    private Ball ball;
-    private Model ballModel;
+    private Model ball;
     private ModelInstance ballInstance;
-    private float ballSize = 0.2f;
-    private float xPosition = 0;
-    private float zPosition = 0;
+    private float ballSize = 1.5f;
 
     // Instance for the 3D field
     private Model flatField;
     private ModelInstance[] fieldInstance;
     private Model slopeModel;
     private ModelInstance[] slopeInstance;
-
-    // Instance for the height storage
-    private static double[][] heightStorage;
 
     // Instance vector for the camera
     public static Vector3 vector1;
@@ -56,9 +50,6 @@ public class PuttingGameScreen implements Screen {
 
     // Instance fot the previously chosen game mode
     private GameMode gameMode;
-
-    private static float[] fieldArray;
-    private int numberOfFields;
 
     //these variables are to decide the shot_speed
     private final double POWER_INCREMENT = 0.01;//m/s
@@ -83,7 +74,7 @@ public class PuttingGameScreen implements Screen {
 
         // Creation of the 3D camera
         camera = new PerspectiveCamera(75, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
-        camera.position.set(4f, 3f, 4f);
+        camera.position.set(3f, 3f, 3f);
         camera.lookAt(0f, 0f, 0f);
         camera.near = 0.1f;
         camera.far = 400f;
@@ -92,125 +83,94 @@ public class PuttingGameScreen implements Screen {
         modelBuilder = new ModelBuilder();
 
         // Creation of a blue flat field that corresponds to the water (need to verify the height of this field)
-        flatField = modelBuilder.createBox(50, 1f, 50,
+        flatField = modelBuilder.createBox(50, 1.0f, 50,
                 new Material(ColorAttribute.createDiffuse(Color.BLUE)),
                 VertexAttributes.Usage.Position | VertexAttributes.Usage.Normal
         );
 
-        // Different pair of 2 fields can be played together
-        // int fieldModel is used to select which terrain we want to apply
-        int fieldModel = 3;
+        // Adding all the mesh (green triangle) to the method that build the field
+        modelBuilder.begin();
+        meshPartBuilder = modelBuilder.part("field", GL20.GL_TRIANGLES,
+                VertexAttributes.Usage.Position | VertexAttributes.Usage.Normal,
+                new Material(ColorAttribute.createDiffuse(Color.GREEN)));
+        buildField(meshPartBuilder);
+        slopeModel = modelBuilder.end();
 
-        numberOfFields = 2;
-
-        fieldInstance = new ModelInstance[numberOfFields];
-        slopeInstance = new ModelInstance[numberOfFields];
-
-        for (int index = fieldModel; index < numberOfFields+fieldModel; index++) {
-
-            // Adding all the mesh (green triangle) to the method that build the field
-            modelBuilder.begin();
-            meshPartBuilder = modelBuilder.part("field", GL20.GL_TRIANGLES,
-                    VertexAttributes.Usage.Position | VertexAttributes.Usage.Normal,
-                    new Material(ColorAttribute.createDiffuse(Color.GREEN)));
-            buildField(meshPartBuilder, index);
-            slopeModel = modelBuilder.end();
-
-            fieldInstance[index-fieldModel] = new ModelInstance(flatField, 0f, -1f, (-index+fieldModel) * 50);
-            slopeInstance[index-fieldModel] = new ModelInstance(slopeModel, 0f, 0f, (-index+fieldModel) * 50);
+        fieldInstance = new ModelInstance[100];
+        slopeInstance = new ModelInstance[100];
+        for (int i = 0; i < 10; i++) {
+            for (int k = 0; k < 10; k++) {
+                fieldInstance[i * 10 + k] = new ModelInstance(flatField, -i * 50, -0.5f, -k * 50);
+                slopeInstance[i * 10 + k] = new ModelInstance(slopeModel, -i * 50, 0, -k * 50);
+            }
         }
 
         // Creation of the ball
-        ballModel = modelBuilder.createSphere(ballSize, ballSize, ballSize, 10, 10,
+        ball = modelBuilder.createSphere(ballSize, ballSize, ballSize, 10, 10,
                 new Material(ColorAttribute.createDiffuse(Color.WHITE)),
                 VertexAttributes.Usage.Position | VertexAttributes.Usage.Normal);
-        ballInstance = new ModelInstance(ballModel, xPosition, (getHeight(0,0, fieldModel))+(ballSize/2), zPosition);
+        ballInstance = new ModelInstance(ball, 0,(defineFunction(0,0))+(ballSize/2), 0);
 
         // Adding an environment which is used for the luminosity of the frame
         environment = new Environment();
         environment.set(new ColorAttribute(ColorAttribute.AmbientLight, 0.3f, 0.3f, 0.3f, 1.f));
-        environment.add(new DirectionalLight().set(0.6f, 0.6f, 0.6f, -1f, -1.0f, 1f));
+        environment.add(new DirectionalLight().set(0.8f, 0.8f, 0.8f, 1f, 0f, 1f));
+
     }
 
     // Method that defines the function we use to create the slope of the field
-    public static float[] defineFunction(double i, double j) {
-
-        fieldArray = new float[5];
+    public static float defineFunction(double i, double j) {
 
         float field0 = (float) (0);
-        float field1 = (float) (Math.sin(i) + Math.sin(j))/3;
+        float field1 = (float) (((Math.sin(i) + Math.sin(j))/3)+0.5);
         float field2 = (float) (Math.sin(i))/3;
-        float field3 = (float) -((Math.atan(i) + Math.atan(j))/2);
-        float ripple = (float) ((0.55)+Math.sin((0.4)*(Math.pow(i,2)+Math.pow(j,2))/10));
+        float field3 = (float) (((Math.atan(i) + Math.atan(j))/2)+0.5);
+        float ripple1 = (float) ((0.4)+Math.sin((0.4)*(Math.pow(i,2)+Math.pow(j,2))/10));
+        float ripple2 = (float) ((0.1)+(Math.sin((0.4)*(Math.pow(i,2)+Math.pow(j,2)))/10)*4);
 
-        fieldArray[0] = field0;
-        fieldArray[1] = field1;
-        fieldArray[2] = field2;
-        fieldArray[3] = field3;
-        fieldArray[4] = ripple;
+        return ripple1;
+    }
 
-        return fieldArray;
+    // Method used to get the friction at a certain location
+    public static float getFriction(double x, double z) {
+
+        if (defineFunction(x,z) < 0) {
+            return -1f;
+        }
+        return 0.13f;
     }
 
     // Method that build the 3D field from a mesh
     // Need to be improved to give another function as input to have other kinds of fields
-    public static void buildField(MeshPartBuilder b, int index){
+    public static void buildField(MeshPartBuilder b){
 
-        int gridWidth=50;
-        int gridDepth=50;
-        heightStorage = new double[gridWidth+1][gridDepth+1];
-        Vector3 p1,p2,p3,p4;
-        Vector3 n1,n2,n3,n4;
+        int gridWidth = 50;
+        int gridDepth = 50;
+        Vector3 pos1,pos2,pos3,pos4;
+        Vector3 nor1,nor2,nor3,nor4;
         MeshPartBuilder.VertexInfo v1,v2,v3,v4;
         for(int i = -gridWidth/2; i < gridWidth/2; i++) {
             for (int j = -gridDepth / 2; j < gridDepth / 2; j++) {
 
-                float[] p1StepArray = defineFunction(i, j);
-                float[] p2StepArray = defineFunction(i, j+1);
-                float[] p3StepArray = defineFunction(i+1, j+1);
-                float[] p4StepArray = defineFunction(i+1, j);
+                pos1 = new Vector3(i, defineFunction(i, j), j);
+                pos2 = new Vector3(i, defineFunction(i, j + 1), j+1);
+                pos3 = new Vector3(i+1, defineFunction(i + 1, j + 1), j+1);
+                pos4 = new Vector3(i+1, defineFunction(i + 1, j), j);
 
-                float p1Step = p1StepArray[index];
-                float p2Step = p2StepArray[index];
-                float p3Step = p3StepArray[index];
-                float p4Step = p4StepArray[index];
+                nor1 = new Vector3(-defineFunction(i, 0), 1, -defineFunction(0, j));
+                nor2 = new Vector3(-defineFunction(i, 0), 1, -defineFunction(0, j + 1));
+                nor3 = new Vector3(-defineFunction(i + 1, 0), 1, -defineFunction(0, j + 1));
+                nor4 = new Vector3(-defineFunction(i + 1, 0), 1, -defineFunction(0, j));
 
-                p1 = new Vector3(i, p1Step, j);
-                p2 = new Vector3(i, p2Step, j+1);
-                p3 = new Vector3(i+1, p3Step, j+1);
-                p4 = new Vector3(i+1, p4Step, j);
-
-                float[] n1StepArray = defineFunction(i, 0);
-                float[] n2StepArray = defineFunction(i+1, 0);
-                float[] n3StepArray = defineFunction(0, j);
-                float[] n4StepArray = defineFunction(0, j+1);
-
-                float n1Step = -(n1StepArray[index]);
-                float n2Step = -(n2StepArray[index]);
-                float n3Step = -(n3StepArray[index]);
-                float n4Step = -(n4StepArray[index]);
-
-                n1 = new Vector3(-n1Step, 1, -n3Step);
-                n2 = new Vector3(-n1Step, 1, -n4Step);
-                n3 = new Vector3(-n2Step, 1, -n4Step);
-                n4 = new Vector3(-n2Step, 1, -n3Step);
-
-                v1 = new MeshPartBuilder.VertexInfo().setPos(p1).setNor(n1).setCol(null).setUV(0.5f, 0.0f);
-                v2 = new MeshPartBuilder.VertexInfo().setPos(p2).setNor(n2).setCol(null).setUV(0.0f, 0.0f);
-                v3 = new MeshPartBuilder.VertexInfo().setPos(p3).setNor(n3).setCol(null).setUV(0.0f, 0.5f);
-                v4 = new MeshPartBuilder.VertexInfo().setPos(p4).setNor(n4).setCol(null).setUV(0.5f, 0.5f);
+                v1 = new MeshPartBuilder.VertexInfo().setPos(pos1).setNor(nor1).setCol(null).setUV(0.5f, 0.0f);
+                v2 = new MeshPartBuilder.VertexInfo().setPos(pos2).setNor(nor2).setCol(null).setUV(0.0f, 0.0f);
+                v3 = new MeshPartBuilder.VertexInfo().setPos(pos3).setNor(nor3).setCol(null).setUV(0.0f, 0.5f);
+                v4 = new MeshPartBuilder.VertexInfo().setPos(pos4).setNor(nor4).setCol(null).setUV(0.5f, 0.5f);
 
                 b.rect(v1, v2, v3, v4);
 
             }
         }
-    }
-
-    // Method to get the value of the height y at a certain point (x, z)
-    public float getHeight(double x, double z, int index) {
-
-        float[] heightArray = defineFunction(x, z);
-        return heightArray[index];
     }
 
     @Override
@@ -226,13 +186,13 @@ public class PuttingGameScreen implements Screen {
         // for the moment I only chose to take the first element of the array of size 100
         // If we want a bigger field we can take the following indexes (every index holds a field of the same size)
         modelBatch.begin(camera);
-            modelBatch.render(ballInstance);
-            for (int i = 0; i < numberOfFields; i++) {
-                modelBatch.render(fieldInstance[i], environment);
-                modelBatch.render(slopeInstance[i], environment);
-            }
-            //modelBatch.render(fieldInstance[0], environment);
-            //modelBatch.render(slopeInstance[0], environment);
+        modelBatch.render(ballInstance);
+        /*for (int i = 0; i < 2; i++) {
+            modelBatch.render(fieldInstance[i], environment);
+            modelBatch.render(slopeInstance[i], environment);
+        }*/
+        modelBatch.render(fieldInstance[0], environment);
+        modelBatch.render(slopeInstance[0], environment);
         modelBatch.end();
 
         InputHandler.checkForInput(this);

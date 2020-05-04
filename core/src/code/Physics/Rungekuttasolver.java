@@ -3,20 +3,23 @@ package code.Physics;
 import code.Board.Friction_function;
 import code.Board.Height_function;
 import code.Board.Vector2d;
+import code.Screens.PuttingGameScreen;
 
 public class Rungekuttasolver{
-    double g= 9.81;
-    double dx = 0.01;
-    double dy = 0.01;
-    double dt = 0.01;
-    double mu;
-    double vx;
-    double vy;
-    double x;
-    double y;
-    double onesixth =(double)1/6;
+
+    private double g = 9.81;
+    private double dx = 0.01;
+    private double dy = 0.01;
+    private double dt = 0.01;
+    private double mu;
+    private double vx;
+    private double vy;
+    private double x;
+    private double y;
+    private double onesixth =(double)1/6;
 
     public static void main(String args[]){
+
         Rungekuttasolver solver = new Rungekuttasolver();
         solver.setValues(0,0,3.9726,8.519);
         for(int i=0; i<6000; i++){
@@ -28,26 +31,28 @@ public class Rungekuttasolver{
     }
 
     public void setValues(double xi,double yi, double vxi, double vyi){
-        x=xi;
-        y=yi;
-        vx=vxi;
-        vy=vyi;
+
+        x = xi;
+        y = yi;
+        vx = vxi;
+        vy = vyi;
     }
 
     //PLEASE DO NOT TOUCH, IT'S for the AI
-    public double [] startRK4(double xPos,double yPos, double xV, double yV){
+    public double[] startRK4(double xPos,double yPos, double xV, double yV){
 
         Rungekuttasolver solver = new Rungekuttasolver();
         solver.setValues(xPos,yPos,xV,yV);
 
         //Run the solver
-        for(int i=0; i<6000; i++){
+        for (int i=0; i<6000; i++) {
             solver.RK4();
         }
         return new double[] {solver.getX(), solver.getY()};
     }
 
     public boolean hasBallStopped(){
+
         boolean stopped =false;
         if(vx==0 && vy==0 /*&& ax==0 && ay == 0*/){
             stopped = true;
@@ -55,14 +60,12 @@ public class Rungekuttasolver{
         return stopped;
     }
     public double getHeight(double x, double y){
-        //TO DO: make height change based on coordinates
-        double height =0;
-        return height;
+
+        return PuttingGameScreen.defineFunction(x,y);
     }
     public double getResistance(double x, double y){
-        //TO DO: make reistance change based on coordinates
-        double resistance = 0.13;
-        return resistance;
+
+        return (double) PuttingGameScreen.getFriction(x,y);
     }
     //alternatively I could make an updateheight function that calculates x and y and stores them instead of 2 different methods  that return x and y, same for the resistance getters!
     public double getFHeightX(double x, double y){
