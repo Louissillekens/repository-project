@@ -11,26 +11,35 @@ import java.util.Comparator;
 public class PuttingBotv2 {
     //Hyperparameters
     static final int populationAmount = 300; //amount of individuals in 1 generation
-    static final int generations = 200; //amount of generations
-    static final double  mutationRate = 0.34; //probability that an iindividual will mutate
-    static final double crossoverRate = 0.4; //under 0.5, will replace from bottom to up fitness. half max
+    static final int generations = 100; //amount of generations
+    static final double  mutationRate = 0.34; //probability that an individual will mutate
+    static final double crossoverRate = 0.4; //UNDER 0.5, will replace from bottom to up fitness. half max
 
-    static final int susCrossover = (int)(crossoverRate*populationAmount); //EVEN NUMBER, >= populationAmount/2,  Number of selections in 1 spin
-    static final int susMutation = (int)(mutationRate*populationAmount); //EVEN NUMBER! Number of selections in 1 spin
-    static int reducerTreshhold = 30; //wich generation the optimisation starts
+    //Other parameters
     static double angleRangeReducer = 0.05; //% of the adjustment
     static double velocityReducer = 0.08; //% of the adjustment
+    static int reducerThreshold = 50; //which generation the optimisation starts
+    static final int susCrossover = (int)(crossoverRate*populationAmount); //EVEN NUMBER, <= populationAmount/2,  Number of selections in 1 spin
+    static final int susMutation = (int)(mutationRate*populationAmount); //EVEN NUMBER! Number of selections in 1 spin
 
-
+    //Positions & Velocities
+    static double [] angleRange = {-90,90}; //OPTIMISATION by reducing the range of angles (no opposite kick)
     static double [] velocityRange = {0, 15}; //OPTIMISATION by reducing the range of angles (no opposite kick)
-    static final double [] flagPos = {50,50};
+    static final double [] flagPos = {35.5,24.5};
+    static final int [] startingPos = {0,0};
+
+    //Others
     static final double tolerance = 0.02;
     static final int sf = 8;
-    static double [] angleRange = {-90,90}; //OPTIMISATION by reducing the range of angles (no opposite kick)
+    static int countRangeReducerCycles;
+
+    //Timers
     static long start = 0;
     static long stop = 0;
 
     static double [][] population = new double[populationAmount][3]; //3 being Angle, Velocity and fitness
+
+    // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
     //Generates a random double between 2 numberes and rounded to n-sf
     static double random(double firstN, double secondN, int sf){
@@ -84,7 +93,7 @@ public class PuttingBotv2 {
         double vyi = (individual[1])*Math.sin(angle);
 
         Rungekuttasolver rk = new Rungekuttasolver();
-        return  rk.startRK4(0,0, vxi, vyi);
+        return  rk.startRK4(startingPos[0],startingPos[1], vxi, vyi);
     }
 
     //Fitness of the population, returns the same array with their respective fitness
@@ -104,16 +113,8 @@ public class PuttingBotv2 {
             //If in hole
             if (populationTemp[i][2] <= tolerance){ //Means we're in the diameter of the flag
                 stop = System.currentTimeMillis();
-
-                System.out.println("*********************************************************");
-                System.out.println("OPTIMAL option = Angle: " + populationTemp[i][0] + ", Velocity: " + populationTemp[i][1]);
-                System.out.println("Final position of: " + Arrays.toString(RK4(populationTemp[i])));
-                System.out.println("Extra info: " + Arrays.toString(populationTemp[i]));
-                System.out.println("Time elapsed: " + (stop-start)/1000);
-                System.out.println("*********************************************************");
-                System.exit(0);
+                printFound(populationTemp[i], true);
             }
-
         }
 
         population = populationTemp; //Updates the new population with it's corresponding fitness values
@@ -173,10 +174,10 @@ public class PuttingBotv2 {
         for (int i = 0; i < selected.length; i++){
 
             //avoid losing the elites
-            if (selected[i] == 0 || selected[i] == 1 || selected[i] == 2){
-                population[populationAmount-1-selected[i]] = mutation();
+            if (selected[i] == 0 || selected[i] == 1 ){
+                population[populationAmount-1-selected[i]] = mutation(population[populationAmount-1-selected[i]][2]);
             }
-            population[selected[i]] = mutation();
+            population[selected[i]] = mutation(population[selected[i]][2]);
         }
     }
 
@@ -189,10 +190,37 @@ public class PuttingBotv2 {
     }
 
     //change individuals to random numbers to increase diversity of the population
-    static double [] mutation(){
+    static double [] mutation(double fitnessIndivi){
 
-        double [] individual = new double[] {random(angleRange[0], angleRange[1], sf), random(velocityRange[0], velocityRange[1], sf), 0};
+        double [] individual = new double[] {random(angleRange[0], angleRange[1], sf), random(velocityRange[0], velocityRange[1], sf), fitnessIndivi};
         return individual;
+    }
+
+
+    //Checks if an optimisation is needed
+    static void optimisationCheck(int currentGen){
+
+        double decreaseIntervalOfOptimisation = 0.5; //30-15-7-3
+
+        reducerThreshold = (int) (reducerThreshold + (reducerThreshold/countRangeReducerCycles)*decreaseIntervalOfOptimisation); //stop at current gen + half of it
+
+        //do not launch a range reduction directly at the first optimisation
+        if (countRangeReducerCycles != 1) {
+            angleRangeReducer = Math.pow(angleRangeReducer, 2);
+            velocityReducer = Math.pow(velocityReducer, 2);
+        }
+
+        //make the range smaller as we evolve in the ga
+        if ((reducerThreshold - reducerThreshold *0.5 )> 1){
+            reducerThreshold =  (int) (reducerThreshold - reducerThreshold *0.5);
+        }
+
+
+        optimisationYield();
+        countRangeReducerCycles++;
+
+        //print2D(population);
+
     }
 
     //Reduces the yield of angle and velocity
@@ -207,20 +235,40 @@ public class PuttingBotv2 {
         velocityRange[1] = (population[0][1] + population[0][1]*velocityReducer);
 
         System.out.println("- - - " + "\n" + "Optimisation Angle: " + angleRange[0] + ";" + angleRange[1] + "\n" +
-                             "Optimisation Velocity: " + velocityRange[0] + ";" + velocityRange[1] + "\n" + "- - - ");
+                "Optimisation Velocity: " + velocityRange[0] + ";" + velocityRange[1] + "\n" + "- - - ");
     }
 
     //prints a 2D array
-    static void print2D(double [][] array){
-        for (double [] i: array){
+    static void print2D(){
+        for (double [] i: population){
             System.out.println(Arrays.toString(i));
         }
     }
 
-    public static void main(String[] args) {
-        start = System.currentTimeMillis();
+    //prints results when found
+    static void printFound(double [] foundIndividual, boolean found){
+        if (found == true) {
+            System.out.println("*********************************************************");
+            System.out.println("OPTIMAL option = Angle: " + foundIndividual[0] + ", Velocity: " + foundIndividual[1]);
+            System.out.println("Final position of: " + Arrays.toString(RK4(foundIndividual)));
+            System.out.println("Extra info: " + Arrays.toString(foundIndividual));
+            System.out.println("Time elapsed: " + (stop - start) / 1000 + "s.");
+            System.out.println("*********************************************************");
+            System.exit(0);
+        } else {
+            System.out.println("\n" + "Best option found, not optimal = Angle:" + foundIndividual[0] + ", Velocity: " + foundIndividual[1]);
+            System.out.println("Final position of: " + Arrays.toString(RK4(foundIndividual)));
+            System.out.println("Extra info: " + Arrays.toString(foundIndividual));
+            System.out.println("Time elapsed: " + (stop-start)/1000 + "s.");
 
-        int countRangeReducerCycles = 0;
+        }
+    }
+
+    public static void main(String[] args) {
+
+        start = System.currentTimeMillis();
+        countRangeReducerCycles = 0;
+
         initialisation();
 
         for (int i = 0; i < generations; i++){
@@ -231,34 +279,19 @@ public class PuttingBotv2 {
             sort(population);
             selection(); //Includes the mutation & crossover + updates the population
 
-            //System.out.println(Arrays.toString(population[0]) + "  " + Arrays.toString(population[1]) + "  " + Arrays.toString(population[2]));
+            System.out.println(Arrays.toString(population[0]) + "  " + Arrays.toString(population[1]) + "  " + Arrays.toString(population[2]));
 
-            if (i != 0 && i%reducerTreshhold == 0){
-                    if (countRangeReducerCycles != 0){
-                        angleRangeReducer = Math.pow(angleRangeReducer, 2);
-                        velocityReducer = Math.pow(velocityReducer, 2);
-
-                        //make the range smaller as we evolve in the ga
-                        if ((reducerTreshhold - reducerTreshhold*0.3 )> 1){
-                            reducerTreshhold = (int) (reducerTreshhold - reducerTreshhold*0.3 );
-                        }
-                    }
-
-                optimisationYield();
+            if (i != 0 && i % reducerThreshold == 0){
                 countRangeReducerCycles++;
-
-                //print2D(population);
+                optimisationCheck(i);
             }
+
         }
+
         fitness();
         sort(population);
-
-        //print2D(population);
         stop = System.currentTimeMillis();
-
-        System.out.println("\n" + "Best option found, not optimal = Angle:" + population[0][0] + ", Velocity: " + population[0][1]);
-        System.out.println("Final position of: " + Arrays.toString(RK4(population[0])));
-        System.out.println("Extra info: " + Arrays.toString(population[0]));
-        System.out.println("Time elapsed: " + (stop-start)/1000 + "s.");
+        printFound(population[0],false);
+        //print2D();
     }
 }
