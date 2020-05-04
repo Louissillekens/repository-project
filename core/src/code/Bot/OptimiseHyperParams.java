@@ -12,7 +12,7 @@ public class OptimiseHyperParams {
     static int generations = 50;
     static int roundsPerParams = 3;
 
-    static double [][] finalRes = new double[10000000][4];
+    static double [][] finalRes = new double[10000][4];
 
     public static void main(String[] args) {
         int n = 0;
