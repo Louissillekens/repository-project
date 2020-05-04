@@ -24,18 +24,16 @@ public class OptimiseHyperParams {
                 for (int k = 0; k < crossoverRate.length; k++){
                     System.out.println("cross; " + crossoverRate[k]);
                     for (int h = 0; h < reducerTreshhold.length; h++){
-                        System.out.println(h);
 
                         HyperparamsOpt bot = new HyperparamsOpt(populationAmount[i],mutationRate[j],crossoverRate[k],
                                 reducerTreshhold[h], generations,roundsPerParams);
 
-                        int success = bot.start();
-                        System.out.println("s: " + success);
+                        boolean success = bot.start();
 
-                        if (success >= roundsPerParams -1){
+                        if (success == true){
                             System.out.println("success: " + success);
                             finalRes[n] = new double[]{populationAmount[i], mutationRate[j], crossoverRate[k], reducerTreshhold[h]};
-                            System.out.println(Arrays.toString(finalRes[n]));
+                            System.out.println("===> " + Arrays.toString(finalRes[n]));
                             n++;
                         }
                     }

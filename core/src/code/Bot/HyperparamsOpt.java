@@ -115,7 +115,6 @@ public class HyperparamsOpt {
             //If in hole
             if (populationTemp[i][2] <= tolerance){ //Means we're in the diameter of the flag
                 success++;
-                System.out.println("inside " + success);
             }
 
         }
@@ -175,7 +174,7 @@ public class HyperparamsOpt {
 
         selected = SUS(susMutation);
         for (int i = 0; i < selected.length; i++){
-            population[populationAmount-1-susCrossover-i] = mutation(population[selected[i]]);
+            population[selected[i]] = mutation();
         }
     }
 
@@ -188,9 +187,9 @@ public class HyperparamsOpt {
     }
 
     //change individuals to random numbers to increase diversity of the population
-    static double [] mutation(double [] individual){
+    static double [] mutation(){
 
-        individual = new double[] {random(angleRange[0], angleRange[1], sf), random(velocityRange[0], velocityRange[1], sf), 0};
+        double[] individual = new double[]{random(angleRange[0], angleRange[1], sf), random(velocityRange[0], velocityRange[1], sf), 0};
         return individual;
     }
 
@@ -213,7 +212,7 @@ public class HyperparamsOpt {
         }
     }
 
-    public int start(){
+    public boolean start(){
         success = 0;
 
         for (int ii = 0; ii < roundsPerParam; ii++) {
@@ -227,9 +226,11 @@ public class HyperparamsOpt {
 
             for (int i = 0; i < generations; i++) {
                 fitness();
-                if (success >= 3){
-                    break;
+
+                if (success >= roundsPerParam){
+                    return true;
                 }
+
                 sort(population);
                 selection(); //Includes the mutation & crossover + updates the population
                 if (i == reducerThreshold) {
@@ -239,7 +240,7 @@ public class HyperparamsOpt {
             fitness();
         }
 
-        return success;
+        return false;
     }
 }
 
