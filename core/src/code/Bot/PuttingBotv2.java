@@ -30,7 +30,7 @@ public class PuttingBotv2 {
 
     //Others
     static final double tolerance = 0.02;
-    static final int sf = 8;
+    static final int sf = 6;
     static int countRangeReducerCycles;
 
     //Timers
@@ -196,13 +196,13 @@ public class PuttingBotv2 {
         return individual;
     }
 
-
     //Checks if an optimisation is needed
     static void optimisationCheck(int currentGen){
 
         double decreaseIntervalOfOptimisation = 0.5; //30-15-7-3
 
-        reducerThreshold = (int) (reducerThreshold + (reducerThreshold/countRangeReducerCycles)*decreaseIntervalOfOptimisation); //stop at current gen + half of it
+        //updates the range more regularly as we evolve in the ga
+        reducerThreshold = (int) (currentGen + (currentGen/countRangeReducerCycles)*decreaseIntervalOfOptimisation); //stop at current gen + half of it
 
         //do not launch a range reduction directly at the first optimisation
         if (countRangeReducerCycles != 1) {
@@ -210,16 +210,8 @@ public class PuttingBotv2 {
             velocityReducer = Math.pow(velocityReducer, 2);
         }
 
-        //make the range smaller as we evolve in the ga
-        if ((reducerThreshold - reducerThreshold *0.5 )> 1){
-            reducerThreshold =  (int) (reducerThreshold - reducerThreshold *0.5);
-        }
-
-
         optimisationYield();
         countRangeReducerCycles++;
-
-        //print2D(population);
 
     }
 
@@ -271,6 +263,10 @@ public class PuttingBotv2 {
 
         initialisation();
 
+        int intelComparator = 6; //how many fitness to compare
+        double [][] intelArray = new double[intelComparator-1][3]; //array that stores the best individuals of 5 gen
+        int  counter = 0;
+
         for (int i = 0; i < generations; i++){
 
             System.out.println("Generation: " + i);
@@ -279,13 +275,13 @@ public class PuttingBotv2 {
             sort(population);
             selection(); //Includes the mutation & crossover + updates the population
 
-            System.out.println(Arrays.toString(population[0]) + "  " + Arrays.toString(population[1]) + "  " + Arrays.toString(population[2]));
+            //System.out.println(Arrays.toString(population[0]) + "  " + Arrays.toString(population[1]) + "  " + Arrays.toString(population[2]));
 
+            //Interval optimisation
             if (i != 0 && i % reducerThreshold == 0){
                 countRangeReducerCycles++;
                 optimisationCheck(i);
             }
-
         }
 
         fitness();
