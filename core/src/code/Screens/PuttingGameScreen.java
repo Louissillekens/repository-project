@@ -14,6 +14,8 @@ import com.badlogic.gdx.graphics.g3d.attributes.ColorAttribute;
 import com.badlogic.gdx.graphics.g3d.environment.DirectionalLight;
 import com.badlogic.gdx.graphics.g3d.utils.MeshPartBuilder;
 import com.badlogic.gdx.graphics.g3d.utils.ModelBuilder;
+import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.game.game.Game;
@@ -57,6 +59,13 @@ public class PuttingGameScreen implements Screen {
     private final double STARTING_SHOT_POWER = 0;
     private double shot_Power = STARTING_SHOT_POWER;//m/s
 
+    // Instance for the power shoot
+    private Rectangle rect1;
+    //private ModelInstance rect1Instance;
+    private Rectangle rect2;
+    //private ModelInstance rect2Instance;
+
+    private ShapeRenderer shapeRenderer;
 
     // Constructor that creates the 3D field + corresponding game mode
     public PuttingGameScreen(final Game game, GameMode gameMode) {
@@ -110,6 +119,8 @@ public class PuttingGameScreen implements Screen {
                 new Material(ColorAttribute.createDiffuse(Color.WHITE)),
                 VertexAttributes.Usage.Position | VertexAttributes.Usage.Normal);
         ballInstance = new ModelInstance(ball, 0,(defineFunction(0,0))+(ballSize/2), 0);
+
+        shapeRenderer = new ShapeRenderer();
 
         // Adding an environment which is used for the luminosity of the frame
         environment = new Environment();
@@ -194,6 +205,19 @@ public class PuttingGameScreen implements Screen {
         modelBatch.render(fieldInstance[0], environment);
         modelBatch.render(slopeInstance[0], environment);
         modelBatch.end();
+
+        shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
+
+        int scale = 40;
+
+        shapeRenderer.setColor(Color.WHITE);
+        shapeRenderer.rect(20, 20, 13, (float) (getMAX_SPEED()*(scale))+4);
+        shapeRenderer.setColor(Color.RED);
+        if ((getShot_Power()*(scale)) < getMAX_SPEED()*(scale)) {
+            shapeRenderer.rect(22, 22, 8, (float) ((getShot_Power()) * (scale)));
+        }
+
+        shapeRenderer.end();
 
         InputHandler.checkForInput(this);
     }
