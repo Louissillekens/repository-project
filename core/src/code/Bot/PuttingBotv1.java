@@ -2,19 +2,18 @@ package code.Bot;
 
 import code.Physics.Rungekuttasolver;
 
-import java.lang.reflect.Array;
 import java.math.BigDecimal;
 import java.math.MathContext;
 import java.util.Arrays;
 import java.util.Comparator;
 
 //For the moment it's a stand alone code using the Runge Kutter for fitness
-public class PuttingBot {
+public class PuttingBotv1 {
     //Hyperparameters
     static final int populationAmount = 200;
     static final int generations = 100;
-    static final double  mutationRate = 0.4;
-    static final int susCrossover = 100; //EVEN NUMBER, >= populationAmount/2,  Number of selections in 1 spin
+    static final double  mutationRate = 0.34;
+    static final int susCrossover = 80; //EVEN NUMBER, >= populationAmount/2,  Number of selections in 1 spin
     static final int susMutation = (int)(mutationRate*populationAmount); //EVEN NUMBER! Number of selections in 1 spin
     static final int reducerTreshhold = 20; //wich generation the optimisation starts
     static double angleRangeReducer = 0.03; //% of the adjustment
@@ -168,7 +167,7 @@ public class PuttingBot {
 
         selected = SUS(susMutation);
         for (int i = 0; i < selected.length; i++){
-            population[populationAmount-1-susCrossover-i] = mutation(population[selected[i]]);
+            population[selected[i]] = mutation();
         }
     }
 
@@ -181,9 +180,9 @@ public class PuttingBot {
     }
 
     //change individuals to random numbers to increase diversity of the population
-    static double [] mutation(double [] individual){
+    static double [] mutation(){
 
-        individual = new double[] {random(angleRange[0], angleRange[1], sf), random(velocityRange[0], velocityRange[1], sf), 0};
+        double [] individual = new double[] {random(angleRange[0], angleRange[1], sf), random(velocityRange[0], velocityRange[1], sf), 0};
         return individual;
     }
 
