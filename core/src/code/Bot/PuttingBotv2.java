@@ -10,7 +10,7 @@ import java.util.Comparator;
 //For the moment it's a stand alone code using the Runge Kutter for fitness
 public class PuttingBotv2 {
     //Hyperparameters
-    static final int populationAmount = 300; //amount of individuals in 1 generation
+    static final int populationAmount = 100; //amount of individuals in 1 generation
     static final int generations = 100; //amount of generations
     static final double  mutationRate = 0.34; //probability that an individual will mutate
     static final double crossoverRate = 0.4; //UNDER 0.5, will replace from bottom to up fitness. half max
@@ -25,11 +25,13 @@ public class PuttingBotv2 {
     //Positions & Velocities
     static double [] angleRange = {-90,90}; //OPTIMISATION by reducing the range of angles (no opposite kick)
     static double [] velocityRange = {0, 15}; //OPTIMISATION by reducing the range of angles (no opposite kick)
-    static final double [] flagPos = {35.5,24.5};
+
+    //will need to calc the height at the end to put the ball at the exact pos
+    static final double [] flagPos = {20,20};
     static final int [] startingPos = {0,0};
 
     //Others
-    static final double tolerance = 0.02;
+    static final double tolerance = 0.2;
     static final int sf = 6;
     static int countRangeReducerCycles;
 
@@ -275,7 +277,7 @@ public class PuttingBotv2 {
             sort(population);
             selection(); //Includes the mutation & crossover + updates the population
 
-            //System.out.println(Arrays.toString(population[0]) + "  " + Arrays.toString(population[1]) + "  " + Arrays.toString(population[2]));
+            System.out.println(Arrays.toString(population[0]) + "  " + Arrays.toString(population[1]) + "  " + Arrays.toString(population[2]));
 
             //Interval optimisation
             if (i != 0 && i % reducerThreshold == 0){
