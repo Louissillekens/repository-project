@@ -47,6 +47,24 @@ public class Ball {
         }
     }
 
+    /**
+     * method that hits the Ball according to the given vector
+     * @param vector
+     */
+    public void hit(Vector2d vector){
+        //TODO implement this
+    }
+
+    /**
+     * method that hits the Ball based on a given x and y direction/angle with given power
+     * @param x_direction the direction on the x-axis the ball needs to move in
+     * @param y_direction the direction on the y-axis the ball needs to move in
+     * @param power the power with which to scale the vector
+     */
+    public void hit(double x_direction, double y_direction, double power){
+        //TODO implement this
+    }
+
 
 
 }
