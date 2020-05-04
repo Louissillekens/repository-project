@@ -8,7 +8,7 @@ import java.util.Arrays;
 import java.util.Comparator;
 
 //For the moment it's a stand alone code using the Runge Kutter for fitness
-public class PuttingBotv1 {
+public class PuttingBotv2 {
     //Hyperparameters
     static final int populationAmount = 300; //amount of individuals in 1 generation
     static final int generations = 200; //amount of generations

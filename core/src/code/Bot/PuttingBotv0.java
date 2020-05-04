@@ -24,7 +24,7 @@ public class PuttingBotv0 {
 
 
     static final int [] velocityRange = {0, 15};
-    static final double [] flagPos = {10,20};
+    static final double [] flagPos = {20,20};
     static final double tolerance = 0.05;
     static final int sf = 8;
     static int [] angleRange = {-90,90}; //OPTIMISATION by reducing the range of angles (no opposite kick)
