@@ -35,7 +35,7 @@ public class PuttingGameScreen implements Screen {
     // Instance for the ball in the game
     private Model ball;
     private ModelInstance ballInstance;
-    private float ballSize = 1.5f;
+    private float ballSize = 0.2f;
 
     // Instance for the 3D field
     private Model flatField;
@@ -61,10 +61,7 @@ public class PuttingGameScreen implements Screen {
 
     // Instance for the power shoot
     private Rectangle rect1;
-    //private ModelInstance rect1Instance;
     private Rectangle rect2;
-    //private ModelInstance rect2Instance;
-
     private ShapeRenderer shapeRenderer;
 
     // Constructor that creates the 3D field + corresponding game mode
@@ -105,13 +102,23 @@ public class PuttingGameScreen implements Screen {
         buildField(meshPartBuilder);
         slopeModel = modelBuilder.end();
 
-        fieldInstance = new ModelInstance[100];
-        slopeInstance = new ModelInstance[100];
-        for (int i = 0; i < 10; i++) {
-            for (int k = 0; k < 10; k++) {
-                fieldInstance[i * 10 + k] = new ModelInstance(flatField, -i * 50, -0.5f, -k * 50);
-                slopeInstance[i * 10 + k] = new ModelInstance(slopeModel, -i * 50, 0, -k * 50);
-            }
+        int numberOfFields = 1;
+
+        fieldInstance = new ModelInstance[numberOfFields];
+        slopeInstance = new ModelInstance[numberOfFields];
+
+        for (int i = 0; i < numberOfFields; i++) {
+
+            // Adding all the mesh (green triangle) to the method that build the field
+            modelBuilder.begin();
+            meshPartBuilder = modelBuilder.part("field", GL20.GL_TRIANGLES,
+                    VertexAttributes.Usage.Position | VertexAttributes.Usage.Normal,
+                    new Material(ColorAttribute.createDiffuse(Color.GREEN)));
+            buildField(meshPartBuilder);
+            slopeModel = modelBuilder.end();
+
+            fieldInstance[i] = new ModelInstance(flatField, 0f, -0.5f, (-i) * 50);
+            slopeInstance[i] = new ModelInstance(slopeModel, 0f, 0f, (-i) * 50);
         }
 
         // Creation of the ball
