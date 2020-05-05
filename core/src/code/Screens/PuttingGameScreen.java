@@ -21,6 +21,8 @@ import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.game.game.Game;
 
+import javax.jws.WebParam;
+
 public class PuttingGameScreen implements Screen {
 
     private Game game;
@@ -141,7 +143,7 @@ public class PuttingGameScreen implements Screen {
         float field2 = (float) (Math.sin(i))/3;
         float field3 = (float) (((Math.atan(i) + Math.atan(j))/2)+0.5);
         float ripple1 = (float) ((0.4)+Math.sin((0.4)*(Math.pow(i,2)+Math.pow(j,2))/10));
-        float ripple2 = (float) ((0.4)+(Math.sin((0.4)*(Math.pow(i,2)+Math.pow(j,2)))/10)*4);
+        float ripple2 = (float) ((0.1)+(Math.sin((0.4)*(Math.pow(i,2)+Math.pow(j,2)))/10)*4);
 
         return field1;
     }
@@ -239,6 +241,8 @@ public class PuttingGameScreen implements Screen {
             double x_direction = getCamera().direction.x;
             double z_direction = getCamera().direction.z;
             double power = getShot_Power();
+
+            System.out.println("first place of the ball 0, 0");
 
             Rungekuttasolver solver = new Rungekuttasolver();
             solver.setValues(ballPositionX, ballPositionZ, (x_direction*power)*300, (z_direction*power)*300);

@@ -1,16 +1,18 @@
 package code.Bot;
 
-import code.Physics.Rungekuttasolver;
+import  code.Physics.Rungekuttasolver;
+import org.graalvm.compiler.replacements.nodes.MacroStateSplitNode;
 
 import java.math.BigDecimal;
 import java.math.MathContext;
+import java.security.GeneralSecurityException;
 import java.util.Arrays;
 import java.util.Comparator;
 
 //For the moment it's a stand alone code using the Runge Kutter for fitness
-public class PuttingBotv2 {
+public class PuttingBotv0H {
     //Hyperparameters
-    static final int populationAmount = 100; //amount of individuals in 1 generation
+    static final int populationAmount = 50; //amount of individuals in 1 generation
     static final int generations = 100; //amount of generations
     static final double  mutationRate = 0.34; //probability that an individual will mutate
     static final double crossoverRate = 0.4; //UNDER 0.5, will replace from bottom to up fitness. half max
@@ -18,16 +20,16 @@ public class PuttingBotv2 {
     //Other parameters
     static double angleRangeReducer = 0.05; //% of the adjustment
     static double velocityReducer = 0.08; //% of the adjustment
-    static int reducerThreshold = 48; //which generation the optimisation starts
+    static int reducerThreshold = 50; //which generation the optimisation starts
     static final int susCrossover = (int)(crossoverRate*populationAmount); //EVEN NUMBER, <= populationAmount/2,  Number of selections in 1 spin
     static final int susMutation = (int)(mutationRate*populationAmount); //EVEN NUMBER! Number of selections in 1 spin
 
     //Positions & Velocities
-    static double [] angleRange = {0,180}; //OPTIMISATION by reducing the range of angles (no opposite kick)
-    static double [] velocityRange = {0, 20}; //OPTIMISATION by reducing the range of angles (no opposite kick)
+    static double [] angleRange = {0,90}; //OPTIMISATION by reducing the range of angles (no opposite kick)
+    static double [] velocityRange = {9, 13}; //OPTIMISATION by reducing the range of angles (no opposite kick)
 
     //will need to calc the height at the end to put the ball at the exact pos
-    static final double [] flagPos = {20,23};
+    static final double [] flagPos = {2,30};
     static final int [] startingPos = {0,0};
 
     //Others
@@ -42,6 +44,76 @@ public class PuttingBotv2 {
     static double [][] population = new double[populationAmount][3]; //3 being Angle, Velocity and fitness
 
     // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+    //makes an array of all possiilities and speed + select the best 100.
+    static void initialisationByRange(){
+        double [][] fullArray = new double[(int)((-velocityRange[0]+velocityRange[1]+1)*(Math.abs(angleRange[0])+angleRange[1]+1))][3];
+
+        int counter = 0;
+
+        //create all the possibilities
+        for (int i = (int) angleRange[0]; i <= angleRange[1]; i++){
+            for (int j = (int) velocityRange[0]; j <= velocityRange[1]; j++){
+                fullArray[counter] = new double[]{i, j, initFitness(i,j)};
+                counter++;
+            }
+        }
+
+        //sort fitness
+        sort(fullArray);
+        //copy in the original pop
+        System.arraycopy(fullArray, 0, population, 0, populationAmount);
+
+        //create new range angle
+        angleRange = new double[]{population[0][0], population[0][0]};
+        for (int i = 0; i < 10; i++){
+            //+1-1 because it can be 60.01
+            //check min
+            if (population[i][0] < angleRange[0]){
+                angleRange[0] = population[i][0]-1;
+            }
+            //check max
+            else if (population[i][0] > angleRange[1]){
+                    angleRange[1] = population[i][0]+1;
+                }
+        }
+
+        //create new range velocity
+        velocityRange = new double[]{population[0][1], population[0][1]};
+        for (int i = 0; i < 10; i++){
+            //check min
+            if (population[i][1] < velocityRange[0]){
+                velocityRange[0] = population[i][1]-1;
+            }
+            //check max
+            else if (population[i][1] > velocityRange[1]){
+                velocityRange[1] = population[i][1]+1;
+            }
+        }
+
+        System.out.println(Arrays.toString(angleRange));
+        System.out.println(Arrays.toString(velocityRange));
+        stop = System.currentTimeMillis();
+        System.out.println("Time elapsed: " + (stop-start)/1000 + "s.");
+
+
+    }
+
+    static double initFitness(double angle, double velo){
+            double [] fullArray = new double[] {angle,velo,0};
+
+            double results[] = RK4(fullArray);
+
+            //Calculate the fitness by the distance between the flag and the ball
+            double fitnessCalc = Math.sqrt(Math.pow((flagPos[0] - results[0]), 2) + (Math.pow((flagPos[1] - results[1]), 2)));
+
+            //If in hole
+            if (fitnessCalc <= tolerance){ //Means we're in the diameter of the flag
+                stop = System.currentTimeMillis();
+                printFound(fullArray, true);
+        }
+        return fitnessCalc;
+    }
 
     //Generates a random double between 2 numberes and rounded to n-sf
     static double random(double firstN, double secondN, int sf){
@@ -66,23 +138,6 @@ public class PuttingBotv2 {
                 return -(Double.compare(o2[2], o1[2])); //low to high https://www.geeksforgeeks.org/double-compare-method-in-java-with-examples/
             }
         });
-    }
-
-    //Initialisation of the empty population array
-    static void initialisation(){
-
-        for (int i=0; i < population.length; i++){
-            for (int j=0; j < population[i].length; j++){
-
-                if (j == 0){    //Angle
-                    population[i][j] = random(angleRange[0], angleRange[1], sf);
-                }else if (j == 1){  //Velocity
-                    population[i][j] = random(velocityRange[0], velocityRange[1], sf);
-                }else{  //Fitness
-                    population[i][j] = 0;
-                }
-            }
-        }
     }
 
     //Executes the RK4 class giving baack the position of the ball
@@ -263,11 +318,7 @@ public class PuttingBotv2 {
         start = System.currentTimeMillis();
         countRangeReducerCycles = 0;
 
-        initialisation();
-
-        int intelComparator = 6; //how many fitness to compare
-        double [][] intelArray = new double[intelComparator-1][3]; //array that stores the best individuals of 5 gen
-        int  counter = 0;
+        initialisationByRange();
 
         for (int i = 0; i < generations; i++){
 
