@@ -15,12 +15,11 @@ import com.badlogic.gdx.graphics.g3d.environment.DirectionalLight;
 import com.badlogic.gdx.graphics.g3d.utils.MeshPartBuilder;
 import com.badlogic.gdx.graphics.g3d.utils.ModelBuilder;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.game.game.Game;
-
-import javax.jws.WebParam;
 
 public class PuttingGameScreen implements Screen {
 
@@ -38,12 +37,16 @@ public class PuttingGameScreen implements Screen {
     private Model ball;
     private ModelInstance ballInstance;
     private float ballSize = 0.2f;
+    private float ballPositionX;
+    private float ballPositionZ;
 
     // Instance for the 3D field
     private Model flatField;
     private ModelInstance[] fieldInstance;
     private Model slopeModel;
     private ModelInstance[] slopeInstance;
+    private Model arrow;
+    private ModelInstance arrowInstance;
 
     // Instance vector for the camera
     public static Vector3 vector1;
@@ -82,7 +85,7 @@ public class PuttingGameScreen implements Screen {
 
         // Creation of the 3D camera
         camera = new PerspectiveCamera(75, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
-        camera.position.set(3f, 3f, 3f);
+        camera.position.set(-3.5f, 3f, -3.5f);
         camera.lookAt(0f, 0f, 0f);
         camera.near = 0.1f;
         camera.far = 400f;
@@ -90,19 +93,11 @@ public class PuttingGameScreen implements Screen {
         modelBatch = new ModelBatch();
         modelBuilder = new ModelBuilder();
 
-        // Creation of a blue flat field that corresponds to the water (need to verify the height of this field)
-        flatField = modelBuilder.createBox(50, 1.0f, 50,
+        // Creation of a blue flat field that corresponds to the water
+        flatField = modelBuilder.createBox(5000, 1.0f, 5000,
                 new Material(ColorAttribute.createDiffuse(Color.BLUE)),
                 VertexAttributes.Usage.Position | VertexAttributes.Usage.Normal
         );
-
-        // Adding all the mesh (green triangle) to the method that build the field
-        modelBuilder.begin();
-        meshPartBuilder = modelBuilder.part("field", GL20.GL_TRIANGLES,
-                VertexAttributes.Usage.Position | VertexAttributes.Usage.Normal,
-                new Material(ColorAttribute.createDiffuse(Color.GREEN)));
-        buildField(meshPartBuilder);
-        slopeModel = modelBuilder.end();
 
         int numberOfFields = 1;
 
@@ -127,7 +122,7 @@ public class PuttingGameScreen implements Screen {
         ball = modelBuilder.createSphere(ballSize, ballSize, ballSize, 10, 10,
                 new Material(ColorAttribute.createDiffuse(Color.WHITE)),
                 VertexAttributes.Usage.Position | VertexAttributes.Usage.Normal);
-        ballInstance = new ModelInstance(ball, 0,(defineFunction(0,0))+(ballSize/2), 0);
+        ballInstance = new ModelInstance(ball, ballPositionX,(defineFunction(ballPositionX, ballPositionZ))+(ballSize/2), ballPositionZ);
 
         shapeRenderer = new ShapeRenderer();
 
@@ -146,9 +141,9 @@ public class PuttingGameScreen implements Screen {
         float field2 = (float) (Math.sin(i))/3;
         float field3 = (float) (((Math.atan(i) + Math.atan(j))/2)+0.5);
         float ripple1 = (float) ((0.4)+Math.sin((0.4)*(Math.pow(i,2)+Math.pow(j,2))/10));
-        float ripple2 = (float) ((0.1)+(Math.sin((0.4)*(Math.pow(i,2)+Math.pow(j,2)))/10)*4);
+        float ripple2 = (float) ((0.4)+(Math.sin((0.4)*(Math.pow(i,2)+Math.pow(j,2)))/10)*4);
 
-        return ripple1;
+        return field1;
     }
 
     // Method used to get the friction at a certain location
@@ -169,8 +164,8 @@ public class PuttingGameScreen implements Screen {
         Vector3 pos1,pos2,pos3,pos4;
         Vector3 nor1,nor2,nor3,nor4;
         MeshPartBuilder.VertexInfo v1,v2,v3,v4;
-        for(int i = -gridWidth/2; i < gridWidth/2; i++) {
-            for (int j = -gridDepth / 2; j < gridDepth / 2; j++) {
+        for(int i = 0; i < gridWidth; i++) {
+            for (int j = 0; j < gridDepth; j++) {
 
                 pos1 = new Vector3(i, defineFunction(i, j), j);
                 pos2 = new Vector3(i, defineFunction(i, j + 1), j+1);
@@ -206,6 +201,7 @@ public class PuttingGameScreen implements Screen {
         // for the moment I only chose to take the first element of the array of size 100
         // If we want a bigger field we can take the following indexes (every index holds a field of the same size)
         modelBatch.begin(camera);
+
         modelBatch.render(ballInstance);
         /*for (int i = 0; i < 2; i++) {
             modelBatch.render(fieldInstance[i], environment);
@@ -213,6 +209,16 @@ public class PuttingGameScreen implements Screen {
         }*/
         modelBatch.render(fieldInstance[0], environment);
         modelBatch.render(slopeInstance[0], environment);
+
+        // Creation of the arrow
+        arrow = modelBuilder.createArrow(ballPositionX, 2f, ballPositionZ,
+                ((camera.direction.x)*5)+(ballPositionX), 3f, ((camera.direction.z)*5)+(ballPositionZ), 0.1f, 0.1f, 10,
+                GL20.GL_TRIANGLES, new Material(ColorAttribute.createDiffuse(Color.RED)),
+                VertexAttributes.Usage.Position | VertexAttributes.Usage.Normal);
+        arrowInstance = new ModelInstance(arrow);
+
+        modelBatch.render(arrowInstance);
+
         modelBatch.end();
 
         shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
@@ -231,31 +237,35 @@ public class PuttingGameScreen implements Screen {
         //key input to take shot
         if(Gdx.input.isKeyJustPressed(Input.Keys.SPACE)){
             double x_direction = getCamera().direction.x;
-            double y_direction = getCamera().direction.y;
+            double z_direction = getCamera().direction.z;
             double power = getShot_Power();
 
-            System.out.println("first place of the ball 0, 0");
-
             Rungekuttasolver solver = new Rungekuttasolver();
-            solver.setValues(x_direction, y_direction, power, power);
+            solver.setValues(ballPositionX, ballPositionZ, (x_direction*power)*300, (z_direction*power)*300);
             solver.RK4();
 
-            ballInstance = new ModelInstance(getBall(), (float) (solver.getX()),
-                    (PuttingGameScreen.defineFunction(solver.getX(),
-                            solver.getY()))+ getBallSize()/2, (float) (solver.getY()));
+            ballPositionX = (float) solver.getX();
+            ballPositionZ = (float) solver.getY();
+
+            ballInstance = new ModelInstance(getBall(), ballPositionX,
+                    (PuttingGameScreen.defineFunction(ballPositionX, ballPositionZ)+ getBallSize()/2), ballPositionZ);
 
             getModelBatch().render(ballInstance);
 
-            System.out.println("new ball place " + solver.getX() + ", " + solver.getY());
-
-            // gamescreen.ball.hit(stuff here that uses power and angle of camera)
-
-            System.out.println("shot taken with power: " + power + " and x_direction: " + x_direction + " and y_direction: " + y_direction);
+            System.out.println("shot taken with power: " + power + " and x_direction: " + x_direction + " and y_direction: " + z_direction);
             //reset the power
             setShot_Power(getSTARTING_SHOT_POWER());
+
+            camera.position.x = ballPositionX-5;
+            camera.position.z = ballPositionZ-5;
+            camera.position.y = 5;
+
+            camera.lookAt(ballPositionX,0,ballPositionZ);
+
         }
 
         InputHandler.checkForInput(this);
+        //camera.lookAt(ballPositionX,0,ballPositionZ);
     }
 
     @Override
@@ -335,5 +345,13 @@ public class PuttingGameScreen implements Screen {
 
     public ModelBatch getModelBatch() {
         return modelBatch;
+    }
+
+    public float getBallPositionX() {
+        return ballPositionX;
+    }
+
+    public float getBallPositionZ() {
+        return ballPositionZ;
     }
 }

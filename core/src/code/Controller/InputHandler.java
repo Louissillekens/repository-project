@@ -23,23 +23,23 @@ public class InputHandler {
 
         // Some key pressed input to rotate the camera and also zoom in zoom out
         if(Gdx.input.isKeyPressed(Input.Keys.LEFT)) {
-            gamescreen.getCamera().lookAt(0,0,0);
-            gamescreen.getCamera().rotateAround(gamescreen.vector1 = new Vector3(0f, 0f, 0f), gamescreen.vector2 = new Vector3(0f, 1f, 0f), -1f);
+            gamescreen.getCamera().rotateAround(PuttingGameScreen.vector1 = new Vector3(0f, 0f, 0f), PuttingGameScreen.vector2 = new Vector3(0f, -1f, 0f), 1f);
+            gamescreen.getCamera().lookAt(gamescreen.getBallPositionX(), 0, gamescreen.getBallPositionZ());
         }
         if(Gdx.input.isKeyPressed(Input.Keys.RIGHT)) {
-            gamescreen.getCamera().lookAt(0,0,0);
-            gamescreen.getCamera().rotateAround(gamescreen.vector1 = new Vector3(0f, 0f, 0f), gamescreen.vector2 = new Vector3(0f, 1f, 0f), 1f);
+            gamescreen.getCamera().rotateAround(PuttingGameScreen.vector1 = new Vector3(0f, 0f, 0f), PuttingGameScreen.vector2 = new Vector3(0f, 1f, 0f), 1f);
+            gamescreen.getCamera().lookAt(gamescreen.getBallPositionX(), 0, gamescreen.getBallPositionZ());
         }
         if(Gdx.input.isKeyPressed(Input.Keys.UP)) {
-            gamescreen.getCamera().lookAt(0,0,0);
             if ((gamescreen.getCamera().position.y > 2)) {
                 gamescreen.getCamera().translate(0, -0.1f, 0);
+                gamescreen.getCamera().lookAt(gamescreen.getBallPositionX(), 0, gamescreen.getBallPositionZ());
             }
         }
         if(Gdx.input.isKeyPressed(Input.Keys.DOWN)) {
-            gamescreen.getCamera().lookAt(0,0,0);
             if (gamescreen.getCamera().position.y < 15) {
                 gamescreen.getCamera().translate(0, 0.1f, 0);
+                gamescreen.getCamera().lookAt(gamescreen.getBallPositionX(), 0, gamescreen.getBallPositionZ());
             }
         }
         // Key pressed input to be back on the game mode screen
@@ -59,7 +59,7 @@ public class InputHandler {
             if(gamescreen.getShot_Power() < gamescreen.getMAX_SPEED() - gamescreen.getPOWER_INCREMENT()){
                 gamescreen.IncrementShotPower(1);
             }
-            System.out.println("shot power now at: " + gamescreen.getShot_Power());
+            //System.out.println("shot power now at: " + gamescreen.getShot_Power());
         }
         if(Gdx.input.isKeyPressed(Input.Keys.S)){
             //round the shot power to two decimal places to avoid errors where the power would get below 0
@@ -68,8 +68,13 @@ public class InputHandler {
             if(gamescreen.getShot_Power() > 0 + gamescreen.getPOWER_INCREMENT()){
                 gamescreen.IncrementShotPower(-1);
             }
-            System.out.println("shot power now at: " + gamescreen.getShot_Power());
+            //System.out.println("shot power now at: " + gamescreen.getShot_Power());
         }
+
+        //System.out.println("pos x : " + gamescreen.getBallPositionX());
+        //System.out.println("pos y : " + gamescreen.getBallPositionZ());
+        //System.out.println("x : " + gamescreen.getCamera().direction.x);
+        //System.out.println("y : " + gamescreen.getCamera().direction.z);
     }
 
     /**
