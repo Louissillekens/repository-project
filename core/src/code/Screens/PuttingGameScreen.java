@@ -20,6 +20,8 @@ import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.game.game.Game;
 
+import javax.jws.WebParam;
+
 public class PuttingGameScreen implements Screen {
 
     private Game game;
@@ -226,6 +228,33 @@ public class PuttingGameScreen implements Screen {
 
         shapeRenderer.end();
 
+        //key input to take shot
+        if(Gdx.input.isKeyJustPressed(Input.Keys.SPACE)){
+            double x_direction = getCamera().direction.x;
+            double y_direction = getCamera().direction.y;
+            double power = getShot_Power();
+
+            System.out.println("first place of the ball 0, 0");
+
+            Rungekuttasolver solver = new Rungekuttasolver();
+            solver.setValues(x_direction, y_direction, power, power);
+            solver.RK4();
+
+            ballInstance = new ModelInstance(getBall(), (float) (solver.getX()),
+                    (PuttingGameScreen.defineFunction(solver.getX(),
+                            solver.getY()))+ getBallSize()/2, (float) (solver.getY()));
+
+            getModelBatch().render(ballInstance);
+
+            System.out.println("new ball place " + solver.getX() + ", " + solver.getY());
+
+            // gamescreen.ball.hit(stuff here that uses power and angle of camera)
+
+            System.out.println("shot taken with power: " + power + " and x_direction: " + x_direction + " and y_direction: " + y_direction);
+            //reset the power
+            setShot_Power(getSTARTING_SHOT_POWER());
+        }
+
         InputHandler.checkForInput(this);
     }
 
@@ -290,5 +319,21 @@ public class PuttingGameScreen implements Screen {
 
     public double getSTARTING_SHOT_POWER(){
         return STARTING_SHOT_POWER;
+    }
+
+    public float getBallSize() {
+        return ballSize;
+    }
+
+    public ModelInstance getBallInstance() {
+        return ballInstance;
+    }
+
+    public Model getBall() {
+        return ball;
+    }
+
+    public ModelBatch getModelBatch() {
+        return modelBatch;
     }
 }

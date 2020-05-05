@@ -1,15 +1,19 @@
 package code.Controller;
 
+import code.Physics.Rungekuttasolver;
 import code.Screens.GameModeScreen;
 import code.Screens.PuttingGameScreen;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
+import com.badlogic.gdx.graphics.g3d.ModelInstance;
 import com.badlogic.gdx.math.Vector3;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 
 public class InputHandler {
+
+
 
     /**
      * checks for input and updates the given PuttingGameScreen accordingly
@@ -65,18 +69,6 @@ public class InputHandler {
                 gamescreen.IncrementShotPower(-1);
             }
             System.out.println("shot power now at: " + gamescreen.getShot_Power());
-        }
-        //key input to take shot
-        if(Gdx.input.isKeyJustPressed(Input.Keys.SPACE)){
-            double x_direction = gamescreen.getCamera().direction.x;
-            double y_direction = gamescreen.getCamera().direction.y;
-            double power = gamescreen.getShot_Power();
-            //TODO make code to take shot based on ball class
-            /*gamescreen.ball.hit(stuff here that uses power and angle of camera)*/
-
-            System.out.println("shot taken with power: " + power + " and x_direction: " + x_direction + " and y_direction: " + y_direction);
-            //reset the power
-            gamescreen.setShot_Power(gamescreen.getSTARTING_SHOT_POWER());
         }
     }
 
