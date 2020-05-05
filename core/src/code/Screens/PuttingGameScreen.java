@@ -20,8 +20,6 @@ import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.game.game.Game;
 
-import javax.jws.WebParam;
-
 public class PuttingGameScreen implements Screen {
 
     private Game game;
@@ -148,7 +146,7 @@ public class PuttingGameScreen implements Screen {
         float ripple1 = (float) ((0.4)+Math.sin((0.4)*(Math.pow(i,2)+Math.pow(j,2))/10));
         float ripple2 = (float) ((0.1)+(Math.sin((0.4)*(Math.pow(i,2)+Math.pow(j,2)))/10)*4);
 
-        return ripple1;
+        return field3;
     }
 
     // Method used to get the friction at a certain location
