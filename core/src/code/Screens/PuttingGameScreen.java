@@ -21,7 +21,7 @@ import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.game.game.Game;
 
-import javax.jws.WebParam;
+//import javax.jws.WebParam;
 
 public class PuttingGameScreen implements Screen {
 
