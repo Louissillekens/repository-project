@@ -31,7 +31,7 @@ public class PuttingGameScreen implements Screen {
     // Instance for the scene
     private PerspectiveCamera camera;
     private ModelBatch modelBatch;
-    private ModelBuilder modelBuilder;
+    private static ModelBuilder modelBuilder;
     private Environment environment;
     private MeshPartBuilder meshPartBuilder;
 
@@ -62,9 +62,9 @@ public class PuttingGameScreen implements Screen {
     private GameMode gameMode;
 
     //these variables are to decide the shot_speed
-    private final double POWER_INCREMENT = 0.01;//m/s
+    private final double POWER_INCREMENT = 0.025;//m/s
     private final double MAX_SPEED = 3;//for now the max speed is 3 (should be possible to change per course)
-    private final double STARTING_SHOT_POWER = 0;
+    private final double STARTING_SHOT_POWER = 0.000001;
     private double shot_Power = STARTING_SHOT_POWER;//m/s
 
     // Instance for the power shoot
@@ -81,6 +81,10 @@ public class PuttingGameScreen implements Screen {
     private static float flagPositionZ = 10;
 
     private static float winRadius = 5;
+
+    private static int count = 0;
+    private float[] positionArrayX = new float[100];
+    private float[] positionArrayZ = new float[100];
 
     // Constructor that creates the 3D field + corresponding game mode
     public PuttingGameScreen(final Game game, GameMode gameMode) {
@@ -208,7 +212,6 @@ public class PuttingGameScreen implements Screen {
                 float meanX = (pos1.x + pos2.x + pos3.x + pos4.x)/4;
                 float meanZ = (pos1.z + pos2.z + pos3.z + pos4.z)/4;
 
-                System.out.println(Math.sqrt(Math.pow((i-flagPositionX), 2) + Math.pow((j-flagPositionZ), 2)));
                 if (euclideanDist(meanX, meanZ) < winRadius) {
                     fieldColor = Color.PURPLE;
                 }
@@ -225,14 +228,27 @@ public class PuttingGameScreen implements Screen {
         }
     }
 
+    // Method that return the euclidean distance between the ball and the flag
     public static float euclideanDist(float positionX, float positionZ) {
 
         return (float) Math.sqrt(Math.pow((positionX-flagPositionX), 2) + Math.pow((positionZ-flagPositionZ), 2));
     }
 
+    // Method that checks if the ball is close enough to the flag
     public boolean isWin(float positionX, float positionZ) {
 
         if (euclideanDist(positionX, positionZ) < winRadius) {
+            return true;
+        }
+        else {
+            return false;
+        }
+    }
+
+    // Method that checks if the ball is in the water
+    public boolean isInWater(float positionX, float positionZ) {
+
+        if (defineFunction(positionX, positionZ) < 0) {
             return true;
         }
         else {
@@ -296,19 +312,19 @@ public class PuttingGameScreen implements Screen {
             double z_direction = getCamera().direction.z;
             double power = getShot_Power();
 
-            System.out.println("first place of the ball 0, 0");
+            positionArrayX[count] = ballPositionX;
+            positionArrayZ[count] = ballPositionZ;
 
             Rungekuttasolver solver = new Rungekuttasolver();
-            solver.setValues(ballPositionX, ballPositionZ, (x_direction*power)*300, (z_direction*power)*300);
+            solver.setValues(ballPositionX, ballPositionZ, (x_direction*power)*600, (z_direction*power)*600);
             solver.RK4();
 
             ballPositionX = (float) solver.getX();
             ballPositionZ = (float) solver.getY();
 
             ballInstance = new ModelInstance(getBall(), ballPositionX,
-                    (PuttingGameScreen.defineFunction(ballPositionX, ballPositionZ)+ getBallSize()/2), ballPositionZ);
-
-            getModelBatch().render(ballInstance);
+                    (defineFunction(ballPositionX, ballPositionZ)+ getBallSize()/2), ballPositionZ);
+            modelBatch.render(ballInstance);
 
             System.out.println("shot taken with power: " + power + " and x_direction: " + x_direction + " and y_direction: " + z_direction);
             //reset the power
@@ -320,10 +336,44 @@ public class PuttingGameScreen implements Screen {
 
             camera.lookAt(ballPositionX,0,ballPositionZ);
 
+            count++;
         }
 
+        // Key press input R that return to the place of the previous shot
+        if (Gdx.input.isKeyPressed(Input.Keys.R)) {
+            if (count > 0) {
+                ballInstance = new ModelInstance(getBall(), positionArrayX[count-1],
+                        (PuttingGameScreen.defineFunction(positionArrayX[count-1], positionArrayZ[count-1]) + getBallSize() / 2), positionArrayZ[count-1]);
+                modelBatch.render(ballInstance);
+                ballPositionX = positionArrayX[count-1];
+                ballPositionZ = positionArrayZ[count-1];
+                camera.position.x = ballPositionX-5;
+                camera.position.z = ballPositionZ-5;
+                camera.position.y = 5;
+                camera.lookAt(ballPositionX,0,ballPositionZ);
+            }
+        }
+
+        // If ball is close enough to the flag, WIN and stop the game
+        if (isWin(ballPositionX, ballPositionZ)) {
+            System.out.println("WIN");
+            game.setScreen(new GameModeScreen(game));
+        }
+
+        // If the ball falls into water, go to the previous position
+        if (isInWater(ballPositionX, ballPositionZ)) {
+
+            ballInstance = new ModelInstance(getBall(), positionArrayX[count-1],
+                    (PuttingGameScreen.defineFunction(positionArrayX[count-1], positionArrayZ[count-1]) + getBallSize() / 2), positionArrayZ[count-1]);
+            modelBatch.render(ballInstance);
+            ballPositionX = positionArrayX[count-1];
+            ballPositionZ = positionArrayZ[count-1];
+            camera.position.x = ballPositionX-5;
+            camera.position.z = ballPositionZ-5;
+            camera.position.y = 5;
+            camera.lookAt(ballPositionX,0,ballPositionZ);
+        }
         InputHandler.checkForInput(this);
-        //camera.lookAt(ballPositionX,0,ballPositionZ);
     }
 
     @Override
