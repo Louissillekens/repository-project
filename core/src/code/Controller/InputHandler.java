@@ -37,7 +37,7 @@ public class InputHandler {
             }
         }
         if(Gdx.input.isKeyPressed(Input.Keys.DOWN)) {
-            if (gamescreen.getCamera().position.y < 15) {
+            if (gamescreen.getCamera().position.y < 12) {
                 gamescreen.getCamera().translate(0, 0.1f, 0);
                 gamescreen.getCamera().lookAt(gamescreen.getBallPositionX(), 0, gamescreen.getBallPositionZ());
             }

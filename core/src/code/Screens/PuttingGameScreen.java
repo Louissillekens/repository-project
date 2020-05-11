@@ -5,23 +5,19 @@ import code.Physics.Rungekuttasolver;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.Screen;
-import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.GL20;
-import com.badlogic.gdx.graphics.PerspectiveCamera;
-import com.badlogic.gdx.graphics.VertexAttributes;
+import com.badlogic.gdx.graphics.*;
 import com.badlogic.gdx.graphics.g3d.*;
 import com.badlogic.gdx.graphics.g3d.attributes.ColorAttribute;
 import com.badlogic.gdx.graphics.g3d.environment.DirectionalLight;
 import com.badlogic.gdx.graphics.g3d.utils.MeshPartBuilder;
 import com.badlogic.gdx.graphics.g3d.utils.ModelBuilder;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
-import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.game.game.Game;
 
-import javax.jws.WebParam;
+import static com.badlogic.gdx.graphics.GL20.GL_TRIANGLES;
 
 public class PuttingGameScreen implements Screen {
 
@@ -31,7 +27,7 @@ public class PuttingGameScreen implements Screen {
     // Instance for the scene
     private PerspectiveCamera camera;
     private ModelBatch modelBatch;
-    private ModelBuilder modelBuilder;
+    private static ModelBuilder modelBuilder;
     private Environment environment;
     private MeshPartBuilder meshPartBuilder;
 
@@ -49,6 +45,7 @@ public class PuttingGameScreen implements Screen {
     private ModelInstance[] slopeInstance;
     private Model arrow;
     private ModelInstance arrowInstance;
+    private static Color fieldColor;
 
     // Instance vector for the camera
     public static Vector3 vector1;
@@ -70,6 +67,16 @@ public class PuttingGameScreen implements Screen {
     private Rectangle rect1;
     private Rectangle rect2;
     private ShapeRenderer shapeRenderer;
+
+    // Instances for the flag
+    private Model flag1;
+    private ModelInstance flag1Instance;
+    private Model flag2;
+    private ModelInstance flag2Instance;
+    private static float flagPositionX = 20;
+    private static float flagPositionZ = 10;
+
+    private static float winRadius = 5;
 
     // Constructor that creates the 3D field + corresponding game mode
     public PuttingGameScreen(final Game game, GameMode gameMode) {
@@ -110,10 +117,7 @@ public class PuttingGameScreen implements Screen {
 
             // Adding all the mesh (green triangle) to the method that build the field
             modelBuilder.begin();
-            meshPartBuilder = modelBuilder.part("field", GL20.GL_TRIANGLES,
-                    VertexAttributes.Usage.Position | VertexAttributes.Usage.Normal,
-                    new Material(ColorAttribute.createDiffuse(Color.GREEN)));
-            buildField(meshPartBuilder);
+            buildField();
             slopeModel = modelBuilder.end();
 
             fieldInstance[i] = new ModelInstance(flatField, 0f, -0.5f, (-i) * 50);
@@ -128,6 +132,19 @@ public class PuttingGameScreen implements Screen {
 
         shapeRenderer = new ShapeRenderer();
 
+        // Creation of the flag
+        flag1 = modelBuilder.createBox(0.1f, 4, 0.1f,
+                new Material(ColorAttribute.createDiffuse(Color.RED)),
+                VertexAttributes.Usage.Position | VertexAttributes.Usage.Normal
+        );
+        flag1Instance = new ModelInstance(flag1, flagPositionX, defineFunction(flagPositionX, flagPositionZ), flagPositionZ);
+
+        flag2 = modelBuilder.createBox(1.5f, 1f, 0.2f,
+                new Material(ColorAttribute.createDiffuse(Color.BLUE)),
+                VertexAttributes.Usage.Position | VertexAttributes.Usage.Normal
+        );
+        flag2Instance = new ModelInstance(flag2, flagPositionX-0.75f, defineFunction(flagPositionX, flagPositionZ)+2.5f, flagPositionZ);
+
         // Adding an environment which is used for the luminosity of the frame
         environment = new Environment();
         environment.set(new ColorAttribute(ColorAttribute.AmbientLight, 0.3f, 0.3f, 0.3f, 1.f));
@@ -138,7 +155,7 @@ public class PuttingGameScreen implements Screen {
     // Method that defines the function we use to create the slope of the field
     public static float defineFunction(double i, double j) {
 
-        float field0 = (float) (0);
+        float field0 = (float) (0.5);
         float field1 = (float) (((Math.sin(i) + Math.sin(j))/3)+0.5);
         float field2 = (float) (Math.sin(i))/3;
         float field3 = (float) (((Math.atan(i) + Math.atan(j))/2)+0.5);
@@ -159,7 +176,7 @@ public class PuttingGameScreen implements Screen {
 
     // Method that build the 3D field from a mesh
     // Need to be improved to give another function as input to have other kinds of fields
-    public static void buildField(MeshPartBuilder b){
+    public static void buildField(){
 
         int gridWidth = 50;
         int gridDepth = 50;
@@ -184,9 +201,38 @@ public class PuttingGameScreen implements Screen {
                 v3 = new MeshPartBuilder.VertexInfo().setPos(pos3).setNor(nor3).setCol(null).setUV(0.0f, 0.5f);
                 v4 = new MeshPartBuilder.VertexInfo().setPos(pos4).setNor(nor4).setCol(null).setUV(0.5f, 0.5f);
 
-                b.rect(v1, v2, v3, v4);
+                float meanX = (pos1.x + pos2.x + pos3.x + pos4.x)/4;
+                float meanZ = (pos1.z + pos2.z + pos3.z + pos4.z)/4;
 
+                System.out.println(Math.sqrt(Math.pow((i-flagPositionX), 2) + Math.pow((j-flagPositionZ), 2)));
+                if (euclideanDist(meanX, meanZ) < winRadius) {
+                    fieldColor = Color.PURPLE;
+                }
+                else {
+                    fieldColor = Color.GREEN;
+                }
+
+                MeshPartBuilder b = modelBuilder.part("field", GL_TRIANGLES,
+                        VertexAttributes.Usage.Position | VertexAttributes.Usage.Normal,
+                        new Material(ColorAttribute.createDiffuse(fieldColor)));
+
+                b.rect(v1, v2, v3, v4);
             }
+        }
+    }
+
+    public static float euclideanDist(float positionX, float positionZ) {
+
+        return (float) Math.sqrt(Math.pow((positionX-flagPositionX), 2) + Math.pow((positionZ-flagPositionZ), 2));
+    }
+
+    public boolean isWin(float positionX, float positionZ) {
+
+        if (euclideanDist(positionX, positionZ) < winRadius) {
+            return true;
+        }
+        else {
+            return false;
         }
     }
 
@@ -204,7 +250,7 @@ public class PuttingGameScreen implements Screen {
         // If we want a bigger field we can take the following indexes (every index holds a field of the same size)
         modelBatch.begin(camera);
 
-        modelBatch.render(ballInstance);
+        modelBatch.render(ballInstance, environment);
         /*for (int i = 0; i < 2; i++) {
             modelBatch.render(fieldInstance[i], environment);
             modelBatch.render(slopeInstance[i], environment);
@@ -215,11 +261,15 @@ public class PuttingGameScreen implements Screen {
         // Creation of the arrow
         arrow = modelBuilder.createArrow(ballPositionX, 2f, ballPositionZ,
                 ((camera.direction.x)*5)+(ballPositionX), 3f, ((camera.direction.z)*5)+(ballPositionZ), 0.1f, 0.1f, 10,
-                GL20.GL_TRIANGLES, new Material(ColorAttribute.createDiffuse(Color.RED)),
+                GL_TRIANGLES, new Material(ColorAttribute.createDiffuse(Color.RED)),
                 VertexAttributes.Usage.Position | VertexAttributes.Usage.Normal);
         arrowInstance = new ModelInstance(arrow);
 
-        modelBatch.render(arrowInstance);
+        modelBatch.render(arrowInstance, environment);
+
+        modelBatch.render(flag1Instance, environment);
+
+        modelBatch.render(flag2Instance, environment);
 
         modelBatch.end();
 
