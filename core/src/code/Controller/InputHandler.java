@@ -31,28 +31,6 @@ public class InputHandler {
             gamescreen.getCamera().lookAt(gamescreen.getBallPositionX(), 0, gamescreen.getBallPositionZ());
         }
         if(Gdx.input.isKeyPressed(Input.Keys.UP)) {
-            if ((gamescreen.getCamera().position.y > 2)) {
-                gamescreen.getCamera().translate(0, -0.1f, 0);
-                gamescreen.getCamera().lookAt(gamescreen.getBallPositionX(), 0, gamescreen.getBallPositionZ());
-            }
-        }
-        if(Gdx.input.isKeyPressed(Input.Keys.DOWN)) {
-            if (gamescreen.getCamera().position.y < 12) {
-                gamescreen.getCamera().translate(0, 0.1f, 0);
-                gamescreen.getCamera().lookAt(gamescreen.getBallPositionX(), 0, gamescreen.getBallPositionZ());
-            }
-        }
-        // Key pressed input to be back on the game mode screen
-        if(Gdx.input.isKeyPressed(Input.Keys.B)) {
-            gamescreen.getGame().setScreen(new GameModeScreen(gamescreen.getGame()));
-        }
-        // Key pressed input to quit
-        if(Gdx.input.isKeyPressed(Input.Keys.Q)) {
-            Gdx.app.exit();
-        }
-
-        //key input for deciding the amount of power to strike the ball with
-        if(Gdx.input.isKeyPressed(Input.Keys.W)){
             //round the shot power to two decimal places to avoid errors where the power would get above max power
             double exact_shot_power = round(gamescreen.getShot_Power(), 2);
             gamescreen.setShot_Power(exact_shot_power);
@@ -61,7 +39,7 @@ public class InputHandler {
             }
             //System.out.println("shot power now at: " + gamescreen.getShot_Power());
         }
-        if(Gdx.input.isKeyPressed(Input.Keys.S)){
+        if(Gdx.input.isKeyPressed(Input.Keys.DOWN)) {
             //round the shot power to two decimal places to avoid errors where the power would get below 0
             double exact_shot_power = round(gamescreen.getShot_Power(), 2);
             gamescreen.setShot_Power(exact_shot_power);
@@ -69,6 +47,14 @@ public class InputHandler {
                 gamescreen.IncrementShotPower(-1);
             }
             //System.out.println("shot power now at: " + gamescreen.getShot_Power());
+        }
+        // Key pressed input to be back on the game mode screen
+        if(Gdx.input.isKeyPressed(Input.Keys.B)) {
+            gamescreen.getGame().setScreen(new GameModeScreen(gamescreen.getGame()));
+        }
+        // Key pressed input to quit
+        if(Gdx.input.isKeyPressed(Input.Keys.Q)) {
+            Gdx.app.exit();
         }
 
         //System.out.println("pos x : " + gamescreen.getBallPositionX());

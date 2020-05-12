@@ -56,6 +56,8 @@ public class PuttingGameScreen implements Screen {
     private Model arrow;
     private ModelInstance arrowInstance;
     private static Color fieldColor;
+    private static float gridWidth = 50;
+    private static float gridDepth = 50;
 
     // Instance vector for the camera
     public static Vector3 vector1;
@@ -190,8 +192,8 @@ public class PuttingGameScreen implements Screen {
     // Need to be improved to give another function as input to have other kinds of fields
     public static void buildField(){
 
-        int gridWidth = 50;
-        int gridDepth = 50;
+        gridWidth = 50;
+        gridDepth = 50;
         Vector3 pos1,pos2,pos3,pos4;
         Vector3 nor1,nor2,nor3,nor4;
         MeshPartBuilder.VertexInfo v1,v2,v3,v4;
@@ -258,6 +260,34 @@ public class PuttingGameScreen implements Screen {
         else {
             return false;
         }
+    }
+
+    // Method that checks if the ball is still in the field
+    public boolean outOfField(float positionX, float positionZ) {
+
+        if (positionX > gridDepth || positionZ > gridWidth || positionX < 0 || positionZ < 0) {
+            return true;
+        }
+        else {
+            return false;
+        }
+    }
+
+    // Method used to reset the shot to the previous one
+    public void resetBallShot() {
+
+        positionArrayX[count] = positionArrayX[count - 1];
+        positionArrayZ[count] = positionArrayZ[count - 1];
+
+        ballPositionX = positionArrayX[count - 1];
+        ballPositionZ = positionArrayZ[count - 1];
+        newBallPositionX = 0;
+        newBallPositionZ = 0;
+
+        camera.position.x = ballPositionX - 5;
+        camera.position.z = ballPositionZ - 5;
+        camera.position.y = 5;
+        camera.lookAt(ballPositionX, 0, ballPositionZ);
     }
 
     @Override
@@ -356,6 +386,10 @@ public class PuttingGameScreen implements Screen {
 
             ballPositionX += ballStepXmean;
             ballPositionZ += ballStepZmean;
+        }
+
+        if ((ballPositionX != newBallPositionX) || (ballPositionZ != newBallPositionZ)) {
+
             camera.position.x = ballPositionX - 5;
             camera.position.z = ballPositionZ - 5;
             camera.position.y = 5;
@@ -363,40 +397,22 @@ public class PuttingGameScreen implements Screen {
             camera.lookAt(ballPositionX, 0, ballPositionZ);
         }
 
+        if (outOfField(ballPositionX, ballPositionZ)) {
+
+            ballPositionX = 0;
+            ballPositionZ = 0;
+        }
+
         // Key press input R that return to the place of the previous shot
         if (Gdx.input.isKeyPressed(Input.Keys.R)) {
-            if (count > 0) {
 
-                positionArrayX[count] = positionArrayX[count - 1];
-                positionArrayZ[count] = positionArrayZ[count - 1];
-
-                ballPositionX = positionArrayX[count - 1];
-                ballPositionZ = positionArrayZ[count - 1];
-                newBallPositionX = 0;
-                newBallPositionZ = 0;
-
-                camera.position.x = ballPositionX - 5;
-                camera.position.z = ballPositionZ - 5;
-                camera.position.y = 5;
-                camera.lookAt(ballPositionX, 0, ballPositionZ);
-            }
+            resetBallShot();
         }
 
         // If the ball falls into water, go to the previous position
         if (isInWater(ballPositionX, ballPositionZ)) {
 
-            positionArrayX[count] = positionArrayX[count - 1];
-            positionArrayZ[count] = positionArrayZ[count - 1];
-
-            ballPositionX = positionArrayX[count-1];
-            ballPositionZ = positionArrayZ[count-1];
-            newBallPositionX = 0;
-            newBallPositionZ = 0;
-
-            camera.position.x = ballPositionX-5;
-            camera.position.z = ballPositionZ-5;
-            camera.position.y = 5;
-            camera.lookAt(ballPositionX,0,ballPositionZ);
+            resetBallShot();
         }
 
         // If ball is close enough to the flag, WIN and stop the game
