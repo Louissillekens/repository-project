@@ -25,7 +25,7 @@ public class PuttingBotv0H {
 
     //Positions & Velocities
     static double [] angleRange = {0,90}; //OPTIMISATION by reducing the range of angles (no opposite kick)
-    static double [] velocityRange = {9, 13}; //OPTIMISATION by reducing the range of angles (no opposite kick)
+    static double [] velocityRange = {9, 13}; //NOT START FROM '0' !! OPTIMISATION by reducing the range of angles (no opposite kick)
 
     //will need to calc the height at the end to put the ball at the exact pos
     static final double [] flagPos = {2,30};
