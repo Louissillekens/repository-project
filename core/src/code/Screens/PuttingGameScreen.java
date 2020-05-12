@@ -15,11 +15,12 @@ import com.badlogic.gdx.graphics.g3d.environment.DirectionalLight;
 import com.badlogic.gdx.graphics.g3d.utils.MeshPartBuilder;
 import com.badlogic.gdx.graphics.g3d.utils.ModelBuilder;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
-import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.game.game.Game;
+
+import java.util.Arrays;
 
 import static com.badlogic.gdx.graphics.GL20.GL_TRIANGLES;
 
@@ -39,8 +40,13 @@ public class PuttingGameScreen implements Screen {
     private Model ball;
     private ModelInstance ballInstance;
     private float ballSize = 0.2f;
-    private float ballPositionX;
-    private float ballPositionZ;
+    private float ballPositionX = 0;
+    private float ballPositionZ = 0;
+    private float newBallPositionX;
+    private float newBallPositionZ;
+    private float ballStepXmean;
+    private float ballStepZmean;
+    private int ballStep = 100;
 
     // Instance for the 3D field
     private Model flatField;
@@ -86,13 +92,14 @@ public class PuttingGameScreen implements Screen {
     private float[] positionArrayX = new float[100];
     private float[] positionArrayZ = new float[100];
 
+    private float timer = 0;
+
     // Constructor that creates the 3D field + corresponding game mode
     public PuttingGameScreen(final Game game, GameMode gameMode) {
 
         this.game = game;
 
         this.createField();
-        this.render(delta);
 
         this.gameMode = new GameMode(gameMode.gameName);
     }
@@ -132,11 +139,8 @@ public class PuttingGameScreen implements Screen {
             slopeInstance[i] = new ModelInstance(slopeModel, 0f, 0f, (-i) * 50);
         }
 
-        // Creation of the ball
-        ball = modelBuilder.createSphere(ballSize, ballSize, ballSize, 10, 10,
-                new Material(ColorAttribute.createDiffuse(Color.WHITE)),
-                VertexAttributes.Usage.Position | VertexAttributes.Usage.Normal);
-        ballInstance = new ModelInstance(ball, ballPositionX,(defineFunction(ballPositionX, ballPositionZ))+(ballSize/2), ballPositionZ);
+        positionArrayX[0] = ballPositionX;
+        positionArrayZ[0] = ballPositionZ;
 
         shapeRenderer = new ShapeRenderer();
 
@@ -270,13 +274,19 @@ public class PuttingGameScreen implements Screen {
         // If we want a bigger field we can take the following indexes (every index holds a field of the same size)
         modelBatch.begin(camera);
 
-        modelBatch.render(ballInstance, environment);
         /*for (int i = 0; i < 2; i++) {
             modelBatch.render(fieldInstance[i], environment);
             modelBatch.render(slopeInstance[i], environment);
         }*/
         modelBatch.render(fieldInstance[0], environment);
         modelBatch.render(slopeInstance[0], environment);
+
+        // Creation of the ball
+        ball = modelBuilder.createSphere(ballSize, ballSize, ballSize, 10, 10,
+                new Material(ColorAttribute.createDiffuse(Color.WHITE)),
+                VertexAttributes.Usage.Position | VertexAttributes.Usage.Normal);
+        ballInstance = new ModelInstance(ball, ballPositionX,(defineFunction(ballPositionX, ballPositionZ))+(ballSize/2), ballPositionZ);
+        modelBatch.render(ballInstance, environment);
 
         // Creation of the arrow
         arrow = modelBuilder.createArrow(ballPositionX, 2f, ballPositionZ,
@@ -308,50 +318,85 @@ public class PuttingGameScreen implements Screen {
 
         //key input to take shot
         if(Gdx.input.isKeyJustPressed(Input.Keys.SPACE)){
-            double x_direction = getCamera().direction.x;
-            double z_direction = getCamera().direction.z;
-            double power = getShot_Power();
 
-            positionArrayX[count] = ballPositionX;
-            positionArrayZ[count] = ballPositionZ;
+            double x_direction = camera.direction.x;
+            double z_direction = camera.direction.z;
+            double power = shot_Power;
+
+            count++;
 
             Rungekuttasolver solver = new Rungekuttasolver();
             solver.setValues(ballPositionX, ballPositionZ, (x_direction*power)*600, (z_direction*power)*600);
             solver.RK4();
 
-            ballPositionX = (float) solver.getX();
-            ballPositionZ = (float) solver.getY();
+            newBallPositionX = (float) solver.getX();
+            newBallPositionZ = (float) solver.getY();
 
-            ballInstance = new ModelInstance(getBall(), ballPositionX,
-                    (defineFunction(ballPositionX, ballPositionZ)+ getBallSize()/2), ballPositionZ);
-            modelBatch.render(ballInstance);
+            positionArrayX[count] = newBallPositionX;
+            positionArrayZ[count] = newBallPositionZ;
+
+            ballPositionX = positionArrayX[count-1];
+            ballPositionZ = positionArrayZ[count-1];
+
+            ballStepXmean = (positionArrayX[count]-positionArrayX[count-1])/ballStep;
+            ballStepZmean = (positionArrayZ[count]-positionArrayZ[count-1])/ballStep;
+
+            System.out.println("final x : " + newBallPositionX);
+            System.out.println("final z : " + newBallPositionZ);
 
             System.out.println("shot taken with power: " + power + " and x_direction: " + x_direction + " and y_direction: " + z_direction);
+
+
             //reset the power
             setShot_Power(getSTARTING_SHOT_POWER());
 
-            camera.position.x = ballPositionX-5;
-            camera.position.z = ballPositionZ-5;
+        }
+
+        if ((ballPositionX < newBallPositionX) && (ballPositionZ < newBallPositionZ)) {
+
+            ballPositionX += ballStepXmean;
+            ballPositionZ += ballStepZmean;
+            camera.position.x = ballPositionX - 5;
+            camera.position.z = ballPositionZ - 5;
             camera.position.y = 5;
 
-            camera.lookAt(ballPositionX,0,ballPositionZ);
-
-            count++;
+            camera.lookAt(ballPositionX, 0, ballPositionZ);
         }
 
         // Key press input R that return to the place of the previous shot
         if (Gdx.input.isKeyPressed(Input.Keys.R)) {
             if (count > 0) {
-                ballInstance = new ModelInstance(getBall(), positionArrayX[count-1],
-                        (PuttingGameScreen.defineFunction(positionArrayX[count-1], positionArrayZ[count-1]) + getBallSize() / 2), positionArrayZ[count-1]);
-                modelBatch.render(ballInstance);
-                ballPositionX = positionArrayX[count-1];
-                ballPositionZ = positionArrayZ[count-1];
-                camera.position.x = ballPositionX-5;
-                camera.position.z = ballPositionZ-5;
+
+                positionArrayX[count] = positionArrayX[count - 1];
+                positionArrayZ[count] = positionArrayZ[count - 1];
+
+                ballPositionX = positionArrayX[count - 1];
+                ballPositionZ = positionArrayZ[count - 1];
+                newBallPositionX = 0;
+                newBallPositionZ = 0;
+
+                camera.position.x = ballPositionX - 5;
+                camera.position.z = ballPositionZ - 5;
                 camera.position.y = 5;
-                camera.lookAt(ballPositionX,0,ballPositionZ);
+                camera.lookAt(ballPositionX, 0, ballPositionZ);
             }
+        }
+
+        // If the ball falls into water, go to the previous position
+        if (isInWater(ballPositionX, ballPositionZ)) {
+
+            positionArrayX[count] = positionArrayX[count - 1];
+            positionArrayZ[count] = positionArrayZ[count - 1];
+
+            ballPositionX = positionArrayX[count-1];
+            ballPositionZ = positionArrayZ[count-1];
+            newBallPositionX = 0;
+            newBallPositionZ = 0;
+
+            camera.position.x = ballPositionX-5;
+            camera.position.z = ballPositionZ-5;
+            camera.position.y = 5;
+            camera.lookAt(ballPositionX,0,ballPositionZ);
         }
 
         // If ball is close enough to the flag, WIN and stop the game
@@ -360,19 +405,6 @@ public class PuttingGameScreen implements Screen {
             game.setScreen(new GameModeScreen(game));
         }
 
-        // If the ball falls into water, go to the previous position
-        if (isInWater(ballPositionX, ballPositionZ)) {
-
-            ballInstance = new ModelInstance(getBall(), positionArrayX[count-1],
-                    (PuttingGameScreen.defineFunction(positionArrayX[count-1], positionArrayZ[count-1]) + getBallSize() / 2), positionArrayZ[count-1]);
-            modelBatch.render(ballInstance);
-            ballPositionX = positionArrayX[count-1];
-            ballPositionZ = positionArrayZ[count-1];
-            camera.position.x = ballPositionX-5;
-            camera.position.z = ballPositionZ-5;
-            camera.position.y = 5;
-            camera.lookAt(ballPositionX,0,ballPositionZ);
-        }
         InputHandler.checkForInput(this);
     }
 
