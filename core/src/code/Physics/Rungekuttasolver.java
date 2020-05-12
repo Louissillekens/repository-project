@@ -48,6 +48,7 @@ public class Rungekuttasolver{
         for (int i=0; i<6000; i++) {
             solver.RK4();
         }
+
         return new double[] {solver.getX(), solver.getY()};
     }
 
