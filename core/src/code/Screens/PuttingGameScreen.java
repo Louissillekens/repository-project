@@ -356,6 +356,10 @@ public class PuttingGameScreen implements Screen {
 
             ballPositionX += ballStepXmean;
             ballPositionZ += ballStepZmean;
+        }
+
+        if ((ballPositionX != newBallPositionX) || (ballPositionZ != newBallPositionZ)) {
+
             camera.position.x = ballPositionX - 5;
             camera.position.z = ballPositionZ - 5;
             camera.position.y = 5;
