@@ -23,12 +23,14 @@ public class InputHandler {
 
         // Some key pressed input to rotate the camera and also zoom in zoom out
         if(Gdx.input.isKeyPressed(Input.Keys.LEFT)) {
-            gamescreen.getCamera().rotateAround(PuttingGameScreen.vector1 = new Vector3(0f, 0f, 0f), PuttingGameScreen.vector2 = new Vector3(0f, -1f, 0f), 1f);
-            gamescreen.getCamera().lookAt(gamescreen.getBallPositionX(), 0, gamescreen.getBallPositionZ());
+            gamescreen.getCamera().rotateAround(PuttingGameScreen.vector1 = new Vector3(gamescreen.getBallPositionX(), PuttingGameScreen.defineFunction(gamescreen.getBallPositionX(), gamescreen.getBallPositionZ()), gamescreen.getBallPositionZ()),
+                    PuttingGameScreen.vector2 = new Vector3(0f, -1f, 0f), 1f);
+            gamescreen.getCamera().lookAt(gamescreen.getBallPositionX(), PuttingGameScreen.defineFunction(gamescreen.getBallPositionX(), gamescreen.getBallPositionZ()), gamescreen.getBallPositionZ());
         }
         if(Gdx.input.isKeyPressed(Input.Keys.RIGHT)) {
-            gamescreen.getCamera().rotateAround(PuttingGameScreen.vector1 = new Vector3(0f, 0f, 0f), PuttingGameScreen.vector2 = new Vector3(0f, 1f, 0f), 1f);
-            gamescreen.getCamera().lookAt(gamescreen.getBallPositionX(), 0, gamescreen.getBallPositionZ());
+            gamescreen.getCamera().rotateAround(PuttingGameScreen.vector1 = new Vector3(gamescreen.getBallPositionX(), PuttingGameScreen.defineFunction(gamescreen.getBallPositionX(), gamescreen.getBallPositionZ()), gamescreen.getBallPositionZ()),
+                    PuttingGameScreen.vector2 = new Vector3(0f, 1f, 0f), 1f);
+            gamescreen.getCamera().lookAt(gamescreen.getBallPositionX(), PuttingGameScreen.defineFunction(gamescreen.getBallPositionX(), gamescreen.getBallPositionZ()), gamescreen.getBallPositionZ());
         }
         if(Gdx.input.isKeyPressed(Input.Keys.UP)) {
             //round the shot power to two decimal places to avoid errors where the power would get above max power
@@ -56,11 +58,9 @@ public class InputHandler {
         if(Gdx.input.isKeyPressed(Input.Keys.Q)) {
             Gdx.app.exit();
         }
-
-        //System.out.println("pos x : " + gamescreen.getBallPositionX());
-        //System.out.println("pos y : " + gamescreen.getBallPositionZ());
         //System.out.println("x : " + gamescreen.getCamera().direction.x);
-        //System.out.println("y : " + gamescreen.getCamera().direction.z);
+        //System.out.println("y : " + gamescreen.getCamera().direction.y);
+        //System.out.println("z : " + gamescreen.getCamera().direction.z);
     }
 
     /**
