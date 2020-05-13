@@ -15,28 +15,29 @@ import com.badlogic.gdx.graphics.g3d.environment.DirectionalLight;
 import com.badlogic.gdx.graphics.g3d.utils.MeshPartBuilder;
 import com.badlogic.gdx.graphics.g3d.utils.ModelBuilder;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
-import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector3;
-import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.game.game.Game;
 
 import static com.badlogic.gdx.graphics.GL20.GL_TRIANGLES;
 
+/**
+ * A screen class to render a putting game
+ * @author Clément Detry
+ */
 public class PuttingGameScreen implements Screen {
 
+    // Instance variable for the current game
     private Game game;
-    private Stage stage;
 
-    // Instance for the scene
+    // Instances variables for the perspective scene
     private PerspectiveCamera camera;
     private ModelBatch modelBatch;
     private static ModelBuilder modelBuilder;
     private Environment environment;
-    private MeshPartBuilder meshPartBuilder;
     private float directionX;
     private float directionZ;
 
-    // Instance for the ball in the game
+    // Instances variables for the ball in the game
     private Model ball;
     private ModelInstance ballInstance;
     private float ballSize = 0.2f;
@@ -46,9 +47,8 @@ public class PuttingGameScreen implements Screen {
     private float newBallPositionZ;
     private float ballStepXmean;
     private float ballStepZmean;
-    private int ballStep = 100;
 
-    // Instance for the 3D field
+    // Instances variables for the 3D field
     private Model flatField;
     private ModelInstance[] fieldInstance;
     private Model slopeModel;
@@ -56,67 +56,65 @@ public class PuttingGameScreen implements Screen {
     private Model arrow;
     private ModelInstance arrowInstance;
     private static Color fieldColor;
+    private static int numberOfFields = 1;
     private static float gridWidth = 50;
     private static float gridDepth = 50;
 
-    // Instance vector for the camera
+    // Instances vectors for the camera rotations
     public static Vector3 vector1;
     public static Vector3 vector2;
 
-    // Instance for the time between two frame
-    private final float delta = 1/60f;
-
-    // Instance fot the previously chosen game mode
+    // Instance variable for the chosen game mode
     private GameMode gameMode;
 
-    //these variables are to decide the shot_speed
+    // Instances variable used for the shot power
     private final double POWER_INCREMENT = 0.025;//m/s
     private final double MAX_SPEED = 3;//for now the max speed is 3 (should be possible to change per course)
     private final double STARTING_SHOT_POWER = 0.000001;
     private double shot_Power = STARTING_SHOT_POWER;//m/s
-
-    // Instance for the power shoot
-    private Rectangle rect1;
-    private Rectangle rect2;
     private ShapeRenderer shapeRenderer;
 
-    // Instances for the flag
+    // Instances variables for the flag
     private Model flag1;
     private ModelInstance flag1Instance;
     private Model flag2;
     private ModelInstance flag2Instance;
     private static float flagPositionX = 20;
     private static float flagPositionZ = 10;
-
     private static float winRadius = 5;
 
+    // Instances variables used to store the different positions of the ball
     private static int countIndex = 0;
     private float[] positionArrayX = new float[100];
     private float[] positionArrayZ = new float[100];
 
+    // Instances variables used to store the different translations of the camera
     private float sumX = 0;
     private float[] translateX = new float[100];
     private float sumZ = 0;
     private float[] translateZ = new float[100];
-
     private static boolean trackShot = false;
     private static boolean canTranslateCam = false;
     private static boolean canReset = false;
 
-    // Constructor that creates the 3D field + corresponding game mode
+    /**
+     * Constructor that creates a new instance of the putting game screen
+     * @param game current instance of the game
+     * @param gameMode preciously chosen game mode (not working yet)
+     */
     public PuttingGameScreen(final Game game, GameMode gameMode) {
 
         this.game = game;
-
-        this.createField();
-
         this.gameMode = new GameMode(gameMode.gameName);
+        this.createField();
     }
 
-    // Method that creates the 3D field
+    /**
+     * Method used to create the 3D field
+     */
     public void createField() {
 
-        // Creation of the 3D camera
+        // Creation of the 3D perspective camera
         camera = new PerspectiveCamera(75, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
         camera.position.set(-3.5f, 3f, -3.5f);
         camera.lookAt(ballPositionX, defineFunction(ballPositionX,ballPositionZ), ballPositionZ);
@@ -126,20 +124,18 @@ public class PuttingGameScreen implements Screen {
         modelBatch = new ModelBatch();
         modelBuilder = new ModelBuilder();
 
-        // Creation of a blue flat field that corresponds to the water
+        // Creation of a blue flat field corresponding to the water
         flatField = modelBuilder.createBox(5000, 1.0f, 5000,
                 new Material(ColorAttribute.createDiffuse(Color.BLUE)),
                 VertexAttributes.Usage.Position | VertexAttributes.Usage.Normal
         );
 
-        int numberOfFields = 1;
-
+        // Models that hold information about the field
         fieldInstance = new ModelInstance[numberOfFields];
         slopeInstance = new ModelInstance[numberOfFields];
 
         for (int i = 0; i < numberOfFields; i++) {
 
-            // Adding all the mesh (green triangle) to the method that build the field
             modelBuilder.begin();
             buildField();
             slopeModel = modelBuilder.end();
@@ -148,6 +144,7 @@ public class PuttingGameScreen implements Screen {
             slopeInstance[i] = new ModelInstance(slopeModel, 0f, 0f, (-i) * 50);
         }
 
+        // Initial values of the arrays that store the position of the ball is the first position of the ball
         positionArrayX[0] = ballPositionX;
         positionArrayZ[0] = ballPositionZ;
 
@@ -166,7 +163,7 @@ public class PuttingGameScreen implements Screen {
         );
         flag2Instance = new ModelInstance(flag2, flagPositionX-0.75f, defineFunction(flagPositionX, flagPositionZ)+2.5f, flagPositionZ);
 
-        // Adding an environment which is used for the luminosity of the frame
+        // Adding an environment which is used for the luminosity
         environment = new Environment();
         environment.set(new ColorAttribute(ColorAttribute.AmbientLight, 0.3f, 0.3f, 0.3f, 1.f));
         environment.add(new DirectionalLight().set(0.8f, 0.8f, 0.8f, 1f, 0f, 1f));
@@ -174,18 +171,30 @@ public class PuttingGameScreen implements Screen {
     }
 
     // Method that defines the function we use to create the slope of the field
-    public static float defineFunction(double i, double j) {
+
+    /**
+     * Method that defines the function used to create the form of the field
+     * @param x first variable of the function
+     * @param y second variable of the function
+     * @return the estimation of the function at a given x and y point
+     */
+    public static float defineFunction(double x, double y) {
 
         float field0 = (float) (0.5);
-        float field1 = (float) (((Math.sin(i) + Math.sin(j))/3)+0.5);
-        float field2 = (float) ((Math.sin(i))/3)+0.5f;
-        float field3 = (float) (((Math.atan(i) + Math.atan(j))/2)+0.5);
-        float ripple1 = (float) ((0.4)+Math.sin((0.4)*(Math.pow(i,2)+Math.pow(j,2))/10)+1);
+        float field1 = (float) (((Math.sin(x) + Math.sin(y))/3)+0.5);
+        float field2 = (float) ((Math.sin(x))/3)+0.5f;
+        float field3 = (float) (((Math.atan(x) + Math.atan(y))/2)+0.5);
+        float ripple1 = (float) ((0.4)+Math.sin((0.4)*(Math.pow(x,2)+Math.pow(y,2))/10)+1);
 
         return field1;
     }
 
-    // Method used to get the friction at a certain location
+    /**
+     * Method used to get the friction at a certain location (not fully working yet)
+     * @param x the first coordinate on the field
+     * @param z the second coordinate on the field
+     * @return the estimation of the friction at a given point on the field
+     */
     public static float getFriction(double x, double z) {
 
         if (defineFunction(x,z) < 0) {
@@ -194,8 +203,9 @@ public class PuttingGameScreen implements Screen {
         return 0.13f;
     }
 
-    // Method that build the 3D field from a mesh
-    // Need to be improved to give another function as input to have other kinds of fields
+    /**
+     * Method that build the 3D field using 3D vectors
+     */
     public static void buildField(){
 
         gridWidth = 50;
@@ -240,13 +250,23 @@ public class PuttingGameScreen implements Screen {
         }
     }
 
-    // Method that return the euclidean distance between the ball and the flag
+    /**
+     * Method that return the euclidean distance between the ball and the flag
+     * @param positionX the first coordinate on the field
+     * @param positionZ the second coordinate on the field
+     * @return the euclidean distance between that given point and the flag
+     */
     public static float euclideanDist(float positionX, float positionZ) {
 
         return (float) Math.sqrt(Math.pow((positionX-flagPositionX), 2) + Math.pow((positionZ-flagPositionZ), 2));
     }
 
-    // Method that checks if the ball is close enough to the flag
+    /**
+     * Method that checks if the ball is close enough to the flag
+     * @param positionX the first coordinate on the field
+     * @param positionZ the second coordinate on the field
+     * @return true if the ball is close enough to the field, false otherwise
+     */
     public boolean isWin(float positionX, float positionZ) {
 
         if (euclideanDist(positionX, positionZ) < winRadius) {
@@ -257,7 +277,12 @@ public class PuttingGameScreen implements Screen {
         }
     }
 
-    // Method that checks if the ball is in the water
+    /**
+     * Method that checks if the ball falls into the water
+     * @param positionX the first coordinate of the ball
+     * @param positionZ the second coordinate of the ball
+     * @return true if the ball falls into water, false otherwise
+     */
     public boolean isInWater(float positionX, float positionZ) {
 
         if (defineFunction(positionX, positionZ) < 0) {
@@ -268,7 +293,12 @@ public class PuttingGameScreen implements Screen {
         }
     }
 
-    // Method that checks if the ball is still in the field
+    /**
+     * Method that checks if the ball is still in the field
+     * @param positionX the first coordinate of the ball
+     * @param positionZ the second coordinate of the ball
+     * @return true if the ball go out of the field, false otherwise
+     */
     public boolean outOfField(float positionX, float positionZ) {
 
         if (positionX > gridDepth || positionZ > gridWidth || positionX < 0 || positionZ < 0) {
@@ -279,7 +309,9 @@ public class PuttingGameScreen implements Screen {
         }
     }
 
-    // Method used to reset the shot to the previous one
+    /**
+     * Method used to reset the shot to the previous one
+     */
     public void resetBallShot() {
 
         if (countIndex > 0) {
@@ -294,6 +326,11 @@ public class PuttingGameScreen implements Screen {
         }
     }
 
+
+    /**
+     * Render all the elements of the field
+     * @param delta time between the last and the current frame
+     */
     @Override
     public void render(float delta) {
 
@@ -303,18 +340,13 @@ public class PuttingGameScreen implements Screen {
 
         camera.update();
 
-
-        // Adding the ModelInstance array to the model
-        // for the moment I only chose to take the first element of the array of size 100
-        // If we want a bigger field we can take the following indexes (every index holds a field of the same size)
         modelBatch.begin(camera);
 
-        /*for (int i = 0; i < 2; i++) {
+        // Render the instance of the field with the given environment
+        for (int i = 0; i < numberOfFields; i++) {
             modelBatch.render(fieldInstance[i], environment);
             modelBatch.render(slopeInstance[i], environment);
-        }*/
-        modelBatch.render(fieldInstance[0], environment);
-        modelBatch.render(slopeInstance[0], environment);
+        }
 
         // Creation of the ball
         ball = modelBuilder.createSphere(ballSize, ballSize, ballSize, 10, 10,
@@ -323,7 +355,7 @@ public class PuttingGameScreen implements Screen {
         ballInstance = new ModelInstance(ball, ballPositionX,(defineFunction(ballPositionX, ballPositionZ))+(ballSize/2), ballPositionZ);
         modelBatch.render(ballInstance, environment);
 
-        // Creation of the arrow
+        // Creation of the directive arrow
         arrow = modelBuilder.createArrow(ballPositionX, defineFunction(ballPositionX, ballPositionZ)+1f, ballPositionZ,
                 ((camera.direction.x)*5)+(ballPositionX), defineFunction(ballPositionX, ballPositionZ)+2f, ((camera.direction.z)*5)+(ballPositionZ), 0.1f, 0.1f, 10,
                 GL_TRIANGLES, new Material(ColorAttribute.createDiffuse(Color.RED)),
@@ -336,6 +368,7 @@ public class PuttingGameScreen implements Screen {
 
         modelBatch.end();
 
+        // Creation of the power shot indicator
         shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
 
         int scale = 40;
@@ -349,7 +382,7 @@ public class PuttingGameScreen implements Screen {
 
         shapeRenderer.end();
 
-        //key input to take shot
+        //key input to take a shot with the given power
         if(Gdx.input.isKeyJustPressed(Input.Keys.SPACE)){
 
             directionX = camera.direction.x;
@@ -358,6 +391,8 @@ public class PuttingGameScreen implements Screen {
 
             countIndex++;
 
+            // Instance of the RK4
+            // Used to compute the next position of the ball based on the current position, the camera direction and the power
             Rungekuttasolver solver = new Rungekuttasolver();
             solver.setValues(ballPositionX, ballPositionZ, (directionX*power)*600, (directionZ*power)*600);
             solver.RK4();
@@ -371,16 +406,11 @@ public class PuttingGameScreen implements Screen {
             ballPositionX = positionArrayX[countIndex -1];
             ballPositionZ = positionArrayZ[countIndex -1];
 
-            ballStepXmean = (positionArrayX[countIndex]-positionArrayX[countIndex -1])/ballStep;
-            ballStepZmean = (positionArrayZ[countIndex]-positionArrayZ[countIndex -1])/ballStep;
+            int ballStep = 100;
+            ballStepXmean = (positionArrayX[countIndex]-positionArrayX[countIndex -1])/ ballStep;
+            ballStepZmean = (positionArrayZ[countIndex]-positionArrayZ[countIndex -1])/ ballStep;
 
-            System.out.println("final x : " + newBallPositionX);
-            System.out.println("final z : " + newBallPositionZ);
-
-            System.out.println("shot taken with power: " + power + " and x_direction: " + directionX + " and y_direction: " + directionZ);
-
-
-            //reset the power
+            // Reset the power after the shot
             setShot_Power(getSTARTING_SHOT_POWER());
 
             sumX = 0;
@@ -396,6 +426,8 @@ public class PuttingGameScreen implements Screen {
         double ballPositionZround = (double)(Math.round(ballPositionZ*100))/10;
         double newBallPositionZround = (double)(Math.round(newBallPositionZ*100))/10;
 
+        // Condition that checks if the new position of the ball is different from the current one
+        // If it is the case, move the ball to that new position
         if (((((ballPositionX < newBallPositionX) && (ballPositionZ < newBallPositionZ)) ||
                 ((ballPositionX > newBallPositionX) && (ballPositionZ > newBallPositionZ)) ||
                 ((ballPositionX < newBallPositionX) && (ballPositionZ > newBallPositionZ)) ||
@@ -403,6 +435,7 @@ public class PuttingGameScreen implements Screen {
                 ((ballPositionXround != newBallPositionXround) && (ballPositionZround != newBallPositionZround))) &&
                 (canTranslateCam)) {
 
+            // Scalar factor used for the camera translation
             float scaleFactor = 50;
             ballPositionX += ballStepXmean;
             ballPositionZ += ballStepZmean;
@@ -416,7 +449,7 @@ public class PuttingGameScreen implements Screen {
             translateZ[countIndex - 1] = sumZ;
         }
 
-
+        // Condition used when the ball is out of the field
         if (outOfField(ballPositionX, ballPositionZ)) {
 
             // TODO decides the rule when the ball is out of the field
@@ -426,33 +459,38 @@ public class PuttingGameScreen implements Screen {
         // Key press input R that return to the place of the previous shot
         if (Gdx.input.isKeyPressed(Input.Keys.R)) {
 
+            // Condition that checks if the ball shot can be reset to the previous one
             if (canReset) {
+                // Condition that checks if the camera can be moved after pushing keyboard command R
                 if (trackShot) {
                     camera.translate(-(translateX[countIndex - 1]), -0.001f, -(translateZ[countIndex - 1]));
                 }
                 trackShot = false;
                 canTranslateCam = false;
+                // Call of the method that reset the ball to the previous place
                 resetBallShot();
                 camera.lookAt(ballPositionX, defineFunction(ballPositionX, ballPositionZ), ballPositionZ);
             }
         }
 
-        // If the ball falls into water, go to the previous position
+        // Condition used to reset the ball position when the ball falls into water
         if (isInWater(ballPositionX, ballPositionZ)) {
 
             camera.translate(-(sumX), (float) (-0.001/3), -(sumZ));
             canTranslateCam = false;
             canReset = false;
+            // Call of the method that reset the ball to the previous place
             resetBallShot();
             camera.lookAt(ballPositionX, defineFunction(ballPositionX, ballPositionZ), ballPositionZ);
         }
 
-        // If ball is close enough to the flag, WIN and stop the game
+        // Condition used to check if the ball is closed enough to the flag
         if (isWin(ballPositionX, ballPositionZ)) {
             System.out.println("WIN");
             game.setScreen(new GameModeScreen(game));
         }
 
+        // Call of the class input handler that contains the majority of the user controls
         InputHandler.checkForInput(this);
     }
 
@@ -519,20 +557,8 @@ public class PuttingGameScreen implements Screen {
         return STARTING_SHOT_POWER;
     }
 
-    public float getBallSize() {
-        return ballSize;
-    }
-
-    public ModelInstance getBallInstance() {
-        return ballInstance;
-    }
-
     public Model getBall() {
         return ball;
-    }
-
-    public ModelBatch getModelBatch() {
-        return modelBatch;
     }
 
     public float getBallPositionX() {
