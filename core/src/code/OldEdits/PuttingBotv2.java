@@ -8,6 +8,9 @@ import java.math.MathContext;
 import java.util.Arrays;
 import java.util.Comparator;
 
+/**
+ * @author Alexandre Martens
+ */
 //For the moment it's a stand alone code using the Runge Kutter for fitness
 public class PuttingBotv2 {
     //Hyperparameters
@@ -25,7 +28,7 @@ public class PuttingBotv2 {
 
     //Positions & Velocities
     static double [] angleRange = {0,90}; //OPTIMISATION by reducing the range of angles (no opposite kick)
-    static double [] velocityRange = {0, 20}; //OPTIMISATION by reducing the range of angles (no opposite kick)
+    static double [] velocityRange = {1, 15}; //OPTIMISATION by reducing the range of angles (no opposite kick)
 
     //will need to calc the height at the end to put the ball at the exact pos
     static final double [] flagPos = {PuttingGameScreen.getFlagPositionZ(),PuttingGameScreen.getFlagPositionX()};
@@ -97,7 +100,9 @@ public class PuttingBotv2 {
         double vyi = (individual[1])*Math.sin(angle);
 
         Rungekuttasolver rk = new Rungekuttasolver();
+
         return  rk.startRK4(startingPos[0],startingPos[1], vxi, vyi);
+
     }
 
     //Fitness of the population, returns the same array with their respective fitness
@@ -175,6 +180,7 @@ public class PuttingBotv2 {
         }
 
         selected = SUS(susMutation);
+
         for (int i = 0; i < selected.length; i++){
 
 /*            //avoid losing the elites
@@ -236,8 +242,13 @@ public class PuttingBotv2 {
 
     //prints a 2D array
     static void print2D(){
+        int counter = 0;
+
         for (double [] i: population){
             System.out.println(Arrays.toString(i));
+            double angle = (population[counter][0]*Math.PI)/180;
+            System.out.println("Decomposed angle vector x,y: " + Math.cos(angle) + ", " + Math.sin(angle));
+            counter++;
         }
     }
 
@@ -269,15 +280,10 @@ public class PuttingBotv2 {
 
         initialisation();
 
-        int intelComparator = 6; //how many fitness to compare
-        double [][] intelArray = new double[intelComparator-1][3]; //array that stores the best individuals of 5 gen
-        int  counter = 0;
-
         for (int i = 0; i < generations; i++){
 
+            print2D();
             System.out.println("Generation: " + i);
-            System.out.println("Decomposed angle vector x,y: " + Math.cos(population[0][0]) + ", " + Math.sin(population[0][0]) );
-
 
             fitness();
             sort(population);

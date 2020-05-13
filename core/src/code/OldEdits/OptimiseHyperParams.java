@@ -2,6 +2,9 @@ package code.OldEdits;
 
 import java.util.Arrays;
 
+/**
+ * @author Alexandre Martens
+ */
 public class OptimiseHyperParams {
     static int [] populationAmount = {200,150,250,300,350,400};
     static double [] mutationRate = {0.45,0.4,0.35,0.3,0.25,0.2,0.15,0.1,0.05};

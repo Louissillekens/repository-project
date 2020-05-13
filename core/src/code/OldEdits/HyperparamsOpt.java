@@ -7,6 +7,9 @@ import java.math.MathContext;
 import java.util.Arrays;
 import java.util.Comparator;
 
+/**
+ * @author Alexandre Martens
+ */
 //For the moment it's a stand alone code using the Runge Kutter for fitness
 public class HyperparamsOpt {
     //Hyperparameters

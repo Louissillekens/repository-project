@@ -8,6 +8,9 @@ import java.math.MathContext;
 import java.util.Arrays;
 import java.util.Comparator;
 
+/**
+ * @author Alexandre Martens
+ */
 //For the moment it's a stand alone code using the Runge Kutter for fitness
 public class PuttingBotDeployement {
     //Hyperparameters
@@ -25,7 +28,7 @@ public class PuttingBotDeployement {
 
     //Positions & Velocities
     static double [] angleRange = {0,90}; //OPTIMISATION by reducing the range of angles (no opposite kick)
-    static double [] velocityRange = {0, 20}; //OPTIMISATION by reducing the range of angles (no opposite kick)
+    static double [] velocityRange = {1, 15}; //OPTIMISATION by reducing the range of angles (no opposite kick)
 
     //will need to calc the height at the end to put the ball at the exact pos
     static final double [] flagPos = {PuttingGameScreen.getFlagPositionZ(),PuttingGameScreen.getFlagPositionX()};
@@ -35,6 +38,7 @@ public class PuttingBotDeployement {
     static final double tolerance = PuttingGameScreen.getWinRadius();
     static final int sf = 6;
     static int countRangeReducerCycles;
+    static boolean found = false;
 
     //Timers
     static long start = 0;
@@ -44,7 +48,7 @@ public class PuttingBotDeployement {
 
     // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-    //Generates a random double between 2 numberes and rounded to n-sf
+    //Generates a random double between 2 numbers and rounded to n-sf
     static double random(double firstN, double secondN, int sf){
 
         //Generate a random number in the range
@@ -118,6 +122,7 @@ public class PuttingBotDeployement {
             if (populationTemp[i][2] <= tolerance){ //Means we're in the diameter of the flag
                 stop = System.currentTimeMillis();
                 printFound(populationTemp[i], true);
+                found = true;
             }
         }
 
@@ -248,14 +253,22 @@ public class PuttingBotDeployement {
             System.out.println("OPTIMAL option = Angle: " + foundIndividual[0] + ", Velocity: " + foundIndividual[1]);
             System.out.println("Final position of: " + Arrays.toString(RK4(foundIndividual)));
             System.out.println("Extra info: " + Arrays.toString(foundIndividual));
-            System.out.println("Decomposed angle vector x,y: " + Math.cos(foundIndividual[0]) + ", " + Math.sin(foundIndividual[0]) );
+
+            //Convert degrees to radians, radians is the argument for Math.sin or Math.cos
+            double angle = (population[0][0]*Math.PI)/180;
+            System.out.println("Decomposed angle vector x,y: " + Math.cos(angle) + ", " + Math.sin(angle));
+
             System.out.println("Time elapsed: " + (stop - start) / 1000 + "s.");
             System.out.println("*********************************************************");
         } else {
             System.out.println("\n" + "Best option found, not optimal = Angle:" + foundIndividual[0] + ", Velocity: " + foundIndividual[1]);
             System.out.println("Final position of: " + Arrays.toString(RK4(foundIndividual)));
             System.out.println("Extra info: " + Arrays.toString(foundIndividual));
-            System.out.println("Decomposed angle vector x,y: " + Math.cos(foundIndividual[0]) + ", " + Math.sin(foundIndividual[0]) );
+
+            //Convert degrees to radians, radians is the argument for Math.sin or Math.cos
+            double angle = (population[0][0]*Math.PI)/180;
+            System.out.println("Decomposed angle vector x,y: " + Math.cos(angle) + ", " + Math.sin(angle));
+
             System.out.println("Time elapsed: " + (stop-start)/1000 + "s.");
 
         }
@@ -274,13 +287,16 @@ public class PuttingBotDeployement {
         for (int i = 0; i < generations; i++){
 
             System.out.println("Generation: " + i);
-            System.out.println("Decomposed angle vector x,y: " + Math.cos(population[0][0]) + ", " + Math.sin(population[0][0]) );
 
             fitness();
             sort(population);
             selection(); //Includes the mutation & crossover + updates the population
 
             System.out.println(Arrays.toString(population[0]) + "  " + Arrays.toString(population[1]) + "  " + Arrays.toString(population[2]));
+
+            if (found == true){
+                return;
+            }
 
             //Interval optimisation
             if (i != 0 && i % reducerThreshold == 0){
@@ -296,24 +312,32 @@ public class PuttingBotDeployement {
         //print2D();
     }
 
-    // Get the x vector back to input the RK4
-    public double getXVector() {
-        //Convert degrees to radians, radians is the argument for Math.sin or Math.cos
-        double angle = (population[0][0]*Math.PI)/180;
-
-        //Split the velocity vector into x,y components
-        double vxi = (population[0][1])*Math.cos(angle);
-        return vxi;
+    public static double getVelo(){
+        return population[0][1];
     }
 
     // Get the x vector back to input the RK4
-    public double getYVector() {
+    public static double getXVector() {
+
         //Convert degrees to radians, radians is the argument for Math.sin or Math.cos
         double angle = (population[0][0]*Math.PI)/180;
 
         //Split the velocity vector into x,y components
-        double vyi = (population[0][1])*Math.sin(angle);
+        double vyi = Math.sin(angle);
+        System.out.println("GA returns x " + vyi + " for angle " + population[0][0]);
+
         return vyi;
+    }
+
+    // Get the x vector back to input the RK4
+    public static double getYVector() {
+        //Convert degrees to radians, radians is the argument for Math.sin or Math.cos
+        double angle = (population[0][0]*Math.PI)/180;
+
+        //Split the velocity vector into x,y components
+        double vxi = Math.cos(angle);
+        System.out.println("GA returns x " + vxi + " for angle " + population[0][0]);
+        return vxi;
     }
 
 }

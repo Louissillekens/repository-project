@@ -80,9 +80,9 @@ public class PuttingGameScreen implements Screen {
     private ModelInstance flag1Instance;
     private Model flag2;
     private ModelInstance flag2Instance;
-    private static float flagPositionX = 20;
-    private static float flagPositionZ = 10;
-    private static float winRadius = 5;
+    private static float flagPositionX = 3;
+    private static float flagPositionZ = 15;
+    private static float winRadius = 3;
 
     // Instances variables used to store the different positions of the ball
     private static int countIndex = 0;
@@ -434,14 +434,19 @@ public class PuttingGameScreen implements Screen {
                 int scalar = 600;
                 directionX = camera.direction.x;
                 directionZ = camera.direction.z;
+               // System.out.println("Direction x: " + directionX + "Direction y: " + directionZ);
                 solver.setValues(ballPositionX, ballPositionZ, (directionX*power)*scalar, (directionZ*power)*scalar);
             }
             else if (gameMode.gameName.equals("Bot")) {
 
                 PuttingBotDeployement bot = new PuttingBotDeployement();
-                int scalar = 200;
+                int scalar = 500;
+                bot.start();
+                power = bot.getVelo();
                 directionX = (float) bot.getXVector();
                 directionZ = (float) bot.getYVector();
+                System.out.println("Direction x: " + directionX + "Direction y: " + directionZ);
+
                 System.out.println("dx: " + directionX);
                 System.out.println("dz: " + directionZ);
                 solver.setValues(ballPositionX, ballPositionZ, (directionX*power)*scalar, (directionZ*power)*scalar);

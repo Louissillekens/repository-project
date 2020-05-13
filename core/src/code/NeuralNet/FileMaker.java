@@ -5,6 +5,9 @@ import java.io.*;
 import java.util.Arrays;
 import java.util.Scanner;
 
+/**
+ * @author Alexandre Martens
+ */
 public class FileMaker {
     int angle;
     int velo;

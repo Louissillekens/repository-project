@@ -4,6 +4,9 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
+/**
+ * @author Alexandre Martens
+ */
 public class MathWork {
     private static float minInput1;
     private static float minInput2;

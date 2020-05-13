@@ -2,6 +2,9 @@ package code.NeuralNet;
 
 import java.util.Arrays;
 
+/**
+ * @author Alexandre Martens
+ */
 public class Visuals extends NeuralNet {
 
     // Print the final result in the output layer

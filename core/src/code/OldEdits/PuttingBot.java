@@ -9,6 +9,9 @@ import java.security.GeneralSecurityException;
 import java.util.Arrays;
 import java.util.Comparator;
 
+/**
+ * @author Alexandre Martens
+ */
 //For the moment it's a stand alone code using the Runge Kutter for fitness
 public class PuttingBot {
     //Hyperparameters
@@ -308,13 +311,13 @@ public class PuttingBot {
             System.out.println("Extra info: " + Arrays.toString(foundIndividual));
             System.out.println("Time elapsed: " + (stop - start) / 1000 + "s.");
             System.out.println("*********************************************************");
-            System.exit(0);
+            return;
         } else {
             System.out.println("\n" + "Best option found, not optimal = Angle:" + foundIndividual[0] + ", Velocity: " + foundIndividual[1]);
             System.out.println("Final position of: " + Arrays.toString(RK4(foundIndividual)));
             System.out.println("Extra info: " + Arrays.toString(foundIndividual));
             System.out.println("Time elapsed: " + (stop-start)/1000 + "s.");
-
+            return;
         }
     }
 

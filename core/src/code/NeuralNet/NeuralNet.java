@@ -7,6 +7,9 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
 
+/**
+ * @author Alexandre Martens
+ */
 public class NeuralNet {
 
     static Layer[] layers;

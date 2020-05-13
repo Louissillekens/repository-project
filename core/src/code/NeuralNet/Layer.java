@@ -2,6 +2,10 @@ package code.NeuralNet;
 
 // The purpose of this class is to hold all the neurons
 // Only for fully connected feed forward nn
+
+/**
+ * @author Alexandre Martens
+ */
 public class Layer {
     public Neuron[] neurons;
 

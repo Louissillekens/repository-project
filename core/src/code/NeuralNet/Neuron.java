@@ -1,5 +1,8 @@
 package code.NeuralNet;
 
+/**
+ * @author Alexandre Martens
+ */
 public class Neuron {
 
     static float minWeightValue;
