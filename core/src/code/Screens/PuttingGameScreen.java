@@ -20,8 +20,6 @@ import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.game.game.Game;
 
-import java.util.Arrays;
-
 import static com.badlogic.gdx.graphics.GL20.GL_TRIANGLES;
 
 public class PuttingGameScreen implements Screen {
@@ -35,6 +33,8 @@ public class PuttingGameScreen implements Screen {
     private static ModelBuilder modelBuilder;
     private Environment environment;
     private MeshPartBuilder meshPartBuilder;
+    private float directionX;
+    private float directionZ;
 
     // Instance for the ball in the game
     private Model ball;
@@ -90,11 +90,18 @@ public class PuttingGameScreen implements Screen {
 
     private static float winRadius = 5;
 
-    private static int count = 0;
+    private static int countIndex = 0;
     private float[] positionArrayX = new float[100];
     private float[] positionArrayZ = new float[100];
 
-    private float timer = 0;
+    private float sumX = 0;
+    private float[] translateX = new float[100];
+    private float sumZ = 0;
+    private float[] translateZ = new float[100];
+
+    private static boolean trackShot = false;
+    private static boolean canTranslateCam = false;
+    private static boolean canReset = false;
 
     // Constructor that creates the 3D field + corresponding game mode
     public PuttingGameScreen(final Game game, GameMode gameMode) {
@@ -112,7 +119,7 @@ public class PuttingGameScreen implements Screen {
         // Creation of the 3D camera
         camera = new PerspectiveCamera(75, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
         camera.position.set(-3.5f, 3f, -3.5f);
-        camera.lookAt(0f, 0f, 0f);
+        camera.lookAt(ballPositionX, defineFunction(ballPositionX,ballPositionZ), ballPositionZ);
         camera.near = 0.1f;
         camera.far = 400f;
 
@@ -276,18 +283,16 @@ public class PuttingGameScreen implements Screen {
     // Method used to reset the shot to the previous one
     public void resetBallShot() {
 
-        positionArrayX[count] = positionArrayX[count - 1];
-        positionArrayZ[count] = positionArrayZ[count - 1];
+        if (countIndex > 0) {
 
-        ballPositionX = positionArrayX[count - 1];
-        ballPositionZ = positionArrayZ[count - 1];
-        newBallPositionX = 0;
-        newBallPositionZ = 0;
+            positionArrayX[countIndex] = positionArrayX[countIndex - 1];
+            positionArrayZ[countIndex] = positionArrayZ[countIndex - 1];
 
-        camera.position.x = ballPositionX - 5;
-        camera.position.z = ballPositionZ - 5;
-        camera.position.y = 5;
-        camera.lookAt(ballPositionX, 0, ballPositionZ);
+            ballPositionX = positionArrayX[countIndex - 1];
+            ballPositionZ = positionArrayZ[countIndex - 1];
+            newBallPositionX = 0;
+            newBallPositionZ = 0;
+        }
     }
 
     @Override
@@ -298,6 +303,7 @@ public class PuttingGameScreen implements Screen {
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT);
 
         camera.update();
+
 
         // Adding the ModelInstance array to the model
         // for the moment I only chose to take the first element of the array of size 100
@@ -326,9 +332,7 @@ public class PuttingGameScreen implements Screen {
         arrowInstance = new ModelInstance(arrow);
 
         modelBatch.render(arrowInstance, environment);
-
         modelBatch.render(flag1Instance, environment);
-
         modelBatch.render(flag2Instance, environment);
 
         modelBatch.end();
@@ -349,70 +353,99 @@ public class PuttingGameScreen implements Screen {
         //key input to take shot
         if(Gdx.input.isKeyJustPressed(Input.Keys.SPACE)){
 
-            double x_direction = camera.direction.x;
-            double z_direction = camera.direction.z;
+            directionX = camera.direction.x;
+            directionZ = camera.direction.z;
             double power = shot_Power;
 
-            count++;
+            countIndex++;
 
             Rungekuttasolver solver = new Rungekuttasolver();
-            solver.setValues(ballPositionX, ballPositionZ, (x_direction*power)*600, (z_direction*power)*600);
+            solver.setValues(ballPositionX, ballPositionZ, (directionX*power)*600, (directionZ*power)*600);
             solver.RK4();
 
             newBallPositionX = (float) solver.getX();
             newBallPositionZ = (float) solver.getY();
 
-            positionArrayX[count] = newBallPositionX;
-            positionArrayZ[count] = newBallPositionZ;
+            positionArrayX[countIndex] = newBallPositionX;
+            positionArrayZ[countIndex] = newBallPositionZ;
 
-            ballPositionX = positionArrayX[count-1];
-            ballPositionZ = positionArrayZ[count-1];
+            ballPositionX = positionArrayX[countIndex -1];
+            ballPositionZ = positionArrayZ[countIndex -1];
 
-            ballStepXmean = (positionArrayX[count]-positionArrayX[count-1])/ballStep;
-            ballStepZmean = (positionArrayZ[count]-positionArrayZ[count-1])/ballStep;
+            ballStepXmean = (positionArrayX[countIndex]-positionArrayX[countIndex -1])/ballStep;
+            ballStepZmean = (positionArrayZ[countIndex]-positionArrayZ[countIndex -1])/ballStep;
 
             System.out.println("final x : " + newBallPositionX);
             System.out.println("final z : " + newBallPositionZ);
 
-            System.out.println("shot taken with power: " + power + " and x_direction: " + x_direction + " and y_direction: " + z_direction);
+            System.out.println("shot taken with power: " + power + " and x_direction: " + directionX + " and y_direction: " + directionZ);
 
 
             //reset the power
             setShot_Power(getSTARTING_SHOT_POWER());
 
+            sumX = 0;
+            sumZ = 0;
+
+            trackShot = true;
+            canTranslateCam = true;
+            canReset = true;
         }
 
-        if ((ballPositionX < newBallPositionX) && (ballPositionZ < newBallPositionZ)) {
+        double ballPositionXround = (double)(Math.round(ballPositionX*100))/10;
+        double newBallPositionXround = (double)(Math.round(newBallPositionX*100))/10;
+        double ballPositionZround = (double)(Math.round(ballPositionZ*100))/10;
+        double newBallPositionZround = (double)(Math.round(newBallPositionZ*100))/10;
 
+        if (((((ballPositionX < newBallPositionX) && (ballPositionZ < newBallPositionZ)) ||
+                ((ballPositionX > newBallPositionX) && (ballPositionZ > newBallPositionZ)) ||
+                ((ballPositionX < newBallPositionX) && (ballPositionZ > newBallPositionZ)) ||
+                ((ballPositionX > newBallPositionX) && (ballPositionZ < newBallPositionZ))) &&
+                ((ballPositionXround != newBallPositionXround) && (ballPositionZround != newBallPositionZround))) &&
+                (canTranslateCam)) {
+
+            float scaleFactor = 50;
             ballPositionX += ballStepXmean;
             ballPositionZ += ballStepZmean;
+            camera.lookAt(ballPositionX, defineFunction(ballPositionX, ballPositionZ), ballPositionZ);
+            camera.translate((newBallPositionX - ballPositionX) / scaleFactor, 0.001f / scaleFactor, (newBallPositionZ - ballPositionZ) / scaleFactor);
+
+            sumX += (newBallPositionX - ballPositionX) / (scaleFactor);
+            sumZ += (newBallPositionZ - ballPositionZ) / (scaleFactor);
+
+            translateX[countIndex - 1] = sumX;
+            translateZ[countIndex - 1] = sumZ;
         }
 
-        if ((ballPositionX != newBallPositionX) || (ballPositionZ != newBallPositionZ)) {
-
-            camera.position.x = ballPositionX - 5;
-            camera.position.z = ballPositionZ - 5;
-            camera.position.y = 5;
-
-            camera.lookAt(ballPositionX, 0, ballPositionZ);
-        }
 
         if (outOfField(ballPositionX, ballPositionZ)) {
 
-            ballPositionX = 0;
-            ballPositionZ = 0;
+            // TODO decides the rule when the ball is out of the field
+            game.setScreen(new GameModeScreen(game));
         }
 
         // Key press input R that return to the place of the previous shot
         if (Gdx.input.isKeyPressed(Input.Keys.R)) {
 
-            resetBallShot();
+            if (canReset) {
+                if (trackShot) {
+                    camera.translate(-(translateX[countIndex - 1]), -0.001f, -(translateZ[countIndex - 1]));
+                }
+                trackShot = false;
+                canTranslateCam = false;
+                resetBallShot();
+                camera.lookAt(ballPositionX, defineFunction(ballPositionX, ballPositionZ), ballPositionZ);
+            }
         }
 
         // If the ball falls into water, go to the previous position
         if (isInWater(ballPositionX, ballPositionZ)) {
 
+            camera.translate(-(sumX), (float) (-0.001/3), -(sumZ));
+            canTranslateCam = false;
+            canReset = false;
             resetBallShot();
+            camera.lookAt(ballPositionX, defineFunction(ballPositionX, ballPositionZ), ballPositionZ);
         }
 
         // If ball is close enough to the flag, WIN and stop the game
