@@ -33,7 +33,7 @@ public class NeuralNet {
 
         System.out.println("\n" + "Training is starting... " + "\n");
 
-        train(200000, 0.05f); // The small 'f' is to explicitly state it's a float and not a double
+        train(500000, 0.05f); // The small 'f' is to explicitly state it's a float and not a double
 
         System.out.println("\n" + "Training: Check");
 
