@@ -1,6 +1,5 @@
-package code.Bot;
+package code.OldEdits;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 
 public class OptimiseHyperParams {
@@ -13,6 +12,8 @@ public class OptimiseHyperParams {
     static int roundsPerParams = 3;
 
     static double [][] finalRes = new double[10000][4];
+
+    // This is a pure BARBAR BRUTEFORCE method
 
     public static void main(String[] args) {
         int n = 0;

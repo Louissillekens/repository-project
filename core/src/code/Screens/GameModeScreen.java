@@ -147,7 +147,7 @@ public class GameModeScreen implements Screen {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
 
-                this.game.setScreen(new PuttingGameScreen(myGame, new GameMode(gameName)));
+                this.game.setScreen(new PuttingGameScreen(myGame, new GameMode(gameName), "bot"));
                 this.screen.dispose();
             }
         }

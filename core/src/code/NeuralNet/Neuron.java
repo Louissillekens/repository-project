@@ -7,7 +7,7 @@ public class Neuron {
 
     float[] weights;
     float[] weightsCache; // Used in backpropagation. Stores the new calc weights without replacing the original ones (= weights). We need them to calculate the next layer
-    float gradient; // TODO be more specific: "Speed up calculations, because a lot of reuse of data"
+    float gradient; // Speed up calculations, because a lot of reuse of data
     float bias;
     float value = 0;
 
