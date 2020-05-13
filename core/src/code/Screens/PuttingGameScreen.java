@@ -203,10 +203,9 @@ public class PuttingGameScreen implements Screen {
 
         float field0 = (float) (0.5);
         float field1 = (float) (((Math.sin(i) + Math.sin(j))/3)+0.5);
-        float field2 = (float) (Math.sin(i))/3;
+        float field2 = (float) ((Math.sin(i))/3)+0.5f;
         float field3 = (float) (((Math.atan(i) + Math.atan(j))/2)+0.5);
-        float ripple1 = (float) ((0.4)+Math.sin((0.4)*(Math.pow(i,2)+Math.pow(j,2))/10));
-        float ripple2 = (float) ((0.1)+(Math.sin((0.4)*(Math.pow(i,2)+Math.pow(j,2)))/10)*4);
+        float ripple1 = (float) ((0.4)+Math.sin((0.4)*(Math.pow(i,2)+Math.pow(j,2))/10)+1);
 
         return field1;
     }
@@ -350,8 +349,8 @@ public class PuttingGameScreen implements Screen {
         modelBatch.render(ballInstance, environment);
 
         // Creation of the arrow
-        arrow = modelBuilder.createArrow(ballPositionX, 2f, ballPositionZ,
-                ((camera.direction.x)*5)+(ballPositionX), 3f, ((camera.direction.z)*5)+(ballPositionZ), 0.1f, 0.1f, 10,
+        arrow = modelBuilder.createArrow(ballPositionX, defineFunction(ballPositionX, ballPositionZ)+1f, ballPositionZ,
+                ((camera.direction.x)*5)+(ballPositionX), defineFunction(ballPositionX, ballPositionZ)+2f, ((camera.direction.z)*5)+(ballPositionZ), 0.1f, 0.1f, 10,
                 GL_TRIANGLES, new Material(ColorAttribute.createDiffuse(Color.RED)),
                 VertexAttributes.Usage.Position | VertexAttributes.Usage.Normal);
         arrowInstance = new ModelInstance(arrow);
