@@ -1,5 +1,6 @@
 package code.Screens;
 
+import code.Bot.PuttingBotDeployement;
 import code.Controller.InputHandler;
 import code.Physics.Rungekuttasolver;
 import com.badlogic.gdx.Gdx;
@@ -71,7 +72,12 @@ public class PuttingGameScreen implements Screen {
 
     //these variables are to decide the shot_speed
     private final double POWER_INCREMENT = 0.025;//m/s
-    private final double MAX_SPEED = 3;//for now the max speed is 3 (should be possible to change per course)
+
+    public static float getWinRadius() {
+        return winRadius;
+    }
+
+    private final double MAX_SPEED = 5;//for now the max speed is 3 (should be possible to change per course)
     private final double STARTING_SHOT_POWER = 0.000001;
     private double shot_Power = STARTING_SHOT_POWER;//m/s
 
@@ -85,10 +91,19 @@ public class PuttingGameScreen implements Screen {
     private ModelInstance flag1Instance;
     private Model flag2;
     private ModelInstance flag2Instance;
+
+    public static float getFlagPositionX() {
+        return flagPositionX;
+    }
+
+    public static float getFlagPositionZ() {
+        return flagPositionZ;
+    }
+
     private static float flagPositionX = 20;
     private static float flagPositionZ = 10;
 
-    private static float winRadius = 5;
+    private static float winRadius = 1;
 
     private static int countIndex = 0;
     private float[] positionArrayX = new float[100];
@@ -111,6 +126,16 @@ public class PuttingGameScreen implements Screen {
         this.createField();
 
         this.gameMode = new GameMode(gameMode.gameName);
+
+    }
+
+    // Constructor BOT that creates the 3D field + corresponding game mode
+    public PuttingGameScreen(final Game game, GameMode gameMode, String f) {
+
+        this.game = game;
+        this.createField();
+        this.gameMode = new GameMode(gameMode.gameName);
+
     }
 
     // Method that creates the 3D field
@@ -346,6 +371,7 @@ public class PuttingGameScreen implements Screen {
         shapeRenderer.setColor(Color.RED);
         if ((getShot_Power()*(scale)) < getMAX_SPEED()*(scale)) {
             shapeRenderer.rect(22, 22, 8, (float) ((getShot_Power()) * (scale)));
+            //System.out.println(shot_Power); // TODO shows the shot power
         }
 
         shapeRenderer.end();
@@ -355,6 +381,7 @@ public class PuttingGameScreen implements Screen {
 
             directionX = camera.direction.x;
             directionZ = camera.direction.z;
+            System.out.println("x: " + directionX + ", y: " + directionZ);
             double power = shot_Power;
 
             countIndex++;

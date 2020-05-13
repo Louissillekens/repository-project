@@ -42,7 +42,7 @@ public class NeuralNet {
 
         /*// Test with an unknown value
         float[] testValuesInput = {20};
-        float[] testValuesOutput = {25}; // Whatever the answer, it wont be used in the testing TODO i think
+        float[] testValuesOutput = {25};
 
 
         TrainingData testInput = new TrainingData(testValuesInput, testValuesOutput);

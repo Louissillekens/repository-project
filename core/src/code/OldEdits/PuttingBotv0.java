@@ -1,47 +1,38 @@
-package code.Bot;
+package code.OldEdits;
 
 import code.Physics.Rungekuttasolver;
 
+import java.lang.reflect.Array;
 import java.math.BigDecimal;
 import java.math.MathContext;
 import java.util.Arrays;
 import java.util.Comparator;
 
 //For the moment it's a stand alone code using the Runge Kutter for fitness
-public class HyperparamsOpt {
+public class PuttingBotv0 {
     //Hyperparameters
-    static int populationAmount;
-    static int generations;
-    static double  mutationRate;
-    static double  crossoverRate; //under 0.5
-    static int roundsPerParam;
-    static  int reducerThreshold; //wich generation the optimisation starts
-
-    static int success;
-
+    static final int populationAmount = 200;
+    static final int generations = 100;
+    static final double  mutationRate = 0.4;
+    static final double  crossoverRate = 0.4; //under 0.5
 
     static final int susCrossover = (int)(crossoverRate*populationAmount); //EVEN NUMBER, >= populationAmount/2,  Number of selections in 1 spin
     static final int susMutation = (int)(mutationRate*populationAmount); //EVEN NUMBER! Number of selections in 1 spin
+    static final int reducerTreshhold = 20; //wich generation the optimisation starts
     static double angleRangeReducer = 0.03; //% of the adjustment
     static double velocityReducer = 0.1; //% of the adjustment
 
-    static double [][] population; //3 being Angle, Velocity and fitness
-
 
     static final int [] velocityRange = {0, 15};
-    static final double [] flagPos = {10,20};
+    static final double [] flagPos = {20,20};
     static final double tolerance = 0.05;
     static final int sf = 8;
     static int [] angleRange = {-90,90}; //OPTIMISATION by reducing the range of angles (no opposite kick)
+    static long start = 0;
+    static long stop = 0;
 
-    HyperparamsOpt(int populationAmount, double mutationRate, double crossoverRate, int reducerThreshold, int generations, int roundsPerParam){
-        this.populationAmount = populationAmount;
-        this.mutationRate = mutationRate;
-        this.crossoverRate = crossoverRate;
-        this.reducerThreshold = reducerThreshold;
-        this.generations = generations;
-        this.roundsPerParam = roundsPerParam;
-    }
+    static double [][] population = new double[populationAmount][3]; //3 being Angle, Velocity and fitness
+
 
     //Generates a random double between 2 numberes and rounded to n-sf
     static double random(double firstN, double secondN, int sf){
@@ -69,7 +60,7 @@ public class HyperparamsOpt {
     }
 
     //Initialisation of the empty population array
-    static void initialisation(double [][] population){
+    static void initialisation(){
 
         for (int i=0; i < population.length; i++){
             for (int j=0; j < population[i].length; j++){
@@ -85,7 +76,7 @@ public class HyperparamsOpt {
         }
     }
 
-    //Executes the RK4 class giving back the position of the ball
+    //Executes the RK4 class giving baack the position of the ball
     static double[] RK4(double [] individual){
         //Convert degrees to radians, radians is the argument for Math.sin or Math.cos
         double angle = (individual[0]*Math.PI)/180;
@@ -114,7 +105,13 @@ public class HyperparamsOpt {
 
             //If in hole
             if (populationTemp[i][2] <= tolerance){ //Means we're in the diameter of the flag
-                success++;
+                stop = System.currentTimeMillis();
+
+                System.out.println("OPTIMAL option = Angle: " + populationTemp[i][0] + ", Velocity: " + populationTemp[i][1]);
+                System.out.println("Final position of: " + Arrays.toString(RK4(populationTemp[i])));
+                System.out.println("Extra info: " + Arrays.toString(populationTemp[i]));
+                System.out.println("Time elapsed: " + (stop-start)/1000);
+                System.exit(0);
             }
 
         }
@@ -174,7 +171,7 @@ public class HyperparamsOpt {
 
         selected = SUS(susMutation);
         for (int i = 0; i < selected.length; i++){
-            population[selected[i]] = mutation();
+            population[populationAmount-1-susCrossover-i] = mutation(population[selected[i]]);
         }
     }
 
@@ -187,9 +184,9 @@ public class HyperparamsOpt {
     }
 
     //change individuals to random numbers to increase diversity of the population
-    static double [] mutation(){
+    static double [] mutation(double [] individual){
 
-        double[] individual = new double[]{random(angleRange[0], angleRange[1], sf), random(velocityRange[0], velocityRange[1], sf), 0};
+        individual = new double[] {random(angleRange[0], angleRange[1], sf), random(velocityRange[0], velocityRange[1], sf), 0};
         return individual;
     }
 
@@ -203,6 +200,9 @@ public class HyperparamsOpt {
         //Velocity
         velocityRange[0] = (int)(population[0][1] - population[0][1]*velocityReducer);
         velocityRange[1] = (int)(population[0][1] + population[0][1]*velocityReducer);
+
+        System.out.println("Optimisation Angle: " + angleRange[0] + ";" + angleRange[1] + "\n" +
+                             "Optimisation Velocity: " + velocityRange[0] + ";" + velocityRange[1]);
     }
 
     //prints a 2D array
@@ -212,35 +212,31 @@ public class HyperparamsOpt {
         }
     }
 
-    public boolean start(){
-        success = 0;
+    public static void main(String[] args) {
+        start = System.currentTimeMillis();
 
-        for (int ii = 0; ii < roundsPerParam; ii++) {
+        initialisation();
 
-            double [][] pop = new double[populationAmount][3]; //3 being Angle, Velocity and fitness
-
-            initialisation(pop);
-            //System.out.println(Arrays.toString(pop));
-
-            population = pop;
-
-            for (int i = 0; i < generations; i++) {
-                fitness();
-
-                if (success >= roundsPerParam){
-                    return true;
-                }
-
-                sort(population);
-                selection(); //Includes the mutation & crossover + updates the population
-                if (i == reducerThreshold) {
-                    optimisationYield();
-                }
-            }
+        for (int i = 0; i < generations; i++){
             fitness();
+            sort(population);
+            selection(); //Includes the mutation & crossover + updates the population
+            System.out.println(i);
+            System.out.println(Arrays.toString(population[0]) + "  " + Arrays.toString(population[1]) + "  " + Arrays.toString(population[2]));
+            if (i == reducerTreshhold){
+                optimisationYield();
+                //print2D(population);
+            }
         }
+        fitness();
+        sort(population);
 
-        return false;
+        //print2D(population);
+        stop = System.currentTimeMillis();
+
+        System.out.println("Best option found, not optimal = Angle:" + population[0][0] + ", Velocity: " + population[0][1]);
+        System.out.println("Final position of: " + Arrays.toString(RK4(population[0])));
+        System.out.println("Extra info: " + Arrays.toString(population[0]));
+        System.out.println("Time elapsed: " + (stop-start)/1000 + "s.");
     }
 }
-
