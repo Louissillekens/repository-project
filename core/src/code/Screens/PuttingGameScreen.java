@@ -1,5 +1,6 @@
 package code.Screens;
 
+import code.Bot.PuttingBotDeployement;
 import code.Controller.InputHandler;
 import code.Physics.Rungekuttasolver;
 import com.badlogic.gdx.Gdx;
@@ -326,6 +327,40 @@ public class PuttingGameScreen implements Screen {
         }
     }
 
+    /**
+     * Method that makes the ball move to its new position
+     */
+    public void ballMovement() {
+
+        double ballPositionXround = (double)(Math.round(ballPositionX*100))/10;
+        double newBallPositionXround = (double)(Math.round(newBallPositionX*100))/10;
+        double ballPositionZround = (double)(Math.round(ballPositionZ*100))/10;
+        double newBallPositionZround = (double)(Math.round(newBallPositionZ*100))/10;
+
+        // Condition that checks if the new position of the ball is different from the current one
+        // If it is the case, move the ball to that new position
+        if (((((ballPositionX < newBallPositionX) && (ballPositionZ < newBallPositionZ)) ||
+                ((ballPositionX > newBallPositionX) && (ballPositionZ > newBallPositionZ)) ||
+                ((ballPositionX < newBallPositionX) && (ballPositionZ > newBallPositionZ)) ||
+                ((ballPositionX > newBallPositionX) && (ballPositionZ < newBallPositionZ))) &&
+                ((ballPositionXround != newBallPositionXround) && (ballPositionZround != newBallPositionZround))) &&
+                (canTranslateCam)) {
+
+            // Scalar factor used for the camera translation
+            float scaleFactor = 50;
+            ballPositionX += ballStepXmean;
+            ballPositionZ += ballStepZmean;
+            camera.lookAt(ballPositionX, defineFunction(ballPositionX, ballPositionZ), ballPositionZ);
+            camera.translate((newBallPositionX - ballPositionX) / scaleFactor, 0.001f / scaleFactor, (newBallPositionZ - ballPositionZ) / scaleFactor);
+
+            sumX += (newBallPositionX - ballPositionX) / (scaleFactor);
+            sumZ += (newBallPositionZ - ballPositionZ) / (scaleFactor);
+
+            translateX[countIndex - 1] = sumX;
+            translateZ[countIndex - 1] = sumZ;
+        }
+    }
+
 
     /**
      * Render all the elements of the field
@@ -385,8 +420,6 @@ public class PuttingGameScreen implements Screen {
         //key input to take a shot with the given power
         if(Gdx.input.isKeyJustPressed(Input.Keys.SPACE)){
 
-            directionX = camera.direction.x;
-            directionZ = camera.direction.z;
             double power = shot_Power;
 
             countIndex++;
@@ -394,7 +427,26 @@ public class PuttingGameScreen implements Screen {
             // Instance of the RK4
             // Used to compute the next position of the ball based on the current position, the camera direction and the power
             Rungekuttasolver solver = new Rungekuttasolver();
-            solver.setValues(ballPositionX, ballPositionZ, (directionX*power)*600, (directionZ*power)*600);
+
+            // Condition that checks the game mode chosen by the user before taking the shot
+            if (gameMode.gameName.equals("Single_Player")) {
+
+                int scalar = 600;
+                directionX = camera.direction.x;
+                directionZ = camera.direction.z;
+                solver.setValues(ballPositionX, ballPositionZ, (directionX*power)*scalar, (directionZ*power)*scalar);
+            }
+            else if (gameMode.gameName.equals("Bot")) {
+
+                PuttingBotDeployement bot = new PuttingBotDeployement();
+                int scalar = 200;
+                directionX = (float) bot.getXVector();
+                directionZ = (float) bot.getYVector();
+                System.out.println("dx: " + directionX);
+                System.out.println("dz: " + directionZ);
+                solver.setValues(ballPositionX, ballPositionZ, (directionX*power)*scalar, (directionZ*power)*scalar);
+            }
+
             solver.RK4();
 
             newBallPositionX = (float) solver.getX();
@@ -421,33 +473,7 @@ public class PuttingGameScreen implements Screen {
             canReset = true;
         }
 
-        double ballPositionXround = (double)(Math.round(ballPositionX*100))/10;
-        double newBallPositionXround = (double)(Math.round(newBallPositionX*100))/10;
-        double ballPositionZround = (double)(Math.round(ballPositionZ*100))/10;
-        double newBallPositionZround = (double)(Math.round(newBallPositionZ*100))/10;
-
-        // Condition that checks if the new position of the ball is different from the current one
-        // If it is the case, move the ball to that new position
-        if (((((ballPositionX < newBallPositionX) && (ballPositionZ < newBallPositionZ)) ||
-                ((ballPositionX > newBallPositionX) && (ballPositionZ > newBallPositionZ)) ||
-                ((ballPositionX < newBallPositionX) && (ballPositionZ > newBallPositionZ)) ||
-                ((ballPositionX > newBallPositionX) && (ballPositionZ < newBallPositionZ))) &&
-                ((ballPositionXround != newBallPositionXround) && (ballPositionZround != newBallPositionZround))) &&
-                (canTranslateCam)) {
-
-            // Scalar factor used for the camera translation
-            float scaleFactor = 50;
-            ballPositionX += ballStepXmean;
-            ballPositionZ += ballStepZmean;
-            camera.lookAt(ballPositionX, defineFunction(ballPositionX, ballPositionZ), ballPositionZ);
-            camera.translate((newBallPositionX - ballPositionX) / scaleFactor, 0.001f / scaleFactor, (newBallPositionZ - ballPositionZ) / scaleFactor);
-
-            sumX += (newBallPositionX - ballPositionX) / (scaleFactor);
-            sumZ += (newBallPositionZ - ballPositionZ) / (scaleFactor);
-
-            translateX[countIndex - 1] = sumX;
-            translateZ[countIndex - 1] = sumZ;
-        }
+        ballMovement();
 
         // Condition used when the ball is out of the field
         if (outOfField(ballPositionX, ballPositionZ)) {
@@ -490,8 +516,11 @@ public class PuttingGameScreen implements Screen {
             game.setScreen(new GameModeScreen(game));
         }
 
-        // Call of the class input handler that contains the majority of the user controls
-        InputHandler.checkForInput(this);
+        // Condition that only let the user controls when the Single Player mode is selected
+        if (gameMode.gameName.equals("Single_Player")) {
+            // Call of the class input handler that contains the majority of the user controls
+            InputHandler.checkForInput(this);
+        }
     }
 
     @Override
@@ -567,5 +596,17 @@ public class PuttingGameScreen implements Screen {
 
     public float getBallPositionZ() {
         return ballPositionZ;
+    }
+
+    public static float getFlagPositionX() {
+        return flagPositionX;
+    }
+
+    public static float getFlagPositionZ() {
+        return flagPositionZ;
+    }
+
+    public static float getWinRadius() {
+        return winRadius;
     }
 }

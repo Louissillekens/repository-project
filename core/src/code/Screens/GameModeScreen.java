@@ -69,24 +69,24 @@ public class GameModeScreen implements Screen {
         stage.addActor(singlePlayer);
 
         multiplayer = new TextButton("Player VS Player", skin);
-        multiplayer.setPosition(450, 300);
+        multiplayer.setPosition(100, 200);
         multiplayer.setSize(200, 60);
-        stage.addActor(multiplayer);
+        //stage.addActor(multiplayer);
 
         bot = new TextButton("Bot", skin);
-        bot.setPosition(100, 200);
+        bot.setPosition(450, 300);
         bot.setSize(200, 60);
         stage.addActor(bot);
 
         botVSplayer = new TextButton("Bot VS Player", skin);
         botVSplayer.setPosition(450, 200);
         botVSplayer.setSize(200, 60);
-        stage.addActor(botVSplayer);
+        //stage.addActor(botVSplayer);
 
         botVSbot = new TextButton("Bot VS Bot", skin);
         botVSbot.setPosition(100, 100);
         botVSbot.setSize(200, 60);
-        stage.addActor(botVSbot);
+        //stage.addActor(botVSbot);
 
         // Every inner class are called when a button is pressed
         // It changes the actual screen to the game screen with selected game mode
@@ -147,7 +147,7 @@ public class GameModeScreen implements Screen {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
 
-                this.game.setScreen(new PuttingGameScreen(myGame, new GameMode(gameName), "bot"));
+                this.game.setScreen(new PuttingGameScreen(myGame, new GameMode(gameName)));
                 this.screen.dispose();
             }
         }

@@ -297,7 +297,7 @@ public class PuttingBotDeployement {
     }
 
     // Get the x vector back to input the RK4
-    public static double getXVector() {
+    public double getXVector() {
         //Convert degrees to radians, radians is the argument for Math.sin or Math.cos
         double angle = (population[0][0]*Math.PI)/180;
 
@@ -307,7 +307,7 @@ public class PuttingBotDeployement {
     }
 
     // Get the x vector back to input the RK4
-    public static double getYVector() {
+    public double getYVector() {
         //Convert degrees to radians, radians is the argument for Math.sin or Math.cos
         double angle = (population[0][0]*Math.PI)/180;
 
