@@ -58,6 +58,24 @@ public class InputHandler {
         if(Gdx.input.isKeyPressed(Input.Keys.Q)) {
             Gdx.app.exit();
         }
+
+        // Key press input R that return to the place of the previous shot
+        if (Gdx.input.isKeyPressed(Input.Keys.R)) {
+
+            // Condition that checks if the ball shot can be reset to the previous one
+            if (gamescreen.getCanReset()) {
+                // Condition that checks if the camera can be moved after pushing keyboard command R
+                if (gamescreen.getTrackShot()) {
+                    gamescreen.getCamera().translate(-(gamescreen.getTranslateX()[gamescreen.getCountIndex() - 1]), -0.001f, -(gamescreen.getTranslateZ()[gamescreen.getCountIndex() - 1]));
+                }
+                gamescreen.setTrackShot(false);
+                gamescreen.setCanTranslateCam(false);
+                // Call of the method that reset the ball to the previous place
+                gamescreen.resetBallShot();
+                gamescreen.getCamera().lookAt(gamescreen.getBallPositionX(), gamescreen.defineFunction(gamescreen.getBallPositionX(), gamescreen.getBallPositionZ()), gamescreen.getBallPositionZ());
+            }
+        }
+
         //System.out.println("x : " + gamescreen.getCamera().direction.x);
         //System.out.println("y : " + gamescreen.getCamera().direction.y);
         //System.out.println("z : " + gamescreen.getCamera().direction.z);

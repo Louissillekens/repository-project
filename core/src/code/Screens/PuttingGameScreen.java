@@ -512,23 +512,6 @@ public class PuttingGameScreen implements Screen {
             camera.lookAt(ballPositionX, defineFunction(ballPositionX, ballPositionZ), ballPositionZ);
         }
 
-        // Key press input R that return to the place of the previous shot
-        if (Gdx.input.isKeyPressed(Input.Keys.R)) {
-
-            // Condition that checks if the ball shot can be reset to the previous one
-            if (canReset) {
-                // Condition that checks if the camera can be moved after pushing keyboard command R
-                if (trackShot) {
-                    camera.translate(-(translateX[countIndex - 1]), -0.001f, -(translateZ[countIndex - 1]));
-                }
-                trackShot = false;
-                canTranslateCam = false;
-                // Call of the method that reset the ball to the previous place
-                resetBallShot();
-                camera.lookAt(ballPositionX, defineFunction(ballPositionX, ballPositionZ), ballPositionZ);
-            }
-        }
-
         // Condition used to reset the ball position when the ball falls into water
         if (isInWater(ballPositionX, ballPositionZ)) {
 
@@ -653,5 +636,33 @@ public class PuttingGameScreen implements Screen {
 
     public static float getWinRadius() {
         return winRadius;
+    }
+
+    public boolean getCanReset(){
+        return canReset;
+    }
+
+    public boolean getTrackShot(){
+        return trackShot;
+    }
+
+    public float[] getTranslateX(){
+        return translateX;
+    }
+
+    public float[] getTranslateZ(){
+        return translateZ;
+    }
+
+    public void setTrackShot(boolean value){
+        trackShot = value;
+    }
+
+    public void setCanTranslateCam(boolean value){
+        canTranslateCam = value;
+    }
+
+    public int getCountIndex(){
+        return countIndex;
     }
 }
