@@ -18,8 +18,6 @@ import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Vector3;
 import com.game.game.Game;
 
-import java.util.concurrent.TimeUnit;
-
 import static com.badlogic.gdx.graphics.GL20.GL_TRIANGLES;
 
 /**
@@ -101,7 +99,7 @@ public class PuttingGameScreen implements Screen {
 
     SpriteBatch batch;
     BitmapFont font;
-    private float timer = 4f;
+    private float timer = 2000f;
     private float period = 0;
 
     /**
@@ -378,12 +376,14 @@ public class PuttingGameScreen implements Screen {
         font.getData().setScale(3);
         font.getRegion().getTexture().setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear);
 
-        batch.begin();
-        font.draw(batch, message, 300, 300);
         while (period < timer) {
+            System.out.println(period);
             period += Gdx.graphics.getDeltaTime();
+            batch.begin();
+            font.draw(batch, message, 300, 300);
+            batch.end();
         }
-        batch.end();
+        period = 0;
     }
 
 
@@ -500,10 +500,7 @@ public class PuttingGameScreen implements Screen {
         // Condition used when the ball is out of the field
         if (outOfField(ballPositionX, ballPositionZ)) {
 
-            while (period < timer) {
-                displayMessage("Ball went out of the field");
-                period += Gdx.graphics.getDeltaTime();
-            }
+            displayMessage("Ball went out of the field");
 
             camera.translate(-(sumX), (float) (-0.001/3), -(sumZ));
             canTranslateCam = false;
@@ -515,10 +512,7 @@ public class PuttingGameScreen implements Screen {
         // Condition used to reset the ball position when the ball falls into water
         if (isInWater(ballPositionX, ballPositionZ)) {
 
-            while (period < timer) {
-                displayMessage("Ball fell in the water");
-                period += Gdx.graphics.getDeltaTime();
-            }
+            displayMessage("Ball fell in water");
             camera.translate(-(sumX), (float) (-0.001 / 3), -(sumZ));
             canTranslateCam = false;
             canReset = false;
