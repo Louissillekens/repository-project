@@ -390,14 +390,6 @@ public class PuttingGameScreen implements Screen {
         ballInstance = new ModelInstance(ball, ballPositionX,(defineFunction(ballPositionX, ballPositionZ))+(ballSize/2), ballPositionZ);
         modelBatch.render(ballInstance, environment);
 
-        // Creation of the directive arrow
-        arrow = modelBuilder.createArrow(ballPositionX, defineFunction(ballPositionX, ballPositionZ)+1f, ballPositionZ,
-                ((camera.direction.x)*5)+(ballPositionX), defineFunction(ballPositionX, ballPositionZ)+2f, ((camera.direction.z)*5)+(ballPositionZ), 0.1f, 0.1f, 10,
-                GL_TRIANGLES, new Material(ColorAttribute.createDiffuse(Color.RED)),
-                VertexAttributes.Usage.Position | VertexAttributes.Usage.Normal);
-        arrowInstance = new ModelInstance(arrow);
-
-        modelBatch.render(arrowInstance, environment);
         modelBatch.render(flag1Instance, environment);
         modelBatch.render(flag2Instance, environment);
 
@@ -517,14 +509,24 @@ public class PuttingGameScreen implements Screen {
 
         // Condition used to check if the ball is closed enough to the flag
         if (isWin(ballPositionX, ballPositionZ)) {
+
             System.out.println("WIN");
             game.setScreen(new GameModeScreen(game));
         }
 
         // Condition that only let the user controls when the Single Player mode is selected
         if (gameMode.gameName.equals("Single_Player")) {
+
+            // Creation of the directive arrow
+            arrow = modelBuilder.createArrow(ballPositionX, defineFunction(ballPositionX, ballPositionZ)+1f, ballPositionZ,
+                    ((camera.direction.x)*5)+(ballPositionX), defineFunction(ballPositionX, ballPositionZ)+2f, ((camera.direction.z)*5)+(ballPositionZ), 0.1f, 0.1f, 10,
+                    GL_TRIANGLES, new Material(ColorAttribute.createDiffuse(Color.RED)),
+                    VertexAttributes.Usage.Position | VertexAttributes.Usage.Normal);
+            arrowInstance = new ModelInstance(arrow);
+            modelBatch.render(arrowInstance, environment);
             // Call of the class input handler that contains the majority of the user controls
             InputHandler.checkForInput(this);
+
         }
     }
 
