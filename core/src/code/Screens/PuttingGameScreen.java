@@ -386,6 +386,7 @@ public class PuttingGameScreen implements Screen {
         period = 0;
     }
 
+
     /**
      * Render all the elements of the field
      * @param delta time between the last and the current frame
