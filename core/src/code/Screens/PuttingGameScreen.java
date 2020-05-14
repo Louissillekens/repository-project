@@ -101,6 +101,8 @@ public class PuttingGameScreen implements Screen {
 
     SpriteBatch batch;
     BitmapFont font;
+    private float timer = 4f;
+    private float period = 0;
 
     /**
      * Constructor that creates a new instance of the putting game screen
@@ -365,6 +367,22 @@ public class PuttingGameScreen implements Screen {
         }
     }
 
+    /**
+     * Method used to draw a string on the screen
+     * @param message to draw on the screen
+     */
+    public void displayMessage(String message){
+
+        batch = new SpriteBatch();
+        font = new BitmapFont();
+        font.getData().setScale(3);
+        font.getRegion().getTexture().setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear);
+
+        batch.begin();
+        font.draw(batch, message, 300, 300);
+        batch.end();
+    }
+
 
     /**
      * Render all the elements of the field
@@ -508,19 +526,23 @@ public class PuttingGameScreen implements Screen {
         // Condition used to reset the ball position when the ball falls into water
         if (isInWater(ballPositionX, ballPositionZ)) {
 
-            displayMessage("ball fell in the water");
-            camera.translate(-(sumX), (float) (-0.001/3), -(sumZ));
+            while (period < timer) {
+                period += Gdx.graphics.getDeltaTime();
+                displayMessage("Ball fell in the water");
+            }
+            camera.translate(-(sumX), (float) (-0.001 / 3), -(sumZ));
             canTranslateCam = false;
             canReset = false;
             // Call of the method that reset the ball to the previous place
             resetBallShot();
+            period = 0;
             camera.lookAt(ballPositionX, defineFunction(ballPositionX, ballPositionZ), ballPositionZ);
         }
 
         // Condition used to check if the ball is closed enough to the flag
         if (isWin(ballPositionX, ballPositionZ)) {
 
-            System.out.println("WIN");
+            displayMessage("Win");
             game.setScreen(new GameModeScreen(game));
         }
 
@@ -538,17 +560,6 @@ public class PuttingGameScreen implements Screen {
             InputHandler.checkForInput(this);
 
         }
-    }
-
-    public void displayMessage(String message){
-        batch = new SpriteBatch();
-        font = new BitmapFont();
-        font.getData().setScale(3);
-        font.getRegion().getTexture().setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear);
-
-        batch.begin();
-        font.draw(batch, message, 300, 300);
-        batch.end();
     }
 
     @Override
