@@ -380,6 +380,9 @@ public class PuttingGameScreen implements Screen {
 
         batch.begin();
         font.draw(batch, message, 300, 300);
+        while (period < timer) {
+            period += Gdx.graphics.getDeltaTime();
+        }
         batch.end();
     }
 
@@ -497,7 +500,10 @@ public class PuttingGameScreen implements Screen {
         // Condition used when the ball is out of the field
         if (outOfField(ballPositionX, ballPositionZ)) {
 
-            displayMessage("Ball went out of the field");
+            while (period < timer) {
+                displayMessage("Ball went out of the field");
+                period += Gdx.graphics.getDeltaTime();
+            }
 
             camera.translate(-(sumX), (float) (-0.001/3), -(sumZ));
             canTranslateCam = false;
@@ -527,8 +533,8 @@ public class PuttingGameScreen implements Screen {
         if (isInWater(ballPositionX, ballPositionZ)) {
 
             while (period < timer) {
-                period += Gdx.graphics.getDeltaTime();
                 displayMessage("Ball fell in the water");
+                period += Gdx.graphics.getDeltaTime();
             }
             camera.translate(-(sumX), (float) (-0.001 / 3), -(sumZ));
             canTranslateCam = false;
