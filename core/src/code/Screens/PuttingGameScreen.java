@@ -6,10 +6,9 @@ import code.Physics.Rungekuttasolver;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.Screen;
-import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.GL20;
-import com.badlogic.gdx.graphics.PerspectiveCamera;
-import com.badlogic.gdx.graphics.VertexAttributes;
+import com.badlogic.gdx.graphics.*;
+import com.badlogic.gdx.graphics.g2d.BitmapFont;
+import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g3d.*;
 import com.badlogic.gdx.graphics.g3d.attributes.ColorAttribute;
 import com.badlogic.gdx.graphics.g3d.environment.DirectionalLight;
@@ -18,6 +17,8 @@ import com.badlogic.gdx.graphics.g3d.utils.ModelBuilder;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Vector3;
 import com.game.game.Game;
+
+import java.util.concurrent.TimeUnit;
 
 import static com.badlogic.gdx.graphics.GL20.GL_TRIANGLES;
 
@@ -97,6 +98,9 @@ public class PuttingGameScreen implements Screen {
     private static boolean trackShot = false;
     private static boolean canTranslateCam = false;
     private static boolean canReset = false;
+
+    SpriteBatch batch;
+    BitmapFont font;
 
     /**
      * Constructor that creates a new instance of the putting game screen
@@ -483,8 +487,13 @@ public class PuttingGameScreen implements Screen {
         // Condition used when the ball is out of the field
         if (outOfField(ballPositionX, ballPositionZ)) {
 
-            // TODO decides the rule when the ball is out of the field
-            game.setScreen(new GameModeScreen(game));
+            displayMessage("Ball went out of the field");
+
+            camera.translate(-(sumX), (float) (-0.001/3), -(sumZ));
+            canTranslateCam = false;
+            canReset = false;
+            resetBallShot();
+            camera.lookAt(ballPositionX, defineFunction(ballPositionX, ballPositionZ), ballPositionZ);
         }
 
         // Key press input R that return to the place of the previous shot
@@ -507,6 +516,7 @@ public class PuttingGameScreen implements Screen {
         // Condition used to reset the ball position when the ball falls into water
         if (isInWater(ballPositionX, ballPositionZ)) {
 
+            displayMessage("ball fell in the water");
             camera.translate(-(sumX), (float) (-0.001/3), -(sumZ));
             canTranslateCam = false;
             canReset = false;
@@ -526,6 +536,17 @@ public class PuttingGameScreen implements Screen {
             // Call of the class input handler that contains the majority of the user controls
             InputHandler.checkForInput(this);
         }
+    }
+
+    public void displayMessage(String message){
+        batch = new SpriteBatch();
+        font = new BitmapFont();
+        font.getData().setScale(3);
+        font.getRegion().getTexture().setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear);
+
+        batch.begin();
+        font.draw(batch, message, 300, 300);
+        batch.end();
     }
 
     @Override

@@ -22,12 +22,12 @@ public class InputHandler {
     public static void checkForInput(PuttingGameScreen gamescreen){
 
         // Some key pressed input to rotate the camera and also zoom in zoom out
-        if(Gdx.input.isKeyPressed(Input.Keys.LEFT)) {
+        if(Gdx.input.isKeyPressed(Input.Keys.RIGHT)) {
             gamescreen.getCamera().rotateAround(PuttingGameScreen.vector1 = new Vector3(gamescreen.getBallPositionX(), PuttingGameScreen.defineFunction(gamescreen.getBallPositionX(), gamescreen.getBallPositionZ()), gamescreen.getBallPositionZ()),
                     PuttingGameScreen.vector2 = new Vector3(0f, -1f, 0f), 1f);
             gamescreen.getCamera().lookAt(gamescreen.getBallPositionX(), PuttingGameScreen.defineFunction(gamescreen.getBallPositionX(), gamescreen.getBallPositionZ()), gamescreen.getBallPositionZ());
         }
-        if(Gdx.input.isKeyPressed(Input.Keys.RIGHT)) {
+        if(Gdx.input.isKeyPressed(Input.Keys.LEFT)) {
             gamescreen.getCamera().rotateAround(PuttingGameScreen.vector1 = new Vector3(gamescreen.getBallPositionX(), PuttingGameScreen.defineFunction(gamescreen.getBallPositionX(), gamescreen.getBallPositionZ()), gamescreen.getBallPositionZ()),
                     PuttingGameScreen.vector2 = new Vector3(0f, 1f, 0f), 1f);
             gamescreen.getCamera().lookAt(gamescreen.getBallPositionX(), PuttingGameScreen.defineFunction(gamescreen.getBallPositionX(), gamescreen.getBallPositionZ()), gamescreen.getBallPositionZ());
