@@ -8,6 +8,7 @@ import com.badlogic.gdx.Input;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.*;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
+import com.badlogic.gdx.graphics.g2d.GlyphLayout;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g3d.*;
 import com.badlogic.gdx.graphics.g3d.attributes.ColorAttribute;
@@ -97,10 +98,10 @@ public class PuttingGameScreen implements Screen {
     private static boolean canTranslateCam = false;
     private static boolean canReset = false;
 
-    SpriteBatch batch;
-    BitmapFont font;
-    private float timer = 2000f;
-    private float period = 0;
+    private SpriteBatch batch;
+    private BitmapFont font;
+    private float fontX, fontY;
+    private GlyphLayout layout = new GlyphLayout();
 
     /**
      * Constructor that creates a new instance of the putting game screen
@@ -376,9 +377,16 @@ public class PuttingGameScreen implements Screen {
         font.getData().setScale(3);
         font.getRegion().getTexture().setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear);
 
-        period += Gdx.graphics.getDeltaTime();
+
+        layout.setText(font, message);
+        float width = layout.width;
+        float height = layout.height;
+
+        fontX =  (Game.WIDTH/2) - (layout.width/2);
+        fontY =  (Game.HEIGHT/2) - (layout.height/2);
+
         batch.begin();
-        font.draw(batch, message, 300, 300);
+        font.draw(batch, message, fontX, fontY);
         batch.end();
     }
 
@@ -514,7 +522,6 @@ public class PuttingGameScreen implements Screen {
             canReset = false;
             // Call of the method that reset the ball to the previous place
             resetBallShot();
-            period = 0;
             camera.lookAt(ballPositionX, defineFunction(ballPositionX, ballPositionZ), ballPositionZ);
         }
 
