@@ -103,6 +103,7 @@ public class PuttingGameScreen implements Screen {
     private BitmapFont font = new BitmapFont();
     private float fontX, fontY;
     private GlyphLayout layout = new GlyphLayout();
+    private int period = 5000;
 
     /**
      * Constructor that creates a new instance of the putting game screen
@@ -398,6 +399,9 @@ public class PuttingGameScreen implements Screen {
 
         camera.update();
 
+        // Reset of the timer variable used to freeze the ball
+        float timer = 0;
+
         modelBatch.begin(camera);
 
         // Render the instance of the field with the given environment
@@ -528,7 +532,10 @@ public class PuttingGameScreen implements Screen {
         // Condition used to reset the ball position when the ball falls into water
         if (isInWater(ballPositionX, ballPositionZ)) {
 
-            displayMessage("Ball fell in water");
+            while (timer < period) {
+                displayMessage("Ball fell in water");
+                timer += Gdx.graphics.getDeltaTime();
+            }
             camera.translate(-(sumX), (float) (-0.001 / 3), -(sumZ));
             canTranslateCam = false;
             canReset = false;
@@ -536,11 +543,13 @@ public class PuttingGameScreen implements Screen {
             resetBallShot();
             camera.lookAt(ballPositionX, defineFunction(ballPositionX, ballPositionZ), ballPositionZ);
         }
-
         // Condition used to check if the ball is closed enough to the flag
         if (isWin(ballPositionX, ballPositionZ)) {
 
-            displayMessage("Win");
+            while (timer < period) {
+                displayMessage("Win");
+                timer+=Gdx.graphics.getDeltaTime();
+            }
             game.setScreen(new GameModeScreen(game));
         }
 
