@@ -3,8 +3,12 @@ package code.Screens;
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.BitmapFont;
+import com.badlogic.gdx.graphics.g2d.GlyphLayout;
+import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
@@ -37,6 +41,11 @@ public class GameModeScreen implements Screen {
     private TextButton botVSplayer;
     private TextButton botVSbot;
 
+    // Instances for the text creation
+    private SpriteBatch batch = new SpriteBatch();
+    private BitmapFont font = new BitmapFont();
+    private GlyphLayout layout = new GlyphLayout();
+
     /**
      * a parametric constructor that takes a Game and makes all visuals for the course
      * @param game the game for which to make the GUI
@@ -57,14 +66,14 @@ public class GameModeScreen implements Screen {
         gameModeTexture = new Texture(Gdx.files.internal("GameMode.png"));
         gameModeTexture.setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear);
         gameModeImage = new Image(gameModeTexture);
-        gameModeImage.setPosition(80, 355);
+        gameModeImage.setPosition(80, 405);
         gameModeImage.setSize(550, 95);
         stage.addActor(gameModeImage);
 
         skin = new Skin(Gdx.files.internal("uiskin.json"));
 
         singlePlayer = new TextButton("Single Player", skin);
-        singlePlayer.setPosition(100, 250);
+        singlePlayer.setPosition(100, 300);
         singlePlayer.setSize(200, 60);
         stage.addActor(singlePlayer);
 
@@ -74,7 +83,7 @@ public class GameModeScreen implements Screen {
         //stage.addActor(multiplayer);
 
         bot = new TextButton("Bot", skin);
-        bot.setPosition(400, 250);
+        bot.setPosition(400, 300);
         bot.setSize(200, 60);
         stage.addActor(bot);
 
@@ -196,6 +205,22 @@ public class GameModeScreen implements Screen {
         botVSbot.addListener(new Bot_VS_Bot_Listener(game, this));
     }
 
+    /**
+     * Method used to draw a string on the screen
+     * @param message to draw on the screen
+     */
+    public void displayMessage(String message, float x, float y){
+
+        font.getData().setScale(1.75f, 1.75f);
+        font.getRegion().getTexture().setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear);
+        font.setColor(Color.RED);
+        layout.setText(font, message);
+
+        batch.begin();
+        font.draw(batch, message, x, y);
+        batch.end();
+    }
+
     @Override
     public void render(float delta) {
 
@@ -203,6 +228,13 @@ public class GameModeScreen implements Screen {
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
         stage.draw();
+
+        displayMessage("Game controls:", 100, 260);
+        displayMessage("Left and Right arrow - rotate the camera and change the angle of the shot", 100, 210);
+        displayMessage("Top and bottom arrow - increase or decrease the power of the shot", 100, 170);
+        displayMessage("Space - take a shot with the chosen power and angle ", 100, 130);
+        displayMessage("R - reset the ball location to its previous position", 100, 90);
+        displayMessage("B - return to the game mode menu selector", 100, 50);
     }
 
     @Override

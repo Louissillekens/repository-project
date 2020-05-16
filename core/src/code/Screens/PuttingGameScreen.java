@@ -377,8 +377,8 @@ public class PuttingGameScreen implements Screen {
         font.getData().setScale(3);
         font.getRegion().getTexture().setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear);
         layout.setText(font, message);
-        fontX =  (Game.WIDTH/2) - (layout.width/2);
-        fontY =  (Game.HEIGHT/2) - (layout.height/2);
+        fontX = (Game.WIDTH/2) - (layout.width/2);
+        fontY = (Game.HEIGHT/2) - (layout.height/2);
 
         batch.begin();
         font.draw(batch, message, fontX, fontY);

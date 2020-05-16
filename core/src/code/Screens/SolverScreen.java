@@ -50,19 +50,19 @@ public class SolverScreen implements Screen {
         gameModeTexture = new Texture(Gdx.files.internal("Solver.png"));
         gameModeTexture.setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear);
         gameModeImage = new Image(gameModeTexture);
-        gameModeImage.setPosition(100, 370);
+        gameModeImage.setPosition(100, 420);
         gameModeImage.setSize(400, 60);
         stage.addActor(gameModeImage);
 
         skin = new Skin(Gdx.files.internal("uiskin.json"));
 
         rk4Button = new TextButton("Runge Kutta", skin);
-        rk4Button.setPosition(100, 250);
+        rk4Button.setPosition(100, 300);
         rk4Button.setSize(200, 60);
         stage.addActor(rk4Button);
 
         verletButton = new TextButton("Verlet", skin);
-        verletButton.setPosition(400, 250);
+        verletButton.setPosition(400, 300);
         verletButton.setSize(200, 60);
         stage.addActor(verletButton);
 
