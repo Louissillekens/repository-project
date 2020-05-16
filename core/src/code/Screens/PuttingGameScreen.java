@@ -98,8 +98,8 @@ public class PuttingGameScreen implements Screen {
     private static boolean canTranslateCam = false;
     private static boolean canReset = false;
 
-    private SpriteBatch batch;
-    private BitmapFont font;
+    private SpriteBatch batch = new SpriteBatch();
+    private BitmapFont font = new BitmapFont();
     private float fontX, fontY;
     private GlyphLayout layout = new GlyphLayout();
 
@@ -372,16 +372,9 @@ public class PuttingGameScreen implements Screen {
      */
     public void displayMessage(String message){
 
-        batch = new SpriteBatch();
-        font = new BitmapFont();
         font.getData().setScale(3);
         font.getRegion().getTexture().setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear);
-
-
         layout.setText(font, message);
-        float width = layout.width;
-        float height = layout.height;
-
         fontX =  (Game.WIDTH/2) - (layout.width/2);
         fontY =  (Game.HEIGHT/2) - (layout.height/2);
 
@@ -397,7 +390,7 @@ public class PuttingGameScreen implements Screen {
      */
     @Override
     public void render(float delta) {
-
+        
         Gdx.gl.glViewport(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
         Gdx.gl.glClearColor(0, 0, 0, 1);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT);
