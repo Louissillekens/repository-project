@@ -376,14 +376,10 @@ public class PuttingGameScreen implements Screen {
         font.getData().setScale(3);
         font.getRegion().getTexture().setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear);
 
-        while (period < timer) {
-            System.out.println(period);
-            period += Gdx.graphics.getDeltaTime();
-            batch.begin();
-            font.draw(batch, message, 300, 300);
-            batch.end();
-        }
-        period = 0;
+        period += Gdx.graphics.getDeltaTime();
+        batch.begin();
+        font.draw(batch, message, 300, 300);
+        batch.end();
     }
 
 
