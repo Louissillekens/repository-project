@@ -3,6 +3,7 @@ package code.Screens;
 import code.Bot.PuttingBotDeployement;
 import code.Controller.InputHandler;
 import code.Physics.Rungekuttasolver;
+import code.Physics.VerletSolver;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.Screen;
@@ -438,20 +439,43 @@ public class PuttingGameScreen implements Screen {
 
             countIndex++;
 
-            // Instance of the RK4
-            // Used to compute the next position of the ball based on the current position, the camera direction and the power
-            Rungekuttasolver solver = new Rungekuttasolver();
-
             // Condition that checks the game mode chosen by the user before taking the shot
             if (gameMode.gameName.equals("Single_Player")) {
 
-                int scalar = 600;
-                directionX = camera.direction.x;
-                directionZ = camera.direction.z;
-               // System.out.println("Direction x: " + directionX + "Direction y: " + directionZ);
-                solver.setValues(ballPositionX, ballPositionZ, (directionX*power)*scalar, (directionZ*power)*scalar);
+                // Instance of the RK4 solver
+                // Used to compute the next position of the ball based on the current position, the camera direction and the power
+                if (SolverScreen.getSolverName().equals("RK4")) {
+
+                    int scalar = 600;
+                    directionX = camera.direction.x;
+                    directionZ = camera.direction.z;
+
+                    Rungekuttasolver solver = new Rungekuttasolver();
+                    solver.setValues(ballPositionX, ballPositionZ, (directionX*power)*scalar, (directionZ*power)*scalar);
+                    solver.RK4();
+                    newBallPositionX = (float) solver.getX();
+                    newBallPositionZ = (float) solver.getY();
+                }
+
+                // Instance of the Verlet solver
+                // Used to compute the next position of the ball based on the current position, the camera direction and the power
+                if (SolverScreen.getSolverName().equals("Verlet")) {
+
+                    int scalar = 500;
+                    directionX = camera.direction.x;
+                    directionZ = camera.direction.z;
+
+                    VerletSolver solver = new VerletSolver();
+                    solver.setValues(ballPositionX, ballPositionZ, (directionX*power)*scalar, (directionZ*power)*scalar);
+                    solver.Verlet();
+                    newBallPositionX = (float) solver.getX();
+                    newBallPositionZ = (float) solver.getY();
+                }
+
             }
             else if (gameMode.gameName.equals("Bot")) {
+
+                Rungekuttasolver solver = new Rungekuttasolver();
 
                 PuttingBotDeployement bot = new PuttingBotDeployement();
                 int scalar = 500;
@@ -465,11 +489,6 @@ public class PuttingGameScreen implements Screen {
                 System.out.println("dz: " + directionZ);
                 solver.setValues(ballPositionX, ballPositionZ, (directionX*power)*scalar, (directionZ*power)*scalar);
             }
-
-            solver.RK4();
-
-            newBallPositionX = (float) solver.getX();
-            newBallPositionZ = (float) solver.getY();
 
             positionArrayX[countIndex] = newBallPositionX;
             positionArrayZ[countIndex] = newBallPositionZ;

@@ -57,14 +57,14 @@ public class GameModeScreen implements Screen {
         gameModeTexture = new Texture(Gdx.files.internal("GameMode.png"));
         gameModeTexture.setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear);
         gameModeImage = new Image(gameModeTexture);
-        gameModeImage.setPosition(80, 400);
-        gameModeImage.setSize(500, 100);
+        gameModeImage.setPosition(80, 355);
+        gameModeImage.setSize(550, 95);
         stage.addActor(gameModeImage);
 
         skin = new Skin(Gdx.files.internal("uiskin.json"));
 
         singlePlayer = new TextButton("Single Player", skin);
-        singlePlayer.setPosition(100, 300);
+        singlePlayer.setPosition(100, 250);
         singlePlayer.setSize(200, 60);
         stage.addActor(singlePlayer);
 
@@ -74,7 +74,7 @@ public class GameModeScreen implements Screen {
         //stage.addActor(multiplayer);
 
         bot = new TextButton("Bot", skin);
-        bot.setPosition(450, 300);
+        bot.setPosition(400, 250);
         bot.setSize(200, 60);
         stage.addActor(bot);
 
@@ -105,7 +105,7 @@ public class GameModeScreen implements Screen {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
 
-                this.game.setScreen(new PuttingGameScreen(myGame, new GameMode(gameName)));
+                this.game.setScreen(new SolverScreen(myGame, new GameMode(gameName)));
                 this.screen.dispose();
             }
         }
