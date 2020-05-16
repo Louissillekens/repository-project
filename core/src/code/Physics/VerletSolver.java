@@ -13,6 +13,19 @@ public class VerletSolver{
     private double x;
     private double y;
 
+    public static void main(String args[]){
+        VerletSolver solver = new VerletSolver();
+        solver.setValues(0,0,50,50);
+        for(int i=0; i<3000; i++){
+            solver.Verlet();
+        }
+        System.out.println("the x and y coordinates are:");
+        System.out.println("x: "+solver.getX());
+        System.out.println("y: "+solver.getY());
+
+
+    }
+
     public void setValues(double xi,double yi, double vxi, double vyi){
 
         x = xi;
@@ -57,6 +70,13 @@ public class VerletSolver{
         setValues(nx,ny,nvx,nvy);
 
 
+    }
+    public double getX(){
+        return x;
+    }
+
+    public double getY(){
+        return y;
     }
 
 
