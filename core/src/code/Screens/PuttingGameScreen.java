@@ -81,9 +81,9 @@ public class PuttingGameScreen implements Screen {
     private ModelInstance flag1Instance;
     private Model flag2;
     private ModelInstance flag2Instance;
-    private static float flagPositionX = 3;
-    private static float flagPositionZ = 15;
-    private static float winRadius = 3;
+    private static float flagPositionX = 21;
+    private static float flagPositionZ = 12;
+    private static float winRadius = 2;
 
     // Instances variables used to store the different positions of the ball
     private static int countIndex = 0;
@@ -188,7 +188,7 @@ public class PuttingGameScreen implements Screen {
     public static float defineFunction(double x, double y) {
 
         float field0 = (float) (0.5);
-        float field1 = (float) (((Math.sin(x) + Math.sin(y))/3)+0.5);
+        float field1 = (float) (((Math.sin(x) + Math.sin(y))/4)+0.3);
         float field2 = (float) ((Math.sin(x))/3)+0.5f;
         float field3 = (float) (((Math.atan(x) + Math.atan(y))/2)+0.5);
         float ripple1 = (float) ((0.4)+Math.sin((0.4)*(Math.pow(x,2)+Math.pow(y,2))/10)+1);
