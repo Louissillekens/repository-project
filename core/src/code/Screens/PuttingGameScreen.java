@@ -1,9 +1,9 @@
 package code.Screens;
 
 import code.Bot.PuttingBotDeployement;
-import code.Controller.InputHandler;
 import code.Physics.Rungekuttasolver;
 import code.Physics.VerletSolver;
+import code.util.Util;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.Screen;
@@ -32,6 +32,9 @@ public class PuttingGameScreen implements Screen {
 
     // Instance variable for the current game
     private Game game;
+
+    //this handler takes care of all input from the player
+    InputHandler handler = new InputHandler();
 
     // Instances variables for the perspective scene
     private PerspectiveCamera camera;
@@ -460,85 +463,6 @@ public class PuttingGameScreen implements Screen {
 
         shapeRenderer.end();
 
-        //key input to take a shot with the given power
-        if(Gdx.input.isKeyJustPressed(Input.Keys.SPACE)){
-
-            double power = shot_Power;
-
-            countIndex++;
-
-            // Condition that checks the game mode chosen by the user before taking the shot
-            if (gameMode.gameName.equals("Single_Player")) {
-
-                // Instance of the RK4 solver
-                // Used to compute the next position of the ball based on the current position, the camera direction and the power
-                if (SolverScreen.getSolverName().equals("RK4")) {
-
-                    int scalar = 600;
-                    directionX = camera.direction.x;
-                    directionZ = camera.direction.z;
-
-                    Rungekuttasolver solver = new Rungekuttasolver();
-                    solver.setValues(ballPositionX, ballPositionZ, (directionX*power)*scalar, (directionZ*power)*scalar);
-                    solver.RK4();
-                    newBallPositionX = (float) solver.getX();
-                    newBallPositionZ = (float) solver.getY();
-                }
-
-                // Instance of the Verlet solver
-                // Used to compute the next position of the ball based on the current position, the camera direction and the power
-                if (SolverScreen.getSolverName().equals("Verlet")) {
-
-                    int scalar = 500;
-                    directionX = camera.direction.x;
-                    directionZ = camera.direction.z;
-
-                    VerletSolver solver = new VerletSolver();
-                    solver.setValues(ballPositionX, ballPositionZ, (directionX*power)*scalar, (directionZ*power)*scalar);
-                    solver.Verlet();
-                    newBallPositionX = (float) solver.getX();
-                    newBallPositionZ = (float) solver.getY();
-                }
-
-            }
-            else if (gameMode.gameName.equals("Bot")) {
-
-                Rungekuttasolver solver = new Rungekuttasolver();
-
-                PuttingBotDeployement bot = new PuttingBotDeployement();
-                int scalar = 500;
-                bot.start();
-                power = bot.getVelo();
-                directionX = (float) bot.getXVector();
-                directionZ = (float) bot.getYVector();
-                System.out.println("Direction x: " + directionX + "Direction y: " + directionZ);
-
-                System.out.println("dx: " + directionX);
-                System.out.println("dz: " + directionZ);
-                solver.setValues(ballPositionX, ballPositionZ, (directionX*power)*scalar, (directionZ*power)*scalar);
-            }
-
-            positionArrayX[countIndex] = newBallPositionX;
-            positionArrayZ[countIndex] = newBallPositionZ;
-
-            ballPositionX = positionArrayX[countIndex -1];
-            ballPositionZ = positionArrayZ[countIndex -1];
-
-            int ballStep = 100;
-            ballStepXmean = (positionArrayX[countIndex]-positionArrayX[countIndex -1])/ ballStep;
-            ballStepZmean = (positionArrayZ[countIndex]-positionArrayZ[countIndex -1])/ ballStep;
-
-            // Reset the power after the shot
-            setShot_Power(getSTARTING_SHOT_POWER());
-
-            sumX = 0;
-            sumZ = 0;
-
-            trackShot = true;
-            canTranslateCam = true;
-            canReset = true;
-        }
-
         ballMovement();
 
         // Condition used when the ball is out of the field
@@ -588,7 +512,7 @@ public class PuttingGameScreen implements Screen {
             arrowInstance = new ModelInstance(arrow);
             modelBatch.render(arrowInstance, environment);
             // Call of the class input handler that contains the majority of the user controls
-            InputHandler.checkForInput(this);
+            handler.checkForInput();
 
         }
     }
@@ -714,6 +638,159 @@ public class PuttingGameScreen implements Screen {
 
     public void incrementCountIndex(){
         countIndex++;
+    }
+
+
+    public class InputHandler {
+
+
+
+        /**
+         * checks for input and updates the given PuttingGameScreen accordingly
+         */
+        public void checkForInput(){
+
+            // Some key pressed input to rotate the camera and also zoom in zoom out
+            if(Gdx.input.isKeyPressed(Input.Keys.RIGHT)) {
+                camera.rotateAround(vector1 = new Vector3(ballPositionX, defineFunction(ballPositionX, ballPositionZ), ballPositionZ),
+                        vector2 = new Vector3(0f, -1f, 0f), 1f);
+                camera.lookAt(ballPositionX, defineFunction(ballPositionX, ballPositionZ), ballPositionZ);
+            }
+            if(Gdx.input.isKeyPressed(Input.Keys.LEFT)) {
+                camera.rotateAround(vector1 = new Vector3(ballPositionX, defineFunction(ballPositionX, ballPositionZ), ballPositionZ),
+                        vector2 = new Vector3(0f, 1f, 0f), 1f);
+                camera.lookAt(ballPositionX, defineFunction(ballPositionX, ballPositionZ), ballPositionZ);
+            }
+            if(Gdx.input.isKeyPressed(Input.Keys.UP)) {
+                //round the shot power to two decimal places to avoid errors where the power would get above max power
+                double exact_shot_power = Util.round(shot_Power, 2);
+                shot_Power = exact_shot_power;
+                if(shot_Power < MAX_SPEED - POWER_INCREMENT){
+                    IncrementShotPower(1);
+                }
+                //System.out.println("shot power now at: " + shot_Power);
+            }
+            if(Gdx.input.isKeyPressed(Input.Keys.DOWN)) {
+                //round the shot power to two decimal places to avoid errors where the power would get below 0
+                double exact_shot_power = Util.round(shot_Power, 2);
+                shot_Power = exact_shot_power;
+                if(shot_Power > 0 + POWER_INCREMENT){
+                    IncrementShotPower(-1);
+                }
+                //System.out.println("shot power now at: " + shot_Power);
+            }
+            // Key pressed input to be back on the game mode screen
+            if(Gdx.input.isKeyPressed(Input.Keys.B)) {
+                game.setScreen(new GameModeScreen(game));
+            }
+            // Key pressed input to quit
+            if(Gdx.input.isKeyPressed(Input.Keys.Q)) {
+                Gdx.app.exit();
+            }
+
+            // Key press input R that return to the place of the previous shot
+            if (Gdx.input.isKeyPressed(Input.Keys.R)) {
+
+                // Condition that checks if the ball shot can be reset to the previous one
+                if (canReset) {
+                    // Condition that checks if the camera can be moved after pushing keyboard command R
+                    if (trackShot) {
+                        camera.translate(-(translateX[countIndex - 1]), -0.001f, -(translateZ[countIndex - 1]));
+                    }
+                    trackShot = false;
+                    canTranslateCam = false;
+                    // Call of the method that reset the ball to the previous place
+                    resetBallShot();
+                    camera.lookAt(ballPositionX, defineFunction(ballPositionX, ballPositionZ), ballPositionZ);
+                }
+            }
+
+            //key input to take a shot with the given power
+            if(Gdx.input.isKeyJustPressed(Input.Keys.SPACE)){
+
+                double power = shot_Power;
+
+                countIndex++;
+
+                // Condition that checks the game mode chosen by the user before taking the shot
+                if (gameMode.gameName.equals("Single_Player")) {
+
+                    // Instance of the RK4 solver
+                    // Used to compute the next position of the ball based on the current position, the camera direction and the power
+                    if (SolverScreen.getSolverName().equals("RK4")) {
+
+                        int scalar = 600;
+                        directionX = camera.direction.x;
+                        directionZ = camera.direction.z;
+
+                        Rungekuttasolver solver = new Rungekuttasolver();
+                        solver.setValues(ballPositionX, ballPositionZ, (directionX*power)*scalar, (directionZ*power)*scalar);
+                        solver.RK4();
+                        newBallPositionX = (float) solver.getX();
+                        newBallPositionZ = (float) solver.getY();
+                    }
+
+                    // Instance of the Verlet solver
+                    // Used to compute the next position of the ball based on the current position, the camera direction and the power
+                    if (SolverScreen.getSolverName().equals("Verlet")) {
+
+                        int scalar = 500;
+                        directionX = camera.direction.x;
+                        directionZ = camera.direction.z;
+
+                        VerletSolver solver = new VerletSolver();
+                        solver.setValues(ballPositionX, ballPositionZ, (directionX*power)*scalar, (directionZ*power)*scalar);
+                        solver.Verlet();
+                        newBallPositionX = (float) solver.getX();
+                        newBallPositionZ = (float) solver.getY();
+                    }
+
+                }
+                else if (gameMode.gameName.equals("Bot")) {
+
+                    Rungekuttasolver solver = new Rungekuttasolver();
+
+                    PuttingBotDeployement bot = new PuttingBotDeployement();
+                    int scalar = 500;
+                    bot.start();
+                    power = bot.getVelo();
+                    directionX = (float) bot.getXVector();
+                    directionZ = (float) bot.getYVector();
+                    System.out.println("Direction x: " + directionX + "Direction y: " + directionZ);
+
+                    System.out.println("dx: " + directionX);
+                    System.out.println("dz: " + directionZ);
+                    solver.setValues(ballPositionX, ballPositionZ, (directionX*power)*scalar, (directionZ*power)*scalar);
+                }
+
+                positionArrayX[countIndex] = newBallPositionX;
+                positionArrayZ[countIndex] = newBallPositionZ;
+
+                ballPositionX = positionArrayX[countIndex -1];
+                ballPositionZ = positionArrayZ[countIndex -1];
+
+                int ballStep = 100;
+                ballStepXmean = (positionArrayX[countIndex]-positionArrayX[countIndex -1])/ ballStep;
+                ballStepZmean = (positionArrayZ[countIndex]-positionArrayZ[countIndex -1])/ ballStep;
+
+                // Reset the power after the shot
+                setShot_Power(getSTARTING_SHOT_POWER());
+
+                sumX = 0;
+                sumZ = 0;
+
+                trackShot = true;
+                canTranslateCam = true;
+                canReset = true;
+            }
+
+            //debugging
+            //System.out.println("x : " + camera.direction.x);
+            //System.out.println("y : " + camera.direction.y);
+            //System.out.println("z : " + camera.direction.z);
+        }
+
+
     }
 
 }
