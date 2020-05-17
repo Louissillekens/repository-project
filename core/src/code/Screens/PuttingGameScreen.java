@@ -556,10 +556,6 @@ public class PuttingGameScreen implements Screen {
         return game;
     }
 
-    public GameMode getGameMode(){
-        return gameMode;
-    }
-
     public void IncrementShotPower(int amount){
         shot_Power += amount*POWER_INCREMENT;
     }
@@ -636,9 +632,6 @@ public class PuttingGameScreen implements Screen {
         return countIndex;
     }
 
-    public void incrementCountIndex(){
-        countIndex++;
-    }
 
 
     public class InputHandler {
