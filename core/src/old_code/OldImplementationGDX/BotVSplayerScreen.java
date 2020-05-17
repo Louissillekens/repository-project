@@ -1,4 +1,4 @@
-package code.OldImplementationGDX;
+package old_code.OldImplementationGDX;
 
 import code.Board.*;
 import code.Screens.GameModeScreen;
@@ -14,9 +14,9 @@ import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.game.game.Game;
 
-public class MultiplayerScreen implements Screen {
+public class BotVSplayerScreen implements Screen {
 
-    private final Game game;
+    private final Game myGame;
     private Stage stage;
     private Image background;
     private Image ball_img;
@@ -35,9 +35,9 @@ public class MultiplayerScreen implements Screen {
      * parametric constructor
      * @param myGame object
      */
-    public MultiplayerScreen(final Game myGame) {
+    public BotVSplayerScreen(final Game myGame) {
 
-        this.game = myGame;
+        this.myGame = myGame;
         this.stage = new Stage();
         Gdx.input.setInputProcessor(stage);
 

@@ -1,27 +1,22 @@
-package code.OldImplementationGDX;
+package old_code.OldImplementationGDX;
 
 import code.Board.*;
 import code.Screens.GameModeScreen;
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.Input;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
-import com.badlogic.gdx.scenes.scene2d.ui.ImageButton;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
-import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
-import com.badlogic.gdx.utils.viewport.StretchViewport;
 import com.game.game.Game;
 
-public class BotVSbotScreen implements Screen {
+public class MultiplayerScreen implements Screen {
 
-    private final Game myGame;
+    private final Game game;
     private Stage stage;
     private Image background;
     private Image ball_img;
@@ -40,9 +35,9 @@ public class BotVSbotScreen implements Screen {
      * parametric constructor
      * @param myGame object
      */
-    public BotVSbotScreen(final Game myGame) {
+    public MultiplayerScreen(final Game myGame) {
 
-        this.myGame = myGame;
+        this.game = myGame;
         this.stage = new Stage();
         Gdx.input.setInputProcessor(stage);
 
