@@ -1,12 +1,9 @@
-package code.Controller;
+package old_code;
 
-import code.Bot.PuttingBotDeployement;
-import code.Physics.Rungekuttasolver;
 import code.Screens.GameModeScreen;
 import code.Screens.PuttingGameScreen;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
-import com.badlogic.gdx.graphics.g3d.ModelInstance;
 import com.badlogic.gdx.math.Vector3;
 
 import java.math.BigDecimal;
@@ -77,6 +74,7 @@ public class InputHandler {
             }
         }
 
+        //debugging
         //System.out.println("x : " + gamescreen.getCamera().direction.x);
         //System.out.println("y : " + gamescreen.getCamera().direction.y);
         //System.out.println("z : " + gamescreen.getCamera().direction.z);
