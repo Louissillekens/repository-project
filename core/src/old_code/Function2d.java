@@ -1,4 +1,6 @@
-package code.Board;
+package old_code;
+
+import code.Board.Vector2d;
 
 /**
  * interface for any kind of Function2d

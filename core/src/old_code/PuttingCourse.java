@@ -1,4 +1,7 @@
-package code.Board;
+package old_code;
+
+import code.Board.Ball;
+import code.Board.Vector2d;
 
 /**
  * this class describes a course with all variables that belong to it such as height, friction, location of hole, etc...

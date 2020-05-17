@@ -1,8 +1,5 @@
 package code.Physics;
 
-import code.Board.Friction_function;
-import code.Board.Height_function;
-import code.Board.Vector2d;
 import code.Screens.PuttingGameScreen;
 
 public class Rungekuttasolver{

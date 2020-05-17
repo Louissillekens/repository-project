@@ -1,11 +1,14 @@
-package code.Board;
+package old_code;
 
+
+import code.Board.Vector2d;
+import old_code.Function2d;
 
 /**
  * class that holds the height of the course at multiple points
  * implements interface Function2d
  */
-public class Height_function implements Function2d{
+public class Height_function implements Function2d {
 
 
     private double out_of_bounds_value;

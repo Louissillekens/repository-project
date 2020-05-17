@@ -1,10 +1,12 @@
-package code.Board;
+package old_code;
+
+import code.Board.Vector2d;
 
 /**
  * class that holds the friction of the course at multiple points
  * implements interface Function2d
  */
-public class Friction_function implements Function2d{
+public class Friction_function implements Function2d {
 
     private double out_of_bounds_value;
     private double[][] frictionMap;

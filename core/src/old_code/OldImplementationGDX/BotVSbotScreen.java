@@ -13,6 +13,8 @@ import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.game.game.Game;
+import old_code.Function2d;
+import old_code.Height_function;
 
 public class BotVSbotScreen implements Screen {
 
