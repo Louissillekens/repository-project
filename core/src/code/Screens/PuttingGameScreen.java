@@ -20,6 +20,8 @@ import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Vector3;
 import com.game.game.Game;
 
+import java.util.Random;
+
 import static com.badlogic.gdx.graphics.GL20.GL_TRIANGLES;
 
 /**
@@ -81,8 +83,8 @@ public class PuttingGameScreen implements Screen {
     private ModelInstance flag1Instance;
     private Model flag2;
     private ModelInstance flag2Instance;
-    private static float flagPositionX = 21;
-    private static float flagPositionZ = 12;
+    private static float flagPositionX;
+    private static float flagPositionZ;
     private static float winRadius = 2;
 
     // Instances variables used to store the different positions of the ball
@@ -128,6 +130,8 @@ public class PuttingGameScreen implements Screen {
         camera.lookAt(ballPositionX, defineFunction(ballPositionX,ballPositionZ), ballPositionZ);
         camera.near = 0.1f;
         camera.far = 400f;
+        
+        generateRandomFlagPosition(10,30,10,30);
 
         modelBatch = new ModelBatch();
         modelBuilder = new ModelBuilder();
@@ -383,6 +387,26 @@ public class PuttingGameScreen implements Screen {
         batch.begin();
         font.draw(batch, message, fontX, fontY);
         batch.end();
+    }
+
+    /**
+     * Method used to draw the flag at a random position in a certain range on the field
+     * @param boundX1 smaller bound location X coordinate
+     * @param boundX2 higher bound location X coordinate
+     * @param boundZ1 smaller bound location Z coordinate
+     * @param boundZ2 higher bound location Z coordinate
+     */
+    public void generateRandomFlagPosition(float boundX1, float boundX2, float boundZ1, float boundZ2) {
+
+        Random rand = new Random();
+        float randomX = boundX1 + rand.nextFloat() * (boundX2 - boundX1);
+        float randomZ = boundZ1 + rand.nextFloat() * (boundZ2 - boundZ1);
+
+        flagPositionX = randomX;
+        flagPositionZ = randomZ;
+
+        System.out.println("x: " + randomX);
+        System.out.println("z: " + randomZ);
     }
 
 
