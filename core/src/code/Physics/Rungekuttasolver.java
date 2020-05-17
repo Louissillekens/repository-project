@@ -16,7 +16,7 @@ public class Rungekuttasolver{
     private double vy;
     private double x;
     private double y;
-    private double onesixth =(double)1/6;
+    private final double onesixth =(double)1/6;
 
     public static void main(String args[]){
 
