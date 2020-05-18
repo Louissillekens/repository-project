@@ -34,12 +34,8 @@ public class Ball {
     // Need to update that in the future (when the ball can move)
     public boolean isHit() {
 
-        if (xCurrent != 0f && zCurrent != 0f) {
-            return true;
-        }
-        else {
-            return false;
-        }
+        if (xCurrent != 0f && zCurrent != 0f) return true;
+        return false;
     }
 
 

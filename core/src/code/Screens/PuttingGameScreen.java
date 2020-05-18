@@ -284,12 +284,8 @@ public class PuttingGameScreen implements Screen {
      */
     public boolean isWin(float positionX, float positionZ) {
 
-        if (euclideanDist(positionX, positionZ) < winRadius) {
-            return true;
-        }
-        else {
-            return false;
-        }
+        if(euclideanDist(positionX, positionZ) < winRadius) return true;
+        return false;
     }
 
     /**
@@ -300,12 +296,8 @@ public class PuttingGameScreen implements Screen {
      */
     public boolean isInWater(float positionX, float positionZ) {
 
-        if (defineFunction(positionX, positionZ) < 0) {
-            return true;
-        }
-        else {
-            return false;
-        }
+        if(defineFunction(positionX, positionZ) < 0) return true;
+        return false;
     }
 
     /**
@@ -316,12 +308,8 @@ public class PuttingGameScreen implements Screen {
      */
     public boolean outOfField(float positionX, float positionZ) {
 
-        if (positionX > gridDepth || positionZ > gridWidth || positionX < 0 || positionZ < 0) {
-            return true;
-        }
-        else {
-            return false;
-        }
+        if(positionX > gridDepth || positionZ > gridWidth || positionX < 0 || positionZ < 0) return true;
+        return false;
     }
 
     /**
@@ -656,8 +644,7 @@ public class PuttingGameScreen implements Screen {
             }
             if(Gdx.input.isKeyPressed(Input.Keys.UP)) {
                 //round the shot power to two decimal places to avoid errors where the power would get above max power
-                double exact_shot_power = Util.round(shot_Power, 2);
-                shot_Power = exact_shot_power;
+                shot_Power = Util.round(shot_Power, 2);
                 if(shot_Power < MAX_SPEED - POWER_INCREMENT){
                     IncrementShotPower(1);
                 }
@@ -665,8 +652,7 @@ public class PuttingGameScreen implements Screen {
             }
             if(Gdx.input.isKeyPressed(Input.Keys.DOWN)) {
                 //round the shot power to two decimal places to avoid errors where the power would get below 0
-                double exact_shot_power = Util.round(shot_Power, 2);
-                shot_Power = exact_shot_power;
+                shot_Power = Util.round(shot_Power, 2);
                 if(shot_Power > 0 + POWER_INCREMENT){
                     IncrementShotPower(-1);
                 }
