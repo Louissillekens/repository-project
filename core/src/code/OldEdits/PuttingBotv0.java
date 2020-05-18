@@ -2,7 +2,6 @@ package code.OldEdits;
 
 import code.Physics.Rungekuttasolver;
 
-import java.lang.reflect.Array;
 import java.math.BigDecimal;
 import java.math.MathContext;
 import java.util.Arrays;

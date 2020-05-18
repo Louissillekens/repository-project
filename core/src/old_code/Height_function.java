@@ -2,7 +2,6 @@ package old_code;
 
 
 import code.Board.Vector2d;
-import old_code.Function2d;
 
 /**
  * class that holds the height of the course at multiple points

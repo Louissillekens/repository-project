@@ -2,7 +2,6 @@ package code.NeuralNet;
 import code.Physics.Rungekuttasolver;
 
 import java.io.*;
-import java.util.Arrays;
 import java.util.Scanner;
 
 /**

@@ -1,12 +1,6 @@
 package code.NeuralNet;
 //V2.0 trying to convert from classification to regression, added visuals and random shuffle of the data
 
-import code.Physics.Rungekuttasolver;
-
-import java.io.File;
-import java.io.IOException;
-import java.util.Arrays;
-
 /**
  * @author Alexandre Martens
  */
