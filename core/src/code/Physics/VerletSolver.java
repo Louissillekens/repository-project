@@ -16,7 +16,7 @@ public class VerletSolver{
     public static void main(String args[]){
         VerletSolver solver = new VerletSolver();
         solver.setValues(0,0,50,50);
-        for(int i=0; i<3000; i++){
+        for(int i=0; i<1000; i++){
             solver.Verlet();
         }
         System.out.println("the x and y coordinates are:");
@@ -61,11 +61,11 @@ public class VerletSolver{
     public void Verlet(){
         double nax = getFHeightX(x,y)+ getFFrictionX(vx, vy, x, y);
         double nvx = vx + nax*dt;
-        double nx = x + vx*dt + nvx*dt;
+        double nx = x + vx*dt + nvx*(dt*dt);
 
         double nay = getFHeightY(x,y)+ getFFrictionY(vx, vy, x, y);
         double nvy = vy + nay*dt;
-        double ny = y + vy+dt + nvy*dt;
+        double ny = y + vy*dt + nvy*(dt*dt);
 
         setValues(nx,ny,nvx,nvy);
 
