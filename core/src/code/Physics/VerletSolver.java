@@ -61,11 +61,11 @@ public class VerletSolver{
     public void Verlet(){
         double nax = getFHeightX(x,y)+ getFFrictionX(vx, vy, x, y);
         double nvx = vx + nax*dt;
-        double nx = x + vx*dt + nvx*(dt*dt);
+        double nx = x + vx*dt + nax*(dt*dt);
 
         double nay = getFHeightY(x,y)+ getFFrictionY(vx, vy, x, y);
         double nvy = vy + nay*dt;
-        double ny = y + vy*dt + nvy*(dt*dt);
+        double ny = y + vy*dt + nay*(dt*dt);
 
         setValues(nx,ny,nvx,nvy);
 
