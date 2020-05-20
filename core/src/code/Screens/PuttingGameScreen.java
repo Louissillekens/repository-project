@@ -499,10 +499,10 @@ public class PuttingGameScreen implements Screen {
                     VertexAttributes.Usage.Position | VertexAttributes.Usage.Normal);
             arrowInstance = new ModelInstance(arrow);
             modelBatch.render(arrowInstance, environment);
-            // Call of the class input handler that contains the majority of the user controls
-            handler.checkForInput();
 
         }
+        // Call of the class input handler that contains the majority of the user controls
+        handler.checkForInput();
     }
 
     @Override
