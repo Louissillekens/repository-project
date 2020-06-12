@@ -499,10 +499,14 @@ public class PuttingGameScreen implements Screen {
                     VertexAttributes.Usage.Position | VertexAttributes.Usage.Normal);
             arrowInstance = new ModelInstance(arrow);
             modelBatch.render(arrowInstance, environment);
-
+            // Call of the class input handler that contains the majority of the user controls (only for single player)
+            handler.checkForInput();
+            handler.checkForSpaceInput();
         }
-        // Call of the class input handler that contains the majority of the user controls
-        handler.checkForInput();
+        else {
+            // Bot mode only needs to have space input to work
+            handler.checkForSpaceInput();
+        }
     }
 
     @Override
@@ -627,72 +631,6 @@ public class PuttingGameScreen implements Screen {
 
 
         public void checkForSpaceInput(){
-            //TODO put the code that checks for space input here as it needs to be called separately
-        }
-
-        /**
-         * checks for input and updates the given PuttingGameScreen accordingly
-         */
-        public void checkForInput(){
-
-
-            if (gameMode.gameName.equals("Single_Player")) {
-
-                // Some key pressed input to rotate the camera and also zoom in zoom out
-                if(Gdx.input.isKeyPressed(Input.Keys.RIGHT)) {
-                    camera.rotateAround(vector1 = new Vector3(ballPositionX, defineFunction(ballPositionX, ballPositionZ), ballPositionZ),
-                            vector2 = new Vector3(0f, -1f, 0f), 1f);
-                    camera.lookAt(ballPositionX, defineFunction(ballPositionX, ballPositionZ), ballPositionZ);
-                }
-                if(Gdx.input.isKeyPressed(Input.Keys.LEFT)) {
-                    camera.rotateAround(vector1 = new Vector3(ballPositionX, defineFunction(ballPositionX, ballPositionZ), ballPositionZ),
-                            vector2 = new Vector3(0f, 1f, 0f), 1f);
-                    camera.lookAt(ballPositionX, defineFunction(ballPositionX, ballPositionZ), ballPositionZ);
-                }
-                if(Gdx.input.isKeyPressed(Input.Keys.UP)) {
-                    //round the shot power to two decimal places to avoid errors where the power would get above max power
-                    shot_Power = Util.round(shot_Power, 2);
-                    if(shot_Power < MAX_SPEED - POWER_INCREMENT){
-                        IncrementShotPower(1);
-                    }
-                    //System.out.println("shot power now at: " + shot_Power);
-                }
-                if(Gdx.input.isKeyPressed(Input.Keys.DOWN)) {
-                    //round the shot power to two decimal places to avoid errors where the power would get below 0
-                    shot_Power = Util.round(shot_Power, 2);
-                    if(shot_Power > 0 + POWER_INCREMENT){
-                        IncrementShotPower(-1);
-                    }
-                    //System.out.println("shot power now at: " + shot_Power);
-                }
-                // Key pressed input to be back on the game mode screen
-                if(Gdx.input.isKeyPressed(Input.Keys.B)) {
-                    game.setScreen(new GameModeScreen(game));
-                }
-                // Key pressed input to quit
-                if(Gdx.input.isKeyPressed(Input.Keys.Q)) {
-                    Gdx.app.exit();
-                }
-
-                // Key press input R that return to the place of the previous shot
-                if (Gdx.input.isKeyPressed(Input.Keys.R)) {
-
-                    // Condition that checks if the ball shot can be reset to the previous one
-                    if (canReset) {
-                        // Condition that checks if the camera can be moved after pushing keyboard command R
-                        if (trackShot) {
-                            camera.translate(-(translateX[countIndex - 1]), -0.001f, -(translateZ[countIndex - 1]));
-                        }
-                        trackShot = false;
-                        canTranslateCam = false;
-                        // Call of the method that reset the ball to the previous place
-                        resetBallShot();
-                        camera.lookAt(ballPositionX, defineFunction(ballPositionX, ballPositionZ), ballPositionZ);
-                    }
-                }
-
-            }
-
 
             //key input to take a shot with the given power
             if(Gdx.input.isKeyJustPressed(Input.Keys.SPACE)){
@@ -771,6 +709,70 @@ public class PuttingGameScreen implements Screen {
                 trackShot = true;
                 canTranslateCam = true;
                 canReset = true;
+            }
+        }
+
+        /**
+         * checks for input and updates the given PuttingGameScreen accordingly
+         */
+        public void checkForInput(){
+
+
+            if (gameMode.gameName.equals("Single_Player")) {
+
+                // Some key pressed input to rotate the camera and also zoom in zoom out
+                if(Gdx.input.isKeyPressed(Input.Keys.RIGHT)) {
+                    camera.rotateAround(vector1 = new Vector3(ballPositionX, defineFunction(ballPositionX, ballPositionZ), ballPositionZ),
+                            vector2 = new Vector3(0f, -1f, 0f), 1f);
+                    camera.lookAt(ballPositionX, defineFunction(ballPositionX, ballPositionZ), ballPositionZ);
+                }
+                if(Gdx.input.isKeyPressed(Input.Keys.LEFT)) {
+                    camera.rotateAround(vector1 = new Vector3(ballPositionX, defineFunction(ballPositionX, ballPositionZ), ballPositionZ),
+                            vector2 = new Vector3(0f, 1f, 0f), 1f);
+                    camera.lookAt(ballPositionX, defineFunction(ballPositionX, ballPositionZ), ballPositionZ);
+                }
+                if(Gdx.input.isKeyPressed(Input.Keys.UP)) {
+                    //round the shot power to two decimal places to avoid errors where the power would get above max power
+                    shot_Power = Util.round(shot_Power, 2);
+                    if(shot_Power < MAX_SPEED - POWER_INCREMENT){
+                        IncrementShotPower(1);
+                    }
+                    //System.out.println("shot power now at: " + shot_Power);
+                }
+                if(Gdx.input.isKeyPressed(Input.Keys.DOWN)) {
+                    //round the shot power to two decimal places to avoid errors where the power would get below 0
+                    shot_Power = Util.round(shot_Power, 2);
+                    if(shot_Power > 0 + POWER_INCREMENT){
+                        IncrementShotPower(-1);
+                    }
+                    //System.out.println("shot power now at: " + shot_Power);
+                }
+                // Key pressed input to be back on the game mode screen
+                if(Gdx.input.isKeyPressed(Input.Keys.B)) {
+                    game.setScreen(new GameModeScreen(game));
+                }
+                // Key pressed input to quit
+                if(Gdx.input.isKeyPressed(Input.Keys.Q)) {
+                    Gdx.app.exit();
+                }
+
+                // Key press input R that return to the place of the previous shot
+                if (Gdx.input.isKeyPressed(Input.Keys.R)) {
+
+                    // Condition that checks if the ball shot can be reset to the previous one
+                    if (canReset) {
+                        // Condition that checks if the camera can be moved after pushing keyboard command R
+                        if (trackShot) {
+                            camera.translate(-(translateX[countIndex - 1]), -0.001f, -(translateZ[countIndex - 1]));
+                        }
+                        trackShot = false;
+                        canTranslateCam = false;
+                        // Call of the method that reset the ball to the previous place
+                        resetBallShot();
+                        camera.lookAt(ballPositionX, defineFunction(ballPositionX, ballPositionZ), ballPositionZ);
+                    }
+                }
+
             }
 
             //debugging
