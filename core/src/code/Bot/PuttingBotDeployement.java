@@ -274,6 +274,80 @@ public class PuttingBotDeployement {
         }
     }
 
+    //makes an array of all possiilities and speed + select the best 100.
+    static void initialisationByRange(){
+        // Will contain all the possible combinations 'int'
+        double [][] fullArray = new double[(int)((-velocityRange[0]+velocityRange[1]+1)*(Math.abs(angleRange[0])+angleRange[1]+1))][3];
+
+        int counter = 0;
+
+        //create all the possibilities with fitness
+        for (int i = (int) angleRange[0]; i <= angleRange[1]; i++){
+            for (int j = (int) velocityRange[0]; j <= velocityRange[1]; j++){
+                fullArray[counter] = new double[]{i, j, initFitness(i,j)};
+                counter++;
+            }
+        }
+
+        //sort fitness
+        sort(fullArray);
+        //copy the best 100 to the original pop
+        System.arraycopy(fullArray, 0, population, 0, populationAmount);
+        System.out.println(Arrays.deepToString(population));
+
+        // Calc the angle range
+        angleRange = new double[2];
+
+        for (int i = 0; i < 10; i++){
+            //+1-1 because it can be 60.01
+            //check min
+            if (population[i][0] < angleRange[0]){
+                angleRange[0] = population[i][0]-1;
+            }
+            //check max
+            else if (population[i][0] > angleRange[1]){
+                angleRange[1] = population[i][0]+1;
+            }
+        }
+
+        // Calc the velocity range
+        velocityRange = new double[]{population[0][1], population[0][1]};
+
+        for (int i = 0; i < 10; i++){
+            //check min
+            if (population[i][1] < velocityRange[0]){
+                velocityRange[0] = population[i][1]-1;
+            }
+            //check max
+            else if (population[i][1] > velocityRange[1]){
+                velocityRange[1] = population[i][1]+1;
+            }
+        }
+
+        System.out.println("Range Angle: " + Arrays.toString(angleRange));
+        System.out.println("Range Velocity: " + Arrays.toString(velocityRange));
+        stop = System.currentTimeMillis();
+        System.out.println("Time elapsed: " + (stop-start)/1000 + "s.");
+
+    }
+
+    // Calculates for the INITIALISATION the fitness via RK4 and distance from the hole
+    static double initFitness(double angle, double velo){
+        double [] fullArray = new double[] {angle,velo,0};
+
+        double results[] = RK4(fullArray);
+
+        //Calculate the fitness by the distance between the flag and the ball
+        double fitnessCalc = Math.sqrt(Math.pow((flagPos[0] - results[0]), 2) + (Math.pow((flagPos[1] - results[1]), 2)));
+
+        //If in hole
+        if (fitnessCalc <= tolerance){ //Means we're in the diameter of the flag
+            stop = System.currentTimeMillis();
+            printFound(fullArray, true);
+            found = true;
+        }
+        return fitnessCalc;
+    }
 
     // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
