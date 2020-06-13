@@ -138,6 +138,8 @@ public class PuttingGameScreen implements Screen {
 
     private boolean isCollision = false;
 
+    private boolean ballStop = true;
+
     /**
      * Constructor that creates a new instance of the putting game screen
      * @param game current instance of the game
@@ -164,7 +166,7 @@ public class PuttingGameScreen implements Screen {
         camera.near = 0.1f;
         camera.far = 400f;
         
-        generateRandomFlagPosition(10,30,10,30);
+        generateRandomFlagPosition(20,40,20,40);
 
         modelBatch = new ModelBatch();
         modelBuilder = new ModelBuilder();
@@ -218,29 +220,41 @@ public class PuttingGameScreen implements Screen {
 
         ball = new ModelInstance(ballModel, ballPositionX, (defineFunction(ballPositionX, ballPositionZ))+(ballSize/2), ballPositionZ);
 
-        ModelInstance[] treeInstance = drawObject.drawTree(10,20);
+        for (int i = 0; i < 15; i++) {
 
-        instances.add(treeInstance[0], treeInstance[1]);
+            Random rand = new Random();
+            float randomX = 5 + rand.nextFloat() * (45 - 5);
+            float randomZ = 5 + rand.nextFloat() * (45 - 5);
+
+            while (((Math.abs(randomX-flagPositionX) < 5) && (Math.abs(randomZ-flagPositionZ) < 5)) || (defineFunction(randomX, randomZ) < 0)) {
+                randomX = 5 + rand.nextFloat() * (45 - 5);
+                randomZ = 5 + rand.nextFloat() * (45 - 5);
+            }
+
+            ModelInstance[] treeInstances = drawObject.drawTree(randomX,randomZ);
+
+            instances.add(treeInstances[0], treeInstances[1]);
+
+            trunkShape = new btCylinderShape(new Vector3(0.25f,3,0.25f));
+
+            trunkObject = new btCollisionObject();
+            trunkObject.setCollisionShape(trunkShape);
+            trunkObject.setWorldTransform(treeInstances[0].transform);
+            obstacleObjects.add(trunkObject);
+
+            branchesShape = new btConeShape(2,3);
+
+            branchesObject = new btCollisionObject();
+            branchesObject.setCollisionShape(branchesShape);
+            branchesObject.setWorldTransform(treeInstances[1].transform);
+            obstacleObjects.add(branchesObject);
+        }
 
         ballShape = new btSphereShape(ballSize);
 
         ballObject = new btCollisionObject();
         ballObject.setCollisionShape(ballShape);
         ballObject.setWorldTransform(ball.transform);
-
-        trunkShape = new btCylinderShape(new Vector3(0.25f,3,0.25f));
-
-        trunkObject = new btCollisionObject();
-        trunkObject.setCollisionShape(trunkShape);
-        trunkObject.setWorldTransform(treeInstance[0].transform);
-        obstacleObjects.add(trunkObject);
-
-        branchesShape = new btConeShape(2,3);
-
-        branchesObject = new btCollisionObject();
-        branchesObject.setCollisionShape(branchesShape);
-        branchesObject.setWorldTransform(treeInstance[1].transform);
-        obstacleObjects.add(branchesObject);
 
         collisionConfig = new btDefaultCollisionConfiguration();
         dispatcher = new btCollisionDispatcher(collisionConfig);
@@ -426,6 +440,11 @@ public class PuttingGameScreen implements Screen {
 
             translateX[countIndex - 1] = sumX;
             translateZ[countIndex - 1] = sumZ;
+
+            ballStop = false;
+        }
+        else {
+            ballStop = true;
         }
     }
 
@@ -459,6 +478,11 @@ public class PuttingGameScreen implements Screen {
         float randomX = boundX1 + rand.nextFloat() * (boundX2 - boundX1);
         float randomZ = boundZ1 + rand.nextFloat() * (boundZ2 - boundZ1);
 
+        while (defineFunction(randomX, randomZ) < 0) {
+            randomX = boundX1 + rand.nextFloat() * (boundX2 - boundX1);
+            randomZ = boundZ1 + rand.nextFloat() * (boundZ2 - boundZ1);
+        }
+
         flagPositionX = randomX;
         flagPositionZ = randomZ;
 
@@ -466,6 +490,12 @@ public class PuttingGameScreen implements Screen {
         System.out.println("z: " + randomZ);
     }
 
+    /**
+     * Method that checks the collision between two 3D shapes
+     * @param ballObject object that represents the ball on the field
+     * @param obstacleObject object that represent one of the obstacle on the field
+     * @return true if there is a collision
+     */
     public boolean checkCollision(btCollisionObject ballObject, btCollisionObject obstacleObject) {
 
         CollisionObjectWrapper co0 = new CollisionObjectWrapper(ballObject);
@@ -512,15 +542,15 @@ public class PuttingGameScreen implements Screen {
 
         ballObject.setWorldTransform(ball.transform);
 
+        // Loop that checks the collision between each obstacle and the ball
         for (int i = 0; i < obstacleObjects.size; i++) {
             if (!isCollision) {
                 isCollision = checkCollision(ballObject, obstacleObjects.get(i));
-                System.out.println("No obstacle");
             }
             else {
                 // TODO: compute new ball position with the impact
                 isCollision = false;
-                System.out.println("Obstacle");
+                System.out.println("--> Obstacle");
             }
         }
 
@@ -574,7 +604,7 @@ public class PuttingGameScreen implements Screen {
             camera.lookAt(ballPositionX, defineFunction(ballPositionX, ballPositionZ), ballPositionZ);
         }
         // Condition used to check if the ball is closed enough to the flag
-        if (isWin(ballPositionX, ballPositionZ)) {
+        if (isWin(ballPositionX, ballPositionZ) && ballStop) {
 
             while (timer < period) {
                 displayMessage("Win");
@@ -881,14 +911,6 @@ public class PuttingGameScreen implements Screen {
                 }
 
             }
-
-            //debugging
-            //System.out.println("x : " + camera.direction.x);
-            //System.out.println("y : " + camera.direction.y);
-            //System.out.println("z : " + camera.direction.z);
         }
-
-
     }
-
 }
