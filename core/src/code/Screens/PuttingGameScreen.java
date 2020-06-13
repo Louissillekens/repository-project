@@ -17,9 +17,15 @@ import com.badlogic.gdx.graphics.g3d.environment.DirectionalLight;
 import com.badlogic.gdx.graphics.g3d.utils.MeshPartBuilder;
 import com.badlogic.gdx.graphics.g3d.utils.ModelBuilder;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+import com.badlogic.gdx.math.Circle;
+import com.badlogic.gdx.math.Intersector;
 import com.badlogic.gdx.math.Vector3;
+import com.badlogic.gdx.physics.bullet.Bullet;
+import com.badlogic.gdx.physics.bullet.collision.*;
+import com.badlogic.gdx.utils.Array;
 import com.game.game.Game;
 
+import java.util.ArrayList;
 import java.util.Random;
 
 import static com.badlogic.gdx.graphics.GL20.GL_TRIANGLES;
@@ -45,7 +51,7 @@ public class PuttingGameScreen implements Screen {
     private float directionZ;
 
     // Instances variables for the ball in the game
-    private Model ball;
+    //private Model ball;
     private ModelInstance ballInstance;
     private float ballSize = 0.2f;
     private float ballPositionX = 0;
@@ -110,6 +116,28 @@ public class PuttingGameScreen implements Screen {
     private GlyphLayout layout = new GlyphLayout();
     private int period = 5000;
 
+    private drawObject drawObject = new drawObject();
+
+    private btCollisionConfiguration collisionConfig;
+    private btDispatcher dispatcher;
+
+    private Array<ModelInstance> instances;
+    private Model ballModel;
+
+    private ModelInstance ball;
+
+    private btCollisionShape ballShape;
+    private btCollisionShape trunkShape;
+    private btCollisionShape branchesShape;
+
+    private btCollisionObject ballObject;
+    private btCollisionObject trunkObject;
+    private btCollisionObject branchesObject;
+
+    private Array<btCollisionObject> obstacleObjects = new Array<>();
+
+    private boolean isCollision = false;
+
     /**
      * Constructor that creates a new instance of the putting game screen
      * @param game current instance of the game
@@ -126,6 +154,8 @@ public class PuttingGameScreen implements Screen {
      * Method used to create the 3D field
      */
     public void createField() {
+
+        Bullet.init();
 
         // Creation of the 3D perspective camera
         camera = new PerspectiveCamera(75, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
@@ -178,11 +208,47 @@ public class PuttingGameScreen implements Screen {
         );
         flag2Instance = new ModelInstance(flag2, flagPositionX-0.75f, defineFunction(flagPositionX, flagPositionZ)+2.5f, flagPositionZ);
 
+        instances = new Array<>();
+
+        modelBuilder.begin();
+        modelBuilder.part("sphere", GL20.GL_TRIANGLES, VertexAttributes.Usage.Position | VertexAttributes.Usage.Normal,
+                new Material(ColorAttribute.createDiffuse(Color.WHITE)))
+                .sphere(ballSize, ballSize, ballSize, 10, 10);
+        ballModel = modelBuilder.end();
+
+        ball = new ModelInstance(ballModel, ballPositionX, (defineFunction(ballPositionX, ballPositionZ))+(ballSize/2), ballPositionZ);
+
+        ModelInstance[] treeInstance = drawObject.drawTree(10,20);
+
+        instances.add(treeInstance[0], treeInstance[1]);
+
+        ballShape = new btSphereShape(ballSize);
+
+        ballObject = new btCollisionObject();
+        ballObject.setCollisionShape(ballShape);
+        ballObject.setWorldTransform(ball.transform);
+
+        trunkShape = new btCylinderShape(new Vector3(0.25f,3,0.25f));
+
+        trunkObject = new btCollisionObject();
+        trunkObject.setCollisionShape(trunkShape);
+        trunkObject.setWorldTransform(treeInstance[0].transform);
+        obstacleObjects.add(trunkObject);
+
+        branchesShape = new btConeShape(2,3);
+
+        branchesObject = new btCollisionObject();
+        branchesObject.setCollisionShape(branchesShape);
+        branchesObject.setWorldTransform(treeInstance[1].transform);
+        obstacleObjects.add(branchesObject);
+
+        collisionConfig = new btDefaultCollisionConfiguration();
+        dispatcher = new btCollisionDispatcher(collisionConfig);
+
         // Adding an environment which is used for the luminosity
         environment = new Environment();
         environment.set(new ColorAttribute(ColorAttribute.AmbientLight, 0.3f, 0.3f, 0.3f, 1.f));
         environment.add(new DirectionalLight().set(0.8f, 0.8f, 0.8f, 1f, 0f, 1f));
-
     }
 
     // Method that defines the function we use to create the slope of the field
@@ -400,6 +466,22 @@ public class PuttingGameScreen implements Screen {
         System.out.println("z: " + randomZ);
     }
 
+    public boolean checkCollision(btCollisionObject ballObject, btCollisionObject obstacleObject) {
+
+        CollisionObjectWrapper co0 = new CollisionObjectWrapper(ballObject);
+        CollisionObjectWrapper co1 = new CollisionObjectWrapper(obstacleObject);
+
+        btCollisionAlgorithmConstructionInfo ci = new btCollisionAlgorithmConstructionInfo();
+        ci.setDispatcher1(dispatcher);
+        btCollisionAlgorithm algorithm = new btSphereBoxCollisionAlgorithm(null, ci, co0.wrapper, co1.wrapper, false);
+
+        btDispatcherInfo info = new btDispatcherInfo();
+        btManifoldResult result = new btManifoldResult(co0.wrapper, co1.wrapper);
+
+        algorithm.processCollision(co0.wrapper, co1.wrapper, info, result);
+
+        return result.getPersistentManifold().getNumContacts() > 0;
+    }
 
     /**
      * Render all the elements of the field
@@ -425,12 +507,24 @@ public class PuttingGameScreen implements Screen {
             modelBatch.render(slopeInstance[i], environment);
         }
 
-        // Creation of the ball
-        ball = modelBuilder.createSphere(ballSize, ballSize, ballSize, 10, 10,
-                new Material(ColorAttribute.createDiffuse(Color.WHITE)),
-                VertexAttributes.Usage.Position | VertexAttributes.Usage.Normal);
-        ballInstance = new ModelInstance(ball, ballPositionX,(defineFunction(ballPositionX, ballPositionZ))+(ballSize/2), ballPositionZ);
-        modelBatch.render(ballInstance, environment);
+        modelBatch.render(ball, environment);
+        modelBatch.render(instances, environment);
+
+        ballObject.setWorldTransform(ball.transform);
+
+        for (int i = 0; i < obstacleObjects.size; i++) {
+            if (!isCollision) {
+                isCollision = checkCollision(ballObject, obstacleObjects.get(i));
+                System.out.println("No obstacle");
+            }
+            else {
+                // TODO: compute new ball position with the impact
+                isCollision = false;
+                System.out.println("Obstacle");
+            }
+        }
+
+        ball = new ModelInstance(ballModel, ballPositionX, (defineFunction(ballPositionX, ballPositionZ))+(ballSize/2), ballPositionZ);
 
         modelBatch.render(flag1Instance, environment);
         modelBatch.render(flag2Instance, environment);
@@ -494,7 +588,8 @@ public class PuttingGameScreen implements Screen {
 
             // Creation of the directive arrow
             arrow = modelBuilder.createArrow(ballPositionX, defineFunction(ballPositionX, ballPositionZ)+1f, ballPositionZ,
-                    ((camera.direction.x)*5)+(ballPositionX), defineFunction(ballPositionX, ballPositionZ)+2f, ((camera.direction.z)*5)+(ballPositionZ), 0.1f, 0.1f, 10,
+                    ((camera.direction.x)*5)+(ballPositionX), defineFunction(ballPositionX, ballPositionZ)+2f,
+                    ((camera.direction.z)*5)+(ballPositionZ), 0.1f, 0.1f, 10,
                     GL_TRIANGLES, new Material(ColorAttribute.createDiffuse(Color.RED)),
                     VertexAttributes.Usage.Position | VertexAttributes.Usage.Normal);
             arrowInstance = new ModelInstance(arrow);
@@ -537,6 +632,18 @@ public class PuttingGameScreen implements Screen {
     @Override
     public void dispose() {
 
+        trunkObject.dispose();
+        trunkShape.dispose();
+
+        branchesObject.dispose();
+        branchesShape.dispose();
+
+        ballObject.dispose();
+        ballShape.dispose();
+
+        dispatcher.dispose();
+        collisionConfig.dispose();
+
         modelBatch.dispose();
     }
 
@@ -572,7 +679,7 @@ public class PuttingGameScreen implements Screen {
         return STARTING_SHOT_POWER;
     }
 
-    public Model getBall() {
+    public ModelInstance getBall() {
         return ball;
     }
 
@@ -624,11 +731,11 @@ public class PuttingGameScreen implements Screen {
         return countIndex;
     }
 
-
+    public static ModelBuilder getModelBuilder() {
+        return modelBuilder;
+    }
 
     public class InputHandler {
-
-
 
         public void checkForSpaceInput(){
 

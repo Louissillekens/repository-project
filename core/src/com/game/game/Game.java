@@ -1,6 +1,7 @@
 package com.game.game;
 
 import code.Screens.IntroScreen;
+import code.TestCollision;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 
