@@ -34,11 +34,11 @@ public class Visuals extends NeuralNet {
         }
     }
 
+
     // Print the whole dataset, input and outputs
-    public static void printDataSet(TrainingData[] trainingDataSet){
-        for(int i = 0; i < trainingDataSet.length; i++){
-            System.out.println(Arrays.toString(trainingDataSet[i].getDataInput()) + " -> " + Arrays.toString(trainingDataSet[i].getDataOutput()));
-        }
+    public static void printDataSet(TrainingData data){
+            System.out.println(Arrays.toString(data.dataInput) +
+                    " -> " + Arrays.toString(data.dataOutput));
     }
 
     // Print the weights of the nn

@@ -19,7 +19,8 @@ public class NeuralNet {
 
     float[] currentState; //Qval chosen and wich node it is
     float nextStateQ; //Qval chosen and wich node it is
-    double e = 0.9; // Exploring value TODO should decrease as it goes
+    float e = 0.9f; // Exploring value TODO should decrease as it goes
+    float learningRate = 0.05f;
 
     public NeuralNet(){
         // Set the range of the weights
@@ -28,14 +29,13 @@ public class NeuralNet {
         //Creating the layers
         this.layers = new Layer[4]; //3 layers: input, hidden and output
         this.layers[0] = null; // Input layer, no previous neurons: 0,2
-        this.layers[1] = new Layer(11,64); // Hidden layer: 2 neurons (input layer) coming in
-        this.layers[2] = new Layer(64,64); // Hidden layer: 2 neurons (input layer) coming in
-        this.layers[3] = new Layer(64, 110); // Output layer: 64 neurons (hidden layer), 2 neurons as final output
+        this.layers[1] = new Layer(11,5); // Hidden layer: 2 neurons (input layer) coming in
+        this.layers[2] = new Layer(5,5); // Hidden layer: 2 neurons (input layer) coming in
+        this.layers[3] = new Layer(5, 10); // Output layer: 64 neurons (hidden layer), 2 neurons as final output
         System.out.println("NeuralNet: Created");
     }
 
     public void createTrainingData(Agent agent) {
-        int maxVal = 10; //(0-10 intensity levels)
 
         double [] sensors = agent.getSensors();
 
@@ -48,7 +48,7 @@ public class NeuralNet {
 
         data = new TrainingData(dataInput, dataOutput);
 
-        data = MathWork.sensorScaling(data, 0, 10);
+        data = MathWork.sensorScaling(data, 0, sensors.length);
 
         System.out.println("Dataset: Created");
     }
@@ -81,6 +81,8 @@ public class NeuralNet {
         } else if (nPass == 2){
             nextStateQ = maxQVal();
         }
+        Visuals.neuronValue(layers, layers.length-1);
+        Visuals.showWeights(layers);
     }
 
     /** Exploration/Exploitation dilemma
@@ -88,10 +90,11 @@ public class NeuralNet {
      * @return array of [Qval, pos Qval]
      */
     float[] epsilonSelection(){
-        double random = Math.random();
+        float random = (float) Math.random();
 
         if (random < e){
-            int numb = ThreadLocalRandom.current().nextInt(0, layers[layers.length-1].neurons.length + 1);
+            int numb = ThreadLocalRandom.current().nextInt(0, layers[layers.length-1].neurons.length);
+            System.out.println(numb);
             return new float[] {layers[layers.length-1].neurons[numb].value, numb};
         } else{
             Neuron [] neur = layers[layers.length-1].neurons;
@@ -130,15 +133,14 @@ public class NeuralNet {
 
 
     /** Backward propagation
+     * Hardest part to implement and understand
      * Going from the end of the nn to the front, layer by layer going backwards
      * Methodology: Calculate output layer weights -> calculate the hidden layers weights -> update all weights
      * Documentation source: https://mattmazur.com/2015/03/17/a-step-by-step-backpropagation-example/
-     * tdata is loaded as parameter because we want to check the expected (right answer) output
      * TODO improve the backpropagate gradient: https://medium.com/datathings/neural-networks-and-backpropagation-explained-in-a-simple-way-f540a3611f5e
      */
-    void backpropagate(float learningRate, TrainingData tData){
-        float error = nextStateQ - currentState[0];
-        
+    public void backpropagate(){
+        float targetQ = nextStateQ - currentState[0];
         /*TODO implement rewards and costs
             *https://stats.stackexchange.com/questions/200006/q-learning-with-neural-network-as-function-approximation
           */
@@ -147,10 +149,8 @@ public class NeuralNet {
 
         // Update the output layer first
         for (int i = 0; i < layers[nMin1Layers].neurons.length; i++){
-            float output = layers[nMin1Layers].neurons[i].value; // Value of the current neuron
-            float target = tData.dataOutput[i]; // Expected value (good answer)
-            float derivative = output-target; // Calc how close we are from the actual expectation
-            float delta = derivative *(output*(1-output));
+            float derivative = targetQ; // Calc how close we are from the actual expectation
+            float delta = derivative *(nextStateQ*(1-nextStateQ));
 
             layers[nMin1Layers].neurons[i].gradient = delta;
 
@@ -159,11 +159,9 @@ public class NeuralNet {
                 float error = delta*previous_output;
                 layers[nMin1Layers].neurons[i].weightsCache[j] = layers[nMin1Layers].neurons[i].weights[j] - learningRate*error; // Formula: New weight = old weight — Derivative * learning rate
             }
-
             // Update bias
             layers[nMin1Layers].neurons[i].bias = delta*learningRate;
         }
-
 
         // Update the hidden layers
         for(int i = nMin1Layers-1; i > 0; i--) {
@@ -181,7 +179,6 @@ public class NeuralNet {
                     float error = delta*previous_output;
                     layers[i].neurons[j].weightsCache[k] = layers[i].neurons[j].weights[k] - learningRate*error;
                 }
-
                 // Update bias
                 layers[i].neurons[j].bias = delta*learningRate;
             }
@@ -193,7 +190,12 @@ public class NeuralNet {
                 layers[i].neurons[j].updateWeights();
             }
         }
+        System.out.println("=====");
+        Visuals.neuronValue(layers, layers.length-1);
+        Visuals.showWeights(layers);
+
     }
+
 
     // Sums of all the gradient connecting a given neuron in a given layer
     public  float sumGradient(int neuronIndex, int layerIndex) {
@@ -205,6 +207,7 @@ public class NeuralNet {
         }
         return gradient_sum;
     }
+
 
     // Forward propagation FOR THE VISUAL CLASS
     public void forwardVisuals(float [] dataInput){

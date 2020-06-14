@@ -37,6 +37,8 @@ public class QL {
         neuralNet.createTrainingData(agent);
         neuralNet.forward(2);
         neuralNet.backpropagate();
+        neuralNet.forward(1);
+
 
     /* int episode = 0;
         while (episode < maxEp){
