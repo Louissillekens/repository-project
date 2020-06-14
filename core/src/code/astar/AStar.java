@@ -59,5 +59,4 @@ public class AStar {
     public void computeScore(Node node){
         //TODO
     }
-    
 }
