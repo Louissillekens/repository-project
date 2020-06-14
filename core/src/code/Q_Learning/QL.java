@@ -1,5 +1,9 @@
 package code.Q_Learning;
 
+import code.NeuralNet.NeuralNet;
+import code.NeuralNet.Visuals;
+
+import java.util.ArrayList;
 import java.util.Arrays;
 
 public class QL {
@@ -15,20 +19,24 @@ public class QL {
 
 
     public static void main(String[] args) {
-        Grid grid = new Grid(xFlag,yFlag,precision,2,5);
-        grid.createR();
-        grid.createQ();
 
-        Agent agent = new Agent(xStart, yStart, precision, grid);
+        NeuralNet neuralNet = new NeuralNet();
 
-        int episode = 0;
+        Agent agent = new Agent(xStart, yStart, xFlag, yFlag);
+        agent.sensors = new double[]{1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11};
+
+        neuralNet.createTrainingData(agent);
+        for (int i = 0; i < 1; i++)
+            neuralNet.forward();
+
+    /* int episode = 0;
         while (episode < maxEp){
             while (compareState() == false){
 
             }
             agent.reset(xStart, yStart,precision);
             episode++;
-        }
+        }*/
 
 
 

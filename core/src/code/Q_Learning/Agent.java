@@ -1,30 +1,55 @@
 package code.Q_Learning;
 
 public class Agent {
-    int x;
-    int y;
+    double xPos;
+    double yPos;
+    double xFlag;
+    double yFlag;
 
-    int precision;
+    double [] sensors;
 
-    Grid grid;
 
-    Agent(int xStart, int yStart, int precision, Grid grid){
-        this.precision = precision;
+    Agent(double xStart, double yStart, double xFlag, double yFlag){
+        sensors  = new double[11];
 
-        this.x = xStart*precision;
-        this.y = yStart*precision;
+        this.xFlag = xFlag;
+        this.yFlag = yFlag;
 
-        this.grid = grid;
+        this.xPos = xStart;
+        this.yPos = yStart;
     }
 
-    void update(int x, int y){
-        this.x += x;
-        this.y += y;
+    void updatePos(int x, int y){
+        this.xPos += x;
+        this.yPos += y;
     }
 
-    void reset(int xStart, int yStart, int precision){
-        this.x = xStart*precision;
-        this.y = yStart*precision;
+    void updateSensors(double [] sensors){
+        this.sensors = sensors;
     }
 
+    void reset(int xStart, int yStart){
+        this.xPos = xStart;
+        this.yPos = yStart;
+    }
+
+    public double getxPos() {
+        return xPos;
+    }
+
+    public double getyPos() {
+        return yPos;
+    }
+
+    public double getxFlag() {
+        return xFlag;
+    }
+
+    public double getyFlag() {
+        return yFlag;
+    }
+
+    public double[] getSensors() {
+        return sensors;
+    }
 }

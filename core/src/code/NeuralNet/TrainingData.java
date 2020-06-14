@@ -7,7 +7,7 @@ public class TrainingData {
     float[] dataInput;
     float[] dataOutput;
 
-    public TrainingData(float[] dataInput, float[] dataOutput){
+    TrainingData(float[] dataInput, float[] dataOutput){
         this.dataInput = dataInput;
         this.dataOutput = dataOutput;
     }

@@ -1,119 +1,55 @@
 package code.NeuralNet;
 //V2.0 trying to convert from classification to regression, added visuals and random shuffle of the data
 
+import code.Q_Learning.Agent;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+
 /**
  * @author Alexandre Martens
  */
 public class NeuralNet {
 
-    static Layer[] layers;
-    static TrainingData[] trainingDataSet;
+    Layer[] layers;
+    TrainingData data;
 
-    // Main method
-    public static void main(String[] args) {
-        System.out.println("\n" + "NeuralNet is creating the network... ");
-
+    public NeuralNet(){
         // Set the range of the weights
         Neuron.setRangeWeight(-1,1);
 
         //Creating the layers
-        layers = new Layer[3]; //3 layers: input, hidden and output
-        layers[0] = null; // Input layer, no previous neurons: 0,2
-        layers[1] = new Layer(2,64); // Hidden layer: 2 neurons (input layer) coming in
-        layers[2] = new Layer(64, 2); // Output layer: 64 neurons (hidden layer), 2 neurons as final output
-
-        System.out.println("Network creation: Check" + "\n");
-        createTrainingData();
-
-        // Print target outputs
-        //Visuals.printOutput(trainingDataSet, 10, "target");
-
-        System.out.println("\n" + "Training is starting... " + "\n");
-
-        train(500000, 0.05f); // The small 'f' is to explicitly state it's a float and not a double
-
-        System.out.println("\n" + "Training: Check");
-
-        // Print results
-        Visuals.printOutput(trainingDataSet, 10, "results");
-
-        /*// Test with an unknown value
-        float[] testValuesInput = {20};
-        float[] testValuesOutput = {25};
-
-
-        TrainingData testInput = new TrainingData(testValuesInput, testValuesOutput);
-        forward(testInput.dataInput);
-
-        System.out.println("New data final result: " + layers[2].neurons[0].value);*/
+        this.layers = new Layer[4]; //3 layers: input, hidden and output
+        this.layers[0] = null; // Input layer, no previous neurons: 0,2
+        this.layers[1] = new Layer(11,64); // Hidden layer: 2 neurons (input layer) coming in
+        this.layers[2] = new Layer(64,64); // Hidden layer: 2 neurons (input layer) coming in
+        this.layers[3] = new Layer(64, 110); // Output layer: 64 neurons (hidden layer), 2 neurons as final output
+        System.out.println("NeuralNet: Created");
     }
 
+    public void createTrainingData(Agent agent) {
+        int maxVal = 10; //(0-10 intensity levels)
 
-    public static void createTrainingData() {
-        // FUNCTION: float field1 = (float) (((Math.sin(i) + Math.sin(j))/3)+0.5)
-        // RESISTANCE:
-        // Bot x,y starting always at 0.0
+        double [] sensors = agent.getSensors();
 
-        int angleRange = 20;
-        int veloRange = 10;
-
-        System.out.println("Data managing is starting... ");
-
-        FileMaker file = new FileMaker(angleRange,veloRange);
-        file.createFile();
-        file.convertFile();
-        trainingDataSet = FileMaker.getTrainingDataSet();
-
-        // Shuffle the data
-        trainingDataSet = MathWork.randomShuffle(trainingDataSet);
-
-        // Print the whole dataset
-        // Visuals.printDataSet(trainingDataSet);
-
-        // Scale the whole dataset for the training
-        MathWork.minMaxScaling(trainingDataSet,"input"); // Inputs
-        MathWork.minMaxScaling(trainingDataSet, "output");// Outputs
-        System.out.println("\t" + "Data has been scaled for the NeuralNet!");
-
-        // Print the whole scaled dataset
-        // Visuals.printDataSet(trainingDataSet);
-
-        System.out.println("Data managing: Check");
-
-
-    }
-
-    // Train the network with forward and backward propagation
-    // Epoch is 1 iteration true the whole training dataset
-    public static void train(int epochs, float learningRate){
-        float[] targets = new float[trainingDataSet.length];
-
-        MathWork.minMaxDescaling(trainingDataSet, "output");
-        for (int i = 0; i < trainingDataSet.length; i++){
-            targets[i] = trainingDataSet[i].dataOutput[0];
+        float [] dataInput = new float[sensors.length];
+        float [] dataOutput = new float[layers[layers.length-1].neurons.length]; // Will stay empty for init because no target valuese ftm
+        // Fill all the data inputs of the NN
+        for (int i = 0; i < sensors.length; i++){
+            dataInput[i] = (float) sensors[i];
         }
-        MathWork.minMaxScaling(trainingDataSet, "output");
 
-        for (int i = 0; i < epochs; i++){
+        data = new TrainingData(dataInput, dataOutput);
 
-            float[] outputs = new float[trainingDataSet.length];
+        data = MathWork.sensorScaling(data, 0, 10);
 
-            for (int j = 0; j < trainingDataSet.length; j++){
-                forward(trainingDataSet[j].dataInput);
-                backward(learningRate, trainingDataSet[j]);
-
-                outputs[j] = MathWork.minMaxDescalingIndividual(layers[2].neurons[0].value, "output");
-            }
-            if (i%1000 == 0) {
-                Visuals.loss(outputs, targets);
-                System.out.println("Epoch: " + i + "/" + epochs);
-            }
-        }
+        System.out.println("Dataset: Created");
     }
+
 
     // Forward propagation
-    public static void forward(float[] inputs){
-        layers[0] = new Layer(inputs); // Loads the input of the data into the input layer (layer[0])
+    public void forward(){
+        layers[0] = new Layer(data.getDataInput()); // Loads the input of the data into the input layer (layer[0])
 
         for (int i = 1; i < layers.length; i++){ // Loop true all the layers (hidden and output) (=I)
             for (int j = 0; j < layers[i].neurons.length; j++){ // Loop true all the neurons in that layer
@@ -123,10 +59,17 @@ public class NeuralNet {
                     sum += (layers[i-1].neurons[k].value)*(layers[i].neurons[j].weights[k]); // Formula: SUM(all_weights*value_prev_neuron)
                 }
                 sum += layers[i].neurons[j].bias;
-                layers[i].neurons[j].value = MathWork.sigmoid(sum); // New value of the neuron by taking the sigmoid function
+
+                if (i == layers.length-1){
+                    layers[i].neurons[j].value = MathWork.relu(sum);
+                }else
+                    //TODO should the last layer have the sum or an activation function or scaled
+                    layers[i].neurons[j].value = MathWork.relu(sum); // New value of the neuron by taking the sigmoid function
             }
         }
+        Visuals.neuronValue(layers, layers.length-1); //Output layer
     }
+
 
     /** Backward propagation
      * Going from the end of the nn to the front, layer by layer going backwards
@@ -135,7 +78,7 @@ public class NeuralNet {
      * tdata is loaded as parameter because we want to check the expected (right answer) output
      * TODO improve the backprop gradient: https://medium.com/datathings/neural-networks-and-backpropagation-explained-in-a-simple-way-f540a3611f5e
      */
-    public static void backward(float learningRate, TrainingData tData){
+    void backward(float learningRate, TrainingData tData){
 
         int nLayers = layers.length; // Input layer, all hidden layers and the output layer
         int nMin1Layers = nLayers-1; // All hidden layers and the output layer
@@ -191,7 +134,7 @@ public class NeuralNet {
     }
 
     // Sums of all the gradient connecting a given neuron in a given layer
-    public static float sumGradient(int neuronIndex, int layerIndex) {
+    public  float sumGradient(int neuronIndex, int layerIndex) {
         float gradient_sum = 0;
         Layer current_layer = layers[layerIndex];
         for(int i = 0; i < current_layer.neurons.length; i++) {
@@ -201,4 +144,21 @@ public class NeuralNet {
         return gradient_sum;
     }
 
+    // Forward propagation FOR THE VISUAL CLASS
+    public void forwardVisuals(float [] dataInput){
+        layers[0] = new Layer(dataInput); // Loads the input of the data into the input layer (layer[0])
+
+        for (int i = 1; i < layers.length; i++){ // Loop true all the layers (hidden and output) (=I)
+            for (int j = 0; j < layers[i].neurons.length; j++){ // Loop true all the neurons in that layer
+                float sum = 0;
+
+                for (int k = 0; k < layers[i-1].neurons.length; k++){ // Loops true the neurons of each layer, starting from the input layer (1 layer earlier than j)
+                    sum += (layers[i-1].neurons[k].value)*(layers[i].neurons[j].weights[k]); // Formula: SUM(all_weights*value_prev_neuron)
+                }
+                sum += layers[i].neurons[j].bias;
+                layers[i].neurons[j].value = MathWork.sigmoid(sum); // New value of the neuron by taking the sigmoid function
+            }
+        }
+        Visuals.showWeights(layers);
+    }
 }
