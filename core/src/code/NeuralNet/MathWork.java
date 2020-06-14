@@ -61,13 +61,8 @@ public class MathWork {
     }
 
     // Used to calculate the overall error rate
-    public static float meanSquaredError(float[] outputs, float[] targets) {
-        float sum = 0;
-
-        for (int i = 0; i < outputs.length; i++) {
-            sum += squareMCalc(outputs[i], targets[i]);
-        }
-        return sum/(float) outputs.length;
+    public static float meanSquaredError(float output, float target) {
+        return squareMCalc(output, target);
     }
 
     //Random shuffle an array

@@ -29,9 +29,9 @@ public class NeuralNet {
         //Creating the layers
         this.layers = new Layer[4]; //3 layers: input, hidden and output
         this.layers[0] = null; // Input layer, no previous neurons: 0,2
-        this.layers[1] = new Layer(11,5); // Hidden layer: 2 neurons (input layer) coming in
-        this.layers[2] = new Layer(5,5); // Hidden layer: 2 neurons (input layer) coming in
-        this.layers[3] = new Layer(5, 10); // Output layer: 64 neurons (hidden layer), 2 neurons as final output
+        this.layers[1] = new Layer(11,64); // Hidden layer: 2 neurons (input layer) coming in
+        this.layers[2] = new Layer(64,64); // Hidden layer: 2 neurons (input layer) coming in
+        this.layers[3] = new Layer(64, 10); // Output layer: 64 neurons (hidden layer), 2 neurons as final output
         System.out.println("NeuralNet: Created");
     }
 
@@ -81,8 +81,8 @@ public class NeuralNet {
         } else if (nPass == 2){
             nextStateQ = maxQVal();
         }
-        Visuals.neuronValue(layers, layers.length-1);
-        Visuals.showWeights(layers);
+        //Visuals.neuronValue(layers, layers.length-1);
+        //Visuals.showWeights(layers);
     }
 
     /** Exploration/Exploitation dilemma
@@ -140,7 +140,7 @@ public class NeuralNet {
      * TODO improve the backpropagate gradient: https://medium.com/datathings/neural-networks-and-backpropagation-explained-in-a-simple-way-f540a3611f5e
      */
     public void backpropagate(){
-        float targetQ = nextStateQ - currentState[0];
+        float er = nextStateQ - currentState[0];
         /*TODO implement rewards and costs
             *https://stats.stackexchange.com/questions/200006/q-learning-with-neural-network-as-function-approximation
           */
@@ -149,7 +149,7 @@ public class NeuralNet {
 
         // Update the output layer first
         for (int i = 0; i < layers[nMin1Layers].neurons.length; i++){
-            float derivative = targetQ; // Calc how close we are from the actual expectation
+            float derivative = er; // Calc how close we are from the actual expectation
             float delta = derivative *(nextStateQ*(1-nextStateQ));
 
             layers[nMin1Layers].neurons[i].gradient = delta;
@@ -193,6 +193,7 @@ public class NeuralNet {
         System.out.println("=====");
         Visuals.neuronValue(layers, layers.length-1);
         Visuals.showWeights(layers);
+        System.out.println(er);
 
     }
 

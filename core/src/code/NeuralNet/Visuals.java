@@ -62,7 +62,7 @@ public class Visuals extends NeuralNet {
     }
 
     // Print the mean square error
-    public static void loss(float[] outputs, float[] targets){
+    public static void loss(float outputs, float targets){
         System.out.println("Mean Square Error: " + MathWork.meanSquaredError(outputs, targets));
     }
 
