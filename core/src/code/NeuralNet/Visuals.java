@@ -8,7 +8,7 @@ import java.util.Arrays;
 public class Visuals extends NeuralNet {
 
     // Print the final result in the output layer
-    public static void printOutput(TrainingData[] trainingDataSet, int nFirst, String whatToPrint){
+    public void printOutput(TrainingData[] trainingDataSet, int nFirst, String whatToPrint){
         /*TrainingData[] test = MathWork.minMaxDescaling(trainingDataSet, "input");
         test = MathWork.minMaxDescaling(test, "output");*/
         if (whatToPrint == "target"){
@@ -25,20 +25,20 @@ public class Visuals extends NeuralNet {
             System.out.println("\t" + "Goal:" + "\t" + "Output:");
 
             for (int i = 0; i < nFirst; i++){
-                forward(trainingDataSet[i].dataInput);
-                float result = MathWork.minMaxDescalingIndividual(layers[2].neurons[0].value, "output");
-                float goal = MathWork.minMaxDescalingIndividual(trainingDataSet[i].dataOutput[0],"output");
-                System.out.println("\t" + goal + "\t" + result);
+                forwardVisuals(trainingDataSet[i].dataInput);
+                //float result = MathWork.minMaxDescalingIndividual(layers[2].neurons[0].value, "output");
+                //float goal = MathWork.minMaxDescalingIndividual(trainingDataSet[i].dataOutput[0],"output");
+                //System.out.println("\t" + goal + "\t" + result);
             }
             System.out.println();
         }
     }
 
+
     // Print the whole dataset, input and outputs
-    public static void printDataSet(TrainingData[] trainingDataSet){
-        for(int i = 0; i < trainingDataSet.length; i++){
-            System.out.println(Arrays.toString(trainingDataSet[i].getDataInput()) + " -> " + Arrays.toString(trainingDataSet[i].getDataOutput()));
-        }
+    public static void printDataSet(TrainingData data){
+            System.out.println(Arrays.toString(data.dataInput) +
+                    " -> " + Arrays.toString(data.dataOutput));
     }
 
     // Print the weights of the nn
@@ -64,5 +64,11 @@ public class Visuals extends NeuralNet {
     // Print the mean square error
     public static void loss(float[] outputs, float[] targets){
         System.out.println("Mean Square Error: " + MathWork.meanSquaredError(outputs, targets));
+    }
+
+    public static void neuronValue(Layer[] layers, int layerN){
+        for (int i = 0; i < layers[layerN].neurons.length; i++){
+            System.out.println(layers[layerN].neurons[i].value);
+        }
     }
 }

@@ -63,10 +63,12 @@ public class Rungekuttasolver{
         }
         return hasStopped;
     }
+
     public double getHeight(double x, double y){
 
         return PuttingGameScreen.defineFunction(x,y);
     }
+
     public double getResistance(double x, double y){
 
         return (double) PuttingGameScreen.getFriction(x,y);
