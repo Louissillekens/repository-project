@@ -26,8 +26,17 @@ public class QL {
         agent.sensors = new double[]{1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11};
 
         neuralNet.createTrainingData(agent);
-        for (int i = 0; i < 1; i++)
-            neuralNet.forward();
+        neuralNet.forward(1);
+        /*TODO take action:
+           *use the value in the currentState array to identify which action to take
+           *Take that action action with the agent and update the agent
+           *Take the sensor values again of the agent and redo a trainingset
+           * get the max Q value of that new state
+           * do the calc and backprop the network
+         */
+        neuralNet.createTrainingData(agent);
+        neuralNet.forward(2);
+        neuralNet.backpropagate();
 
     /* int episode = 0;
         while (episode < maxEp){
@@ -37,9 +46,6 @@ public class QL {
             agent.reset(xStart, yStart,precision);
             episode++;
         }*/
-
-
-
     }
 
     //Checks whether the next state reached its destination

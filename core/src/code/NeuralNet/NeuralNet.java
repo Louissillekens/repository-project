@@ -5,6 +5,9 @@ import code.Q_Learning.Agent;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+import java.util.concurrent.ThreadLocalRandom;
 
 /**
  * @author Alexandre Martens
@@ -13,6 +16,10 @@ public class NeuralNet {
 
     Layer[] layers;
     TrainingData data;
+
+    float[] currentState; //Qval chosen and wich node it is
+    float nextStateQ; //Qval chosen and wich node it is
+    double e = 0.9; // Exploring value TODO should decrease as it goes
 
     public NeuralNet(){
         // Set the range of the weights
@@ -47,8 +54,10 @@ public class NeuralNet {
     }
 
 
+
     // Forward propagation
-    public void forward(){
+    //int nPass means if it's the first forward prop or 2nd one
+    public void forward(int nPass){
         layers[0] = new Layer(data.getDataInput()); // Loads the input of the data into the input layer (layer[0])
 
         for (int i = 1; i < layers.length; i++){ // Loop true all the layers (hidden and output) (=I)
@@ -67,7 +76,56 @@ public class NeuralNet {
                     layers[i].neurons[j].value = MathWork.relu(sum); // New value of the neuron by taking the sigmoid function
             }
         }
-        Visuals.neuronValue(layers, layers.length-1); //Output layer
+        if (nPass == 1){
+            currentState = epsilonSelection();
+        } else if (nPass == 2){
+            nextStateQ = maxQVal();
+        }
+    }
+
+    /** Exploration/Exploitation dilemma
+     * TODO should decrease the e over time or shouldn't i in a nn?
+     * @return array of [Qval, pos Qval]
+     */
+    float[] epsilonSelection(){
+        double random = Math.random();
+
+        if (random < e){
+            int numb = ThreadLocalRandom.current().nextInt(0, layers[layers.length-1].neurons.length + 1);
+            return new float[] {layers[layers.length-1].neurons[numb].value, numb};
+        } else{
+            Neuron [] neur = layers[layers.length-1].neurons;
+            List<Float> list = new ArrayList<Float>();
+
+            for (int i = 0; i < neur.length; i++){
+                list.add(neur[i].value);
+            }
+            //find pos of that max val
+            float max = Collections.max(list);
+            int numb = 0;
+            for (int i = 0; i < neur.length; i++){
+                if (neur[i].value == max){
+                    numb = i;
+                    break;
+                }
+            }
+            return new float[]{max, numb};
+        }
+    }
+
+
+    /**
+     * @return maximum value of the output layer
+     */
+    float maxQVal(){
+        float max = 0;
+        Neuron [] neur = layers[layers.length-1].neurons;
+        List<Float> list = new ArrayList<Float>();
+
+        for (int i = 0; i < neur.length; i++){
+            list.add(neur[i].value);
+        }
+        return Collections.max(list);
     }
 
 
@@ -76,10 +134,14 @@ public class NeuralNet {
      * Methodology: Calculate output layer weights -> calculate the hidden layers weights -> update all weights
      * Documentation source: https://mattmazur.com/2015/03/17/a-step-by-step-backpropagation-example/
      * tdata is loaded as parameter because we want to check the expected (right answer) output
-     * TODO improve the backprop gradient: https://medium.com/datathings/neural-networks-and-backpropagation-explained-in-a-simple-way-f540a3611f5e
+     * TODO improve the backpropagate gradient: https://medium.com/datathings/neural-networks-and-backpropagation-explained-in-a-simple-way-f540a3611f5e
      */
-    void backward(float learningRate, TrainingData tData){
-
+    void backpropagate(float learningRate, TrainingData tData){
+        float error = nextStateQ - currentState[0];
+        
+        /*TODO implement rewards and costs
+            *https://stats.stackexchange.com/questions/200006/q-learning-with-neural-network-as-function-approximation
+          */
         int nLayers = layers.length; // Input layer, all hidden layers and the output layer
         int nMin1Layers = nLayers-1; // All hidden layers and the output layer
 
