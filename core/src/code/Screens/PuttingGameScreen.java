@@ -293,7 +293,7 @@ public class PuttingGameScreen implements Screen {
     public static float getFriction(double x, double z) {
 
         if (defineFunction(x,z) < 0) {
-            return -1f;
+            return 1f;
         }
         return 0.13f;
     }
