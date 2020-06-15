@@ -7,7 +7,7 @@ import java.util.List;
 /**
  * @author Alexandre Martens
  */
-public class MathWork {
+public class MathWork extends NeuralNet {
 
     /**
      * @param min minimum value in the range inclusive
@@ -97,6 +97,13 @@ public class MathWork {
         }
 
         return data;
+    }
+
+    public float pythFlag(float xO, float yO){
+        float deltaX = originalAgent.getxFlag() - xO;
+        float deltaY = originalAgent.getyFlag() - yO;
+
+        return (float) Math.sqrt(Math.pow(deltaX,2) + Math.pow(deltaY,2));
     }
 
     // Min-Max descaling

@@ -3,19 +3,24 @@ package code.Q_Learning;
 import code.NeuralNet.Layer;
 
 public class Agent {
-    double xPos;
-    double yPos;
-    double xFlag;
-    double yFlag;
+    float xPos;
+    float yPos;
+    float xFlag;
+    float yFlag;
 
-    double [] sensors;
+    float rewards;
 
-    float [] Qval;
-    float [] nextQmaxVal;
-    Layer [] layers;
+    float [] sensors;
 
-    Agent(double xStart, double yStart, double xFlag, double yFlag){
-        sensors  = new double[11];
+    float [] Qval; //Used to store the originalAgent Qvalues to avoid losing them
+    float [] nextQmaxVal; //Used to store the (Reward + maxQ(s',a')) of each Qval
+
+    Layer [] layers; //Save the whole network bias, weights and values //TODO optimise this by removing the qval i think
+
+    Agent(float xStart, float yStart, float xFlag, float yFlag){
+        sensors  = new float[11];
+
+        rewards = 0;
 
         this.xFlag = xFlag;
         this.yFlag = yFlag;
@@ -42,16 +47,25 @@ public class Agent {
         this.yPos += y;
     }
 
-    void updateSensors(double [] sensors){
+    void updateSensors(float [] sensors){
         this.sensors = sensors;
     }
 
-    void reset(int xStart, int yStart){
+    void reset(float xStart, float yStart){
         this.xPos = xStart;
         this.yPos = yStart;
+
+        this.rewards = 0;
+
+        float [] sensors = null;
+        float [] Qval = null;
+        float [] nextQmaxVal = null;
+
+        Layer [] layers = null;
+
     }
 
-    public void setSensors(double[] sensors) {
+    public void setSensors(float[] sensors) {
         this.sensors = sensors;
     }
 
@@ -71,23 +85,23 @@ public class Agent {
         return layers;
     }
 
-    public double getxPos() {
+    public float getxPos() {
         return xPos;
     }
 
-    public double getyPos() {
+    public float getyPos() {
         return yPos;
     }
 
-    public double getxFlag() {
+    public float getxFlag() {
         return xFlag;
     }
 
-    public double getyFlag() {
+    public float getyFlag() {
         return yFlag;
     }
 
-    public double[] getSensors() {
+    public float[] getSensors() {
         return sensors;
     }
 

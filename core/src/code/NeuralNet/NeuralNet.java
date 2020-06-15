@@ -16,10 +16,16 @@ public class NeuralNet {
     TrainingData data;
 
     float nextStateQ; //Qval chosen and wich node it is
-    float e = 0.9f; // Exploring value TODO should decrease as it goes
-    float learningRate = 0.05f;
+    float epsilon = 1.0f; // Exploring value TODO should decrease as it goes
+    float gamma = 0.8f; //How important furure rewards become (closer to 1 means giving more importance to future rewards)
+    float learningRate = 0.05f; // For the feedF and backP. Has nothing to do with alpha (no alpha in QLNN)
+
+    //Under the rewards cat.
+    float costStep = -8;
+    float localReward;
 
     Agent originalAgent;
+    Agent tempAgent;
 
     public NeuralNet(){
         // Set the range of the weights
@@ -36,7 +42,7 @@ public class NeuralNet {
 
     public void createTrainingData(Agent agent, boolean original) {
 
-        double [] sensors = agent.getSensors();
+        float [] sensors = agent.getSensors();
 
         float [] dataInput = new float[sensors.length];
         //TODO do smth with the dataoutup
@@ -49,6 +55,7 @@ public class NeuralNet {
         data = new TrainingData(dataInput, dataOutput);
 
         data = MathWork.sensorScaling(data, 0, sensors.length);
+
         if (original == true){
             originalAgent = agent;
         }
@@ -102,7 +109,7 @@ public class NeuralNet {
      */
     public void forwardQMax() {
         for (int i = 0; i < originalAgent.getQval().length; i++){
-            Agent tempAgent = originalAgent;
+            tempAgent = originalAgent;
             tempAgent.giveAction(i); //will perform action i mapped to it, update itself and get new sensors values
             createTrainingData(tempAgent, false); //create the new dataset with the tempagent sensor
             forward(false);
@@ -112,7 +119,7 @@ public class NeuralNet {
 
 
     /**
-     * @return maximum value of the output layer
+     * @return maximum value of the output layer AND COMPUTES THE REWARDS
      */
     float maxQVal(){
         float max = 0;
@@ -122,7 +129,16 @@ public class NeuralNet {
         for (int i = 0; i < neur.length; i++){
             list.add(neur[i].value);
         }
-        return Collections.max(list);
+        return (rewards() + gamma*Collections.max(list));
+    }
+
+    float rewards(){
+        localReward = costStep;
+
+        //Perform the distance calc between the old state and the new one to check if the ball has advanced or not
+        MathWork math = new MathWork();
+        localReward += (math.pythFlag(originalAgent.getxPos(), originalAgent.getyPos()) - math.pythFlag(tempAgent.getxPos(), tempAgent.getyPos()));
+        return localReward;
     }
 
 
@@ -298,8 +314,9 @@ public class NeuralNet {
         //Visuals.printAllWeights(layers);
     }
 
+
     /** Exploration/Exploitation dilemma
-     * TODO should decrease the e over time or shouldn't i in a nn?
+     * TODO should decrease the epsilon over time or shouldn't i in a nn?
      * @return array of [Qval, pos Qval]
      */
     float[] epsilonSelection(){
@@ -307,7 +324,7 @@ public class NeuralNet {
 
         float random = (float) Math.random();
 
-        if (random < e){
+        if (random < epsilon){
             int numb = ThreadLocalRandom.current().nextInt(0, layers[layers.length-1].neurons.length);
             System.out.println(numb);
             return new float[] {layers[layers.length-1].neurons[numb].value, numb};
@@ -331,13 +348,11 @@ public class NeuralNet {
         }
     }
 
-    public void update() {
-        ;
-        Agent tempAgent = originalAgent;
+    public Agent update() {
+        tempAgent = originalAgent;
         tempAgent.giveAction((int) epsilonSelection()[1]); //will perform action i mapped to it, update itself and get new sensors values
-        createTrainingData(tempAgent, false); //create the new dataset with the tempagent sensor
-        forward(false);
-        originalAgent.setNextQmaxVal(i, maxQVal());
         originalAgent = tempAgent;
+
+        return originalAgent;
     }
 }

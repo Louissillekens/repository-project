@@ -5,13 +5,11 @@ import code.NeuralNet.NeuralNet;
 import java.util.Arrays;
 
 public class QL {
-    static double xStart = 2;
-    static double yStart = 2;
+    static float xStart = 2;
+    static float yStart = 2;
 
-    static double xFlag = 5;
-    static double yFlag = 7;
-
-    static int precision = 2; // 1 square will be traversed in 2 steps: 0.5/0.5
+    static float xFlag = 5;
+    static float yFlag = 7;
 
     static int maxEp = 200;
 
@@ -20,41 +18,44 @@ public class QL {
 
         NeuralNet neuralNet = new NeuralNet();
 
-        Agent agentOriginal = new Agent(xStart, yStart, xFlag, yFlag);
-        agentOriginal.setSensors(new double[]{1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11});
+        Agent agentOriginal = new Agent(xStart, yStart, xFlag, yFlag); //TODO has to update it's sensors imed in constructor
+        agentOriginal.setSensors(new float[]{1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11});
 
-        neuralNet.createTrainingData(agentOriginal,true); //0 means original agent that we save
-        neuralNet.forward(true); //Original agent with Qval
-        neuralNet.forwardQMax(); //All maxQ val mapped with every action possible from the original agent
-        neuralNet.backprop(); //TODO fix the backprop completely. Bias >0 and values ridiculous big
-        neuralNet.update();
+        int episode = 0;
+
+        while (episode < maxEp){
+            while (compareState(agentOriginal) == false){
+                neuralNet.createTrainingData(agentOriginal,true); //0 means original agent that we save
+                neuralNet.forward(true); //Original agent with Qval
+                neuralNet.forwardQMax(); //All maxQ val mapped with every action possible from the original agent
+                neuralNet.backprop(); //TODO fix the backprop completely. Bias >0 and values ridiculous big. cost is q-q'**2
+                agentOriginal = neuralNet.update();
+            }
+            //Reset position, reward
+            agentOriginal.reset(xStart, yStart); //TODO implement reset sensor calc
+            agentOriginal.setSensors(new float[]{1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11});
+            episode++;
+        }
+
+
+
         /*TODO take action:
-           *use the value in the currentState array to identify which action to take
-           *Take that action action with the agent and update the agent
-           *Take the sensor values again of the agent and redo a trainingset
-           * get the max Q value of that new state
-           * do the calc and backprop the network
+         *use the value in the currentState array to identify which action to take
+         *Take that action action with the agent and update the agent
+         *Take the sensor values again of the agent and redo a trainingset
+         * get the max Q value of that new state
+         * do the calc and backprop the network
          */
 
-        neuralNet.backprop();
-        //neuralNet.forward(1);
 
-
-    /* int episode = 0;
-        while (episode < maxEp){
-            while (compareState() == false){
-
-            }
-            agent.reset(xStart, yStart,precision);
-            episode++;
-        }*/
     }
 
     //Checks whether the next state reached its destination
-/*    private static boolean compareState() {
-        int [] flag = {xFlag, yFlag};
-        int [] nextState = {};
-
-        return Arrays.equals(flag, nextState);
-    }*/
+    private static boolean compareState(Agent agent) {
+        float [] flag = { xFlag, yFlag};
+        float [] state = {agent.getxPos(),agent.getyPos()};
+        //TODO checks if ball is in hole or raduis
+        //Arrays.equals(flag, nextState)
+        return false;
+    }
 }
