@@ -136,11 +136,4 @@ public class Rungekuttasolver{
         return vy;
     }
 
-    public double getVx() {
-        return vx;
-    }
-
-    public double getVy() {
-        return vy;
-    }
 }

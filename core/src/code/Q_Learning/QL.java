@@ -50,10 +50,10 @@ public class QL {
     }
 
     //Checks whether the next state reached its destination
-    private static boolean compareState() {
+/*    private static boolean compareState() {
         int [] flag = {xFlag, yFlag};
         int [] nextState = {};
 
         return Arrays.equals(flag, nextState);
-    }
+    }*/
 }
