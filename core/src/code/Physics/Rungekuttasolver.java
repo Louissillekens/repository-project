@@ -14,21 +14,19 @@ public class Rungekuttasolver{
     private double x;
     private double y;
     private final double onesixth =(double)1/6;
-    private static boolean hasBallStopped;
+    private static boolean hasStopped;
 
     public static void main(String args[]){
 
         Rungekuttasolver solver = new Rungekuttasolver();
         solver.setValues(0,0,3.9726,8.519);
-        for(int i =0; i<2000;i++){
+        while (!hasStopped) {
             solver.RK4();
-            //System.out.println("x: "+ solver.getX());
-            //System.out.println("y: "+ solver.getY());
-            System.out.println("vx: "+ solver.getVx());
-            System.out.println("vy: "+ solver.getVy());
-            //System.out.println("height: "+solver.getHeight(solver.getX(),solver.getY()));
-            //System.out.println("resistance: " + solver.getResistance(solver.getX(), solver.getY()));
-
+            System.out.println("x: "+solver.getX());
+            System.out.println("y: "+solver.getY());
+            System.out.println();
+            System.out.println("vx: " + solver.getVx());
+            System.out.println("vy: " + solver.getVy());
         }
         System.out.println("the x and y coordinates are:");
         System.out.println("x: "+solver.getX());
@@ -59,11 +57,11 @@ public class Rungekuttasolver{
 
     public boolean hasBallStopped(){
 
-        boolean stopped =false;
+        hasStopped =false;
         if(vx==0 && vy==0 /*&& ax==0 && ay == 0*/){
-            stopped = true;
+            hasStopped = true;
         }
-        return stopped;
+        return hasStopped;
     }
 
     public double getHeight(double x, double y){
@@ -138,4 +136,11 @@ public class Rungekuttasolver{
         return vy;
     }
 
+    public double getVx() {
+        return vx;
+    }
+
+    public double getVy() {
+        return vy;
+    }
 }

@@ -79,6 +79,11 @@ public class VerletSolver{
         return y;
     }
 
+    public double getVx() {
+        return vx;
+    }
 
-    
+    public double getVy() {
+        return vy;
+    }
 }

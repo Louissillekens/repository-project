@@ -17,15 +17,11 @@ import com.badlogic.gdx.graphics.g3d.environment.DirectionalLight;
 import com.badlogic.gdx.graphics.g3d.utils.MeshPartBuilder;
 import com.badlogic.gdx.graphics.g3d.utils.ModelBuilder;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
-import com.badlogic.gdx.math.Circle;
-import com.badlogic.gdx.math.Intersector;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.physics.bullet.Bullet;
-import com.badlogic.gdx.physics.bullet.collision.*;
 import com.badlogic.gdx.utils.Array;
 import com.game.game.Game;
 
-import java.util.ArrayList;
 import java.util.Random;
 
 import static com.badlogic.gdx.graphics.GL20.GL_TRIANGLES;
@@ -45,6 +41,7 @@ public class PuttingGameScreen implements Screen {
     // Instances variables for the perspective scene
     private PerspectiveCamera camera;
     private ModelBatch modelBatch;
+    private MeshPartBuilder meshPartBuilder;
     private static ModelBuilder modelBuilder;
     private Environment environment;
     private float directionX;
@@ -118,13 +115,14 @@ public class PuttingGameScreen implements Screen {
 
     private drawObject drawObject = new drawObject();
 
-    private btCollisionConfiguration collisionConfig;
-    private btDispatcher dispatcher;
-
     private Array<ModelInstance> instances;
     private Model ballModel;
 
     private ModelInstance ball;
+
+    /*
+    private btCollisionConfiguration collisionConfig;
+    private btDispatcher dispatcher;
 
     private btCollisionShape ballShape;
     private btCollisionShape trunkShape;
@@ -134,11 +132,38 @@ public class PuttingGameScreen implements Screen {
     private btCollisionObject trunkObject;
     private btCollisionObject branchesObject;
 
-    private Array<btCollisionObject> obstacleObjects = new Array<>();
+    private btCollisionShape lineShape;
+    private btCollisionObject lineObject;
 
-    private boolean isCollision = false;
+    private Array<btCollisionObject> obstacleObjects = new Array<>();
+    */
 
     private boolean ballStop = true;
+
+    private float vx;
+    private float vy;
+
+    private boolean isDetectorCollision1 = false;
+    private boolean isDetectorCollision2 = false;
+    private boolean isDetectorCollision3 = false;
+    private boolean isDetectorCollision4 = false;
+    private boolean isDetectorCollision5 = false;
+    private boolean isDetectorCollision6 = false;
+    private boolean isDetectorCollision7 = false;
+    private boolean isDetectorCollision8 = false;
+    private boolean isDetectorCollision9 = false;
+    private boolean isDetectorCollision10 = false;
+    private boolean isDetectorCollision11 = false;
+
+    private static float[] treePositionX;
+    private static float[] treePositionZ;
+    private int numberOfTree = 25;
+
+    private int numberOfLinesSensors = 50;
+    private double[] sensorsSize = new double[11];
+    private Array<ModelInstance> sensors = new Array<>();
+    private int countForSensors = 0;
+
 
     /**
      * Constructor that creates a new instance of the putting game screen
@@ -220,7 +245,10 @@ public class PuttingGameScreen implements Screen {
 
         ball = new ModelInstance(ballModel, ballPositionX, (defineFunction(ballPositionX, ballPositionZ))+(ballSize/2), ballPositionZ);
 
-        for (int i = 0; i < 15; i++) {
+        treePositionX = new float[numberOfTree];
+        treePositionZ = new float[numberOfTree];
+
+        for (int i = 0; i < numberOfTree; i++) {
 
             Random rand = new Random();
             float randomX = 5 + rand.nextFloat() * (45 - 5);
@@ -231,10 +259,14 @@ public class PuttingGameScreen implements Screen {
                 randomZ = 5 + rand.nextFloat() * (45 - 5);
             }
 
+            treePositionX[i] = randomX;
+            treePositionZ[i] = randomZ;
+
             ModelInstance[] treeInstances = drawObject.drawTree(randomX,randomZ);
 
             instances.add(treeInstances[0], treeInstances[1]);
 
+            /*
             trunkShape = new btCylinderShape(new Vector3(0.25f,3,0.25f));
 
             trunkObject = new btCollisionObject();
@@ -247,9 +279,11 @@ public class PuttingGameScreen implements Screen {
             branchesObject = new btCollisionObject();
             branchesObject.setCollisionShape(branchesShape);
             branchesObject.setWorldTransform(treeInstances[1].transform);
-            obstacleObjects.add(branchesObject);
+            obstacleObjects.add(branchesObject);*/
+
         }
 
+        /*
         ballShape = new btSphereShape(ballSize);
 
         ballObject = new btCollisionObject();
@@ -258,6 +292,7 @@ public class PuttingGameScreen implements Screen {
 
         collisionConfig = new btDefaultCollisionConfiguration();
         dispatcher = new btCollisionDispatcher(collisionConfig);
+        */
 
         // Adding an environment which is used for the luminosity
         environment = new Environment();
@@ -329,7 +364,7 @@ public class PuttingGameScreen implements Screen {
                 float meanX = (pos1.x + pos2.x + pos3.x + pos4.x)/4;
                 float meanZ = (pos1.z + pos2.z + pos3.z + pos4.z)/4;
 
-                if (euclideanDist(meanX, meanZ) < winRadius) {
+                if (euclideanDistFlag(meanX, meanZ) < winRadius) {
                     fieldColor = Color.PURPLE;
                 }
                 else {
@@ -351,9 +386,17 @@ public class PuttingGameScreen implements Screen {
      * @param positionZ the second coordinate on the field
      * @return the euclidean distance between that given point and the flag
      */
-    public static float euclideanDist(float positionX, float positionZ) {
+    public static float euclideanDistFlag(float positionX, float positionZ) {
 
         return (float) Math.sqrt(Math.pow((positionX-flagPositionX), 2) + Math.pow((positionZ-flagPositionZ), 2));
+    }
+
+    public static float euclideanDistObstacles(float positionX, float positionZ, int index) {
+
+        float treeX = treePositionX[index];
+        float treeZ = treePositionZ[index];
+
+        return (float) Math.sqrt(Math.pow((positionX-treeX), 2) + Math.pow((positionZ-treeZ), 2));
     }
 
     /**
@@ -364,7 +407,7 @@ public class PuttingGameScreen implements Screen {
      */
     public boolean isWin(float positionX, float positionZ) {
 
-        if(euclideanDist(positionX, positionZ) < winRadius) return true;
+        if(euclideanDistFlag(positionX, positionZ) < winRadius) return true;
         return false;
     }
 
@@ -490,12 +533,7 @@ public class PuttingGameScreen implements Screen {
         System.out.println("z: " + randomZ);
     }
 
-    /**
-     * Method that checks the collision between two 3D shapes
-     * @param ballObject object that represents the ball on the field
-     * @param obstacleObject object that represent one of the obstacle on the field
-     * @return true if there is a collision
-     */
+    /*
     public boolean checkCollision(btCollisionObject ballObject, btCollisionObject obstacleObject) {
 
         CollisionObjectWrapper co0 = new CollisionObjectWrapper(ballObject);
@@ -511,6 +549,93 @@ public class PuttingGameScreen implements Screen {
         algorithm.processCollision(co0.wrapper, co1.wrapper, info, result);
 
         return result.getPersistentManifold().getNumContacts() > 0;
+    }*/
+
+    public boolean checkCollision(int index) {
+
+        if (euclideanDistObstacles(ballPositionX, ballPositionZ, index) < 0.3f) {
+            return true;
+        }
+        else {
+            return false;
+        }
+    }
+
+    public void drawSensor(double angle, float x1, float x2, float z1, float z2, int index, int num) {
+
+        boolean collision = false;
+
+        float radian = (float) Math.toRadians(angle);
+
+        float rotationX1 = (float) ((x1) * Math.cos(radian) - (z1) * Math.sin(radian));
+        float rotationZ1 = (float) ((z1) * Math.cos(radian) + (x1) * Math.sin(radian));
+
+        float rotationX2 = (float) ((x1 + x2) * Math.cos(radian) - (z1 + z2) * Math.sin(radian));
+        float rotationZ2 = (float) ((z1 + z2) * Math.cos(radian) + (x1 + x2) * Math.sin(radian));
+
+        modelBuilder.begin();
+        meshPartBuilder = modelBuilder.part("line", 1, 3, new Material());
+        meshPartBuilder.setColor(Color.WHITE);
+        meshPartBuilder.line(ballPositionX + rotationX1, (defineFunction(ballPositionX + rotationX1, ballPositionZ + rotationZ1) + 0.1f), ballPositionZ + rotationZ1,
+                ballPositionX + rotationX2, (defineFunction(ballPositionX + rotationX2, ballPositionZ + rotationZ2) + 0.1f), ballPositionZ + rotationZ2);
+        Model lineModel = modelBuilder.end();
+        ModelInstance lineInstance = new ModelInstance(lineModel);
+
+        for (int j = 0; j < numberOfTree; j++) {
+            if (euclideanDistObstacles(ballPositionX + rotationX2, ballPositionZ + rotationZ2, j) < 0.25f) {
+                sensorsSize[num] = (index + 1)/(numberOfLinesSensors/10f);
+                collision = true;
+            }
+        }
+
+        if (defineFunction(ballPositionX + rotationX2, ballPositionZ + rotationZ2) < 0) {
+            sensorsSize[num] = (index + 1)/(numberOfLinesSensors/10f);
+            collision = true;
+        }
+
+        if (outOfField(ballPositionX + rotationX2, ballPositionZ + rotationZ2)) {
+            sensorsSize[num] = (index + 1)/(numberOfLinesSensors/10f);
+            collision = true;
+        }
+
+        if (collision) {
+            if (num == 0) {
+                isDetectorCollision1 = true;
+            }
+            if (num == 1) {
+                isDetectorCollision2 = true;
+            }
+            if (num == 2) {
+                isDetectorCollision3 = true;
+            }
+            if (num == 3) {
+                isDetectorCollision4 = true;
+            }
+            if (num == 4) {
+                isDetectorCollision5 = true;
+            }
+            if (num == 6) {
+                isDetectorCollision7 = true;
+            }
+            if (num == 7) {
+                isDetectorCollision8 = true;
+            }
+            if (num == 8) {
+                isDetectorCollision9 = true;
+            }
+            if (num == 9) {
+                isDetectorCollision10 = true;
+            }
+            if (num == 10) {
+                isDetectorCollision11 = true;
+            }
+        }
+
+        if (!collision) {
+            sensors.add(lineInstance);
+        }
+
+        sensorsSize[num] = (index + 1)/(numberOfLinesSensors/10f);
     }
 
     /**
@@ -540,21 +665,148 @@ public class PuttingGameScreen implements Screen {
         modelBatch.render(ball, environment);
         modelBatch.render(instances, environment);
 
-        ballObject.setWorldTransform(ball.transform);
+        //ballObject.setWorldTransform(ball.transform);
 
         // Loop that checks the collision between each obstacle and the ball
-        for (int i = 0; i < obstacleObjects.size; i++) {
-            if (!isCollision) {
-                isCollision = checkCollision(ballObject, obstacleObjects.get(i));
-            }
-            else {
-                // TODO: compute new ball position with the impact
-                isCollision = false;
+        for (int i = 0; i < numberOfTree; i++) {
+            if (checkCollision(i)) {
+                if (SolverScreen.getSolverName().equals("RK4")) {
+
+                    Rungekuttasolver RK4 = new Rungekuttasolver();
+
+                    float vx = (float) RK4.getVx();
+                    float vy = (float) RK4.getVy();
+
+                    int scalar = 600;
+
+                    RK4.setValues(ballPositionX, ballPositionZ, vx*scalar, vy*scalar);
+                    RK4.RK4();
+                    newBallPositionX = (float) RK4.getX();
+                    newBallPositionZ = (float) RK4.getY();
+                }
+                else if (SolverScreen.getSolverName().equals("Verlet")) {
+
+                    VerletSolver Verlet = new VerletSolver();
+
+                    float vx = (float) Verlet.getVx();
+                    float vy = (float) Verlet.getVy();
+                }
+
                 System.out.println("--> Obstacle");
             }
         }
 
         ball = new ModelInstance(ballModel, ballPositionX, (defineFunction(ballPositionX, ballPositionZ))+(ballSize/2), ballPositionZ);
+
+        if (ballStop) {
+
+            if (countForSensors < 1) {
+
+                sensors.clear();
+
+                float stepX = 0;
+                float stepZ = 0;
+                float stepX1 = (flagPositionX - ballPositionX) / numberOfLinesSensors;
+                float stepZ1 = (flagPositionZ - ballPositionZ) / numberOfLinesSensors;
+
+                int i = 0;
+                while (i < numberOfLinesSensors) {
+                    if (!isDetectorCollision6) {
+
+                        modelBuilder.begin();
+                        meshPartBuilder = modelBuilder.part("line", 1, 3, new Material());
+                        meshPartBuilder.setColor(Color.RED);
+                        meshPartBuilder.line((ballPositionX + (stepX)), defineFunction((ballPositionX + (stepX)), (ballPositionZ + (stepZ))) + 0.1f, (ballPositionZ + (stepZ)),
+                                ballPositionX + stepX + stepX1, defineFunction(ballPositionX + stepX + (stepX1), ballPositionZ + stepZ + (stepZ1)) + 0.1f, ballPositionZ + stepZ + (stepZ1));
+                        Model lineModel = modelBuilder.end();
+                        ModelInstance lineInstance = new ModelInstance(lineModel);
+
+                        for (int j = 0; j < numberOfTree; j++) {
+                            if (euclideanDistObstacles(ballPositionX + stepX + stepX1, ballPositionZ + stepZ + stepZ1, j) < 0.25f) {
+                                sensorsSize[5] = (i + 1) / (numberOfLinesSensors/10f);
+                                isDetectorCollision6 = true;
+                            }
+                        }
+
+                        if (defineFunction(ballPositionX + stepX + stepX1, ballPositionZ + stepZ + stepZ1) < 0) {
+                            sensorsSize[5] = (i + 1) / (numberOfLinesSensors/10f);
+                            isDetectorCollision6 = true;
+                        }
+
+                        if (outOfField(ballPositionX + stepX + stepX1, ballPositionZ + stepZ + stepZ1)) {
+                            sensorsSize[5] = (i + 1) / (numberOfLinesSensors/10f);
+                            isDetectorCollision6 = true;
+                        }
+
+                        if (!isDetectorCollision6) {
+                            sensors.add(lineInstance);
+                        }
+
+                        sensorsSize[5] = (i + 1) / (numberOfLinesSensors/10f);;
+                    }
+
+                    if (!isDetectorCollision1) {
+                        drawSensor(-135, stepX, stepX1, stepZ, stepZ1, i, 0);
+                    }
+                    if (!isDetectorCollision2) {
+                        drawSensor(-90, stepX, stepX1, stepZ, stepZ1, i, 1);
+                    }
+                    if (!isDetectorCollision3) {
+                        drawSensor(-67.5, stepX, stepX1, stepZ, stepZ1, i, 2);
+                    }
+                    if (!isDetectorCollision4) {
+                        drawSensor(-45, stepX, stepX1, stepZ, stepZ1, i, 3);
+                    }
+                    if (!isDetectorCollision5) {
+                        drawSensor(-22.5, stepX, stepX1, stepZ, stepZ1, i, 4);
+                    }
+                    if (!isDetectorCollision7) {
+                        drawSensor(22.5, stepX, stepX1, stepZ, stepZ1, i, 6);
+                    }
+                    if (!isDetectorCollision8) {
+                        drawSensor(45, stepX, stepX1, stepZ, stepZ1, i, 7);
+                    }
+                    if (!isDetectorCollision9) {
+                        drawSensor(67.5, stepX, stepX1, stepZ, stepZ1, i, 8);
+                    }
+                    if (!isDetectorCollision10) {
+                        drawSensor(90, stepX, stepX1, stepZ, stepZ1, i, 9);
+                    }
+                    if (!isDetectorCollision11) {
+                        drawSensor(135, stepX, stepX1, stepZ, stepZ1, i, 10);
+                    }
+
+                    // Print the resulting size of each sensors
+                    // System.out.println("sensorsSize = " + Arrays.toString(sensorsSize));
+
+                    stepX += (flagPositionX - ballPositionX) / numberOfLinesSensors;
+                    stepZ += (flagPositionZ - ballPositionZ) / numberOfLinesSensors;
+
+                    i++;
+                }
+
+                isDetectorCollision1 = false;
+                isDetectorCollision2 = false;
+                isDetectorCollision3 = false;
+                isDetectorCollision4 = false;
+                isDetectorCollision5 = false;
+                isDetectorCollision6 = false;
+                isDetectorCollision7 = false;
+                isDetectorCollision8 = false;
+                isDetectorCollision9 = false;
+                isDetectorCollision10 = false;
+                isDetectorCollision11 = false;
+
+                countForSensors++;
+            }
+        }
+
+        if (!ballStop) {
+            countForSensors = 0;
+        }
+        else {
+            modelBatch.render(sensors, environment);
+        }
 
         modelBatch.render(flag1Instance, environment);
         modelBatch.render(flag2Instance, environment);
@@ -625,13 +877,16 @@ public class PuttingGameScreen implements Screen {
             arrowInstance = new ModelInstance(arrow);
             modelBatch.render(arrowInstance, environment);
             // Call of the class input handler that contains the majority of the user controls (only for single player)
-            handler.checkForInput();
-            handler.checkForSpaceInput();
+            if (ballStop) {
+                handler.checkForInput();
+                handler.checkForSpaceInput();
+            }
         }
         else {
             // Bot mode only needs to have space input to work
             handler.checkForSpaceInput();
         }
+
     }
 
     @Override
@@ -662,6 +917,7 @@ public class PuttingGameScreen implements Screen {
     @Override
     public void dispose() {
 
+        /*
         trunkObject.dispose();
         trunkShape.dispose();
 
@@ -673,6 +929,7 @@ public class PuttingGameScreen implements Screen {
 
         dispatcher.dispose();
         collisionConfig.dispose();
+        */
 
         modelBatch.dispose();
     }
@@ -776,6 +1033,8 @@ public class PuttingGameScreen implements Screen {
 
                 countIndex++;
 
+                ballStop = false;
+
                 // Condition that checks the game mode chosen by the user before taking the shot
                 if (gameMode.gameName.equals("Single_Player")) {
 
@@ -783,15 +1042,23 @@ public class PuttingGameScreen implements Screen {
                     // Used to compute the next position of the ball based on the current position, the camera direction and the power
                     if (SolverScreen.getSolverName().equals("RK4")) {
 
-                        int scalar = 600;
                         directionX = camera.direction.x;
                         directionZ = camera.direction.z;
 
-                        Rungekuttasolver solver = new Rungekuttasolver();
-                        solver.setValues(ballPositionX, ballPositionZ, (directionX*power)*scalar, (directionZ*power)*scalar);
-                        solver.RK4();
-                        newBallPositionX = (float) solver.getX();
-                        newBallPositionZ = (float) solver.getY();
+                        Rungekuttasolver RK4 = new Rungekuttasolver();
+
+                        RK4.setValues(ballPositionX, ballPositionZ, (directionX*power)*50, (directionZ*power)*50);
+
+                        while (!ballStop) {
+                            RK4.RK4();
+                            newBallPositionX = (float) RK4.getX();
+                            newBallPositionZ = (float) RK4.getY();
+
+                            vx = (float) RK4.getVx();
+                            vy = (float) RK4.getVy();
+                            //System.out.println("vx = " + vx);
+                            //System.out.println("vy = " + vy);
+                        }
                     }
 
                     // Instance of the Verlet solver
@@ -802,17 +1069,25 @@ public class PuttingGameScreen implements Screen {
                         directionX = camera.direction.x;
                         directionZ = camera.direction.z;
 
-                        VerletSolver solver = new VerletSolver();
-                        solver.setValues(ballPositionX, ballPositionZ, (directionX*power)*scalar, (directionZ*power)*scalar);
-                        solver.Verlet();
-                        newBallPositionX = (float) solver.getX();
-                        newBallPositionZ = (float) solver.getY();
+                        VerletSolver Verlet = new VerletSolver();
+
+                        Verlet.setValues(ballPositionX, ballPositionZ, (directionX * power) * scalar, (directionZ * power) * scalar);
+
+                        Verlet.Verlet();
+                        newBallPositionX = (float) Verlet.getX();
+                        newBallPositionZ = (float) Verlet.getY();
+
+                        vx = (float) Verlet.getVx();
+                        vy = (float) Verlet.getVx();
+                        System.out.println("vx = " + vx);
+                        System.out.println("vy = " + vy);
+
                     }
 
                 }
                 else if (gameMode.gameName.equals("Bot")) {
 
-                    Rungekuttasolver solver = new Rungekuttasolver();
+                    Rungekuttasolver Verlet = new Rungekuttasolver();
 
                     PuttingBotDeployement bot = new PuttingBotDeployement();
                     int scalar = 500;
@@ -824,7 +1099,7 @@ public class PuttingGameScreen implements Screen {
 
                     System.out.println("dx: " + directionX);
                     System.out.println("dz: " + directionZ);
-                    solver.setValues(ballPositionX, ballPositionZ, (directionX*power)*scalar, (directionZ*power)*scalar);
+                    Verlet.setValues(ballPositionX, ballPositionZ, (directionX*power)*scalar, (directionZ*power)*scalar);
                 }
 
                 positionArrayX[countIndex] = newBallPositionX;
@@ -909,7 +1184,6 @@ public class PuttingGameScreen implements Screen {
                         camera.lookAt(ballPositionX, defineFunction(ballPositionX, ballPositionZ), ballPositionZ);
                     }
                 }
-
             }
         }
     }

@@ -8,16 +8,6 @@ import java.util.List;
  * @author Alexandre Martens
  */
 public class MathWork {
-    private static float minInput1;
-    private static float minInput2;
-    private static float minOutput1;
-    private static float minOutput2;
-
-    private static float maxInput1;
-    private static float maxInput2;
-    private static float maxOutput1;
-    private static float maxOutput2;
-
 
     /**
      * @param min minimum value in the range inclusive
@@ -71,13 +61,8 @@ public class MathWork {
     }
 
     // Used to calculate the overall error rate
-    public static float meanSquaredError(float[] outputs, float[] targets) {
-        float sum = 0;
-
-        for (int i = 0; i < outputs.length; i++) {
-            sum += squareMCalc(outputs[i], targets[i]);
-        }
-        return sum/(float) outputs.length;
+    public static float meanSquaredError(float output, float target) {
+        return squareMCalc(output, target);
     }
 
     //Random shuffle an array
@@ -93,83 +78,35 @@ public class MathWork {
     }
 
     // Min-Max scaling
-    public static TrainingData[] minMaxScaling(TrainingData[] data, String IorO) {
+    public static TrainingData sensorScaling(TrainingData data, int minVal, int maxVal) {
 
-        if (IorO == "input") {
-            float[] array1 = new float[data.length]; // Length dataset
-            float[] array2 = new float[data.length]; // Length dataset
+        // Scale the data
+        for (int i = 0; i < data.dataInput.length; i++) { // Loop true the dataset
+            data.dataInput[i] = (data.dataInput[i] - minVal) / (maxVal - minVal);
+        }
 
-            // Find the min and max in the dataset input 1
-            for (int i = 0; i < data.length; i++) { // Loop true the dataset
-                array1[i] = data[i].dataInput[0];
-            }
-            // Find the min and max in the dataset input 2
-            for (int i = 0; i < data.length; i++) { // Loop true the dataset
-                array2[i] = data[i].dataInput[1];
-            }
-
-            Arrays.sort(array1); // Sort the array to get the min first and max last
-            Arrays.sort(array2); // Sort the array to get the min first and max last
-
-            minInput1 = array1[0];
-            maxInput1 = array1[data.length - 1];
-            minInput2 = array2[0];
-            maxInput2 = array2[data.length - 1];
-
-            // Scale the data 1
-            for (int i = 0; i < data.length; i++) { // Loop true the dataset
-                    data[i].dataInput[0] = (data[i].dataInput[0] - minInput1) / (maxInput1 - minInput1);
-                }
-
-            // Scale the data 2
-            for (int i = 0; i < data.length; i++) { // Loop true the dataset
-                    data[i].dataInput[1] = (data[i].dataInput[1] - minInput2) / (maxInput2 - minInput2);
-                }
-
-            return data;
-
-    } else {
-            float[] array1 = new float[data.length]; // Length dataset
-            float[] array2 = new float[data.length]; // Length dataset
-
-            // Find the min and max in the dataset output 1
-            for (int i = 0; i < data.length; i++) { // Loop true the dataset
-                array1[i] = data[i].dataOutput[0];
-            }
-            // Find the min and max in the dataset output 2
-            for (int i = 0; i < data.length; i++) { // Loop true the dataset
-                array2[i] = data[i].dataOutput[1];
-            }
-
-            Arrays.sort(array1); // Sort the array to get the min first and max last
-            Arrays.sort(array2); // Sort the array to get the min first and max last
-
-            minOutput1 = array1[0];
-            maxOutput1 = array1[data.length - 1];
-            minOutput2 = array2[0];
-            maxOutput2 = array2[data.length - 1];
-
-            // Scale the data 1
-            for (int i = 0; i < data.length; i++) { // Loop true the dataset
-                data[i].dataOutput[0] = (data[i].dataOutput[0] - minOutput1) / (maxOutput1 - minOutput1);
-            }
-
-            // Scale the data 2
-            for (int i = 0; i < data.length; i++) { // Loop true the dataset
-                data[i].dataOutput[1] = (data[i].dataOutput[1] - minOutput2) / (maxOutput2 - minOutput2);
-            }
-
-            return data;
+        return data;
     }
-}
 
     // Min-Max descaling
+    public static TrainingData sensorDescaling(TrainingData data, int minVal, int maxVal) {
+
+        // Descale the data
+        for (int i = 0; i < data.dataInput.length; i++) { // Loop true the dataset
+            data.dataInput[i] = (data.dataInput[i] * (maxVal - minVal) + minVal);
+        }
+
+        return data;
+    }
+
+    // Min-Max descaling
+/*
     public static TrainingData[] minMaxDescaling(TrainingData[] data, String IorO) {
 
         if (IorO == "input") {
             // Descale the input data
             for (int i = 0; i < data.length; i++) { // Loop true the dataset
-                    data[i].dataInput[0] = (data[i].dataInput[0] * (maxInput1 - minInput1) + minInput1);
+                data[i].dataInput[0] = (data[i].dataInput[0] * (maxInput1 - minInput1) + minInput1);
             }
             for (int i = 0; i < data.length; i++) { // Loop true the dataset
                 data[i].dataInput[1] = (data[i].dataInput[1] * (maxInput2 - minInput2) + minInput2);
@@ -179,7 +116,7 @@ public class MathWork {
         } else {
             // Descale the output data
             for (int i = 0; i < data.length; i++) { // Loop true the dataset
-                    data[i].dataOutput[0] = (data[i].dataOutput[0] * (maxOutput1 - minOutput1) + minOutput1);
+                data[i].dataOutput[0] = (data[i].dataOutput[0] * (maxOutput1 - minOutput1) + minOutput1);
             }
             for (int i = 0; i < data.length; i++) { // Loop true the dataset
                 data[i].dataOutput[1] = (data[i].dataOutput[1] * (maxOutput2 - minOutput2) + minOutput2);
@@ -187,7 +124,9 @@ public class MathWork {
             return data;
         }
     }
+*/
 
+/*
     public static float minMaxDescalingIndividual(float val, String IorO) {
         if (IorO == "input"){
             return ((val) * (maxInput1 - minInput1) + minInput1);
@@ -195,4 +134,5 @@ public class MathWork {
             return ((val) * (maxOutput1 - minOutput1) + minOutput1);
         }
     }
+*/
 }

@@ -1,5 +1,6 @@
 package code.Board;
 
+
 /**
  * class for a simple Vector in 2d holding an x and y coordinate
  */
@@ -61,6 +62,12 @@ public class Vector2d {
     public void change_both(double newx, double newy){
         x = newx;
         y = newy;
+    }
+
+    public boolean equals(Vector2d aVector){
+
+        if(this.x == aVector.get_x() && this.y == aVector.get_y()) return true;
+        return false;
     }
 
 }
