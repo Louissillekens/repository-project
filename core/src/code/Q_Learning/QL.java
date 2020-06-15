@@ -26,6 +26,8 @@ public class QL {
         neuralNet.createTrainingData(agentOriginal,true); //0 means original agent that we save
         neuralNet.forward(true); //Original agent with Qval
         neuralNet.forwardQMax(); //All maxQ val mapped with every action possible from the original agent
+        neuralNet.backprop(); //TODO fix the backprop completely. Bias >0 and values ridiculous big
+        neuralNet.update();
         /*TODO take action:
            *use the value in the currentState array to identify which action to take
            *Take that action action with the agent and update the agent
@@ -33,9 +35,8 @@ public class QL {
            * get the max Q value of that new state
            * do the calc and backprop the network
          */
-        //neuralNet.createTrainingData(agentOriginal);
-        //neuralNet.forward(2);
-        //neuralNet.backpropagate();
+
+        neuralNet.backprop();
         //neuralNet.forward(1);
 
 
