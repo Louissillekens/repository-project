@@ -37,12 +37,18 @@ public class Visuals extends NeuralNet {
 
     // Print the whole dataset, input and outputs
     public static void printDataSet(TrainingData data){
-            System.out.println(Arrays.toString(data.dataInput) +
-                    " -> " + Arrays.toString(data.dataOutput));
+        System.out.println(Arrays.toString(data.dataInput) +
+                " -> " + Arrays.toString(data.dataOutput));
     }
 
     // Print the weights of the nn
-    public static void showWeights(Layer[] layers){
+    public static void showWeights(Layer[] layers, int layerN){
+        for (int i = 0; i < layers[layerN].neurons.length; i++){
+            System.out.println(Arrays.toString(layers[layerN].neurons[i].weights));
+        }
+        System.out.println("- - - - -");
+    }
+    public static void showAllWeights(Layer[] layers){
         for (int i = 0; i < layers.length; i++){
             for (int j = 0; j < layers[i].neurons.length; j++){
                 System.out.println(Arrays.toString(layers[i].neurons[j].weights));

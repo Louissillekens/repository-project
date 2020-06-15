@@ -55,14 +55,14 @@ public class MathWork {
         return sum;
     }
 
-    public static float squareMCalc(float output, float target) {
+    public static float squaredCalc(float output, float target) {
         float calc = (float) Math.pow((target - output),2);
         return calc;
     }
 
     // Used to calculate the overall error rate
     public static float meanSquaredError(float output, float target) {
-        return squareMCalc(output, target);
+        return squaredCalc(output, target);
     }
 
     //Random shuffle an array

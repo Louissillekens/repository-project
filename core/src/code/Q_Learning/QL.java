@@ -1,17 +1,15 @@
 package code.Q_Learning;
 
 import code.NeuralNet.NeuralNet;
-import code.NeuralNet.Visuals;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 
 public class QL {
-    static int xStart = 2;
-    static int yStart = 2;
+    static double xStart = 2;
+    static double yStart = 2;
 
-    static int xFlag = 5;
-    static int yFlag = 7;
+    static double xFlag = 5;
+    static double yFlag = 7;
 
     static int precision = 2; // 1 square will be traversed in 2 steps: 0.5/0.5
 
@@ -22,11 +20,12 @@ public class QL {
 
         NeuralNet neuralNet = new NeuralNet();
 
-        Agent agent = new Agent(xStart, yStart, xFlag, yFlag);
-        agent.sensors = new double[]{1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11};
+        Agent agentOriginal = new Agent(xStart, yStart, xFlag, yFlag);
+        agentOriginal.setSensors(new double[]{1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11});
 
-        neuralNet.createTrainingData(agent);
-        neuralNet.forward(1);
+        neuralNet.createTrainingData(agentOriginal,true); //0 means original agent that we save
+        neuralNet.forward(true); //Original agent with Qval
+        neuralNet.forwardQMax(); //All maxQ val mapped with every action possible from the original agent
         /*TODO take action:
            *use the value in the currentState array to identify which action to take
            *Take that action action with the agent and update the agent
@@ -34,9 +33,9 @@ public class QL {
            * get the max Q value of that new state
            * do the calc and backprop the network
          */
-        neuralNet.createTrainingData(agent);
-        neuralNet.forward(2);
-        neuralNet.backpropagate();
+        //neuralNet.createTrainingData(agentOriginal);
+        //neuralNet.forward(2);
+        //neuralNet.backpropagate();
         //neuralNet.forward(1);
 
 
