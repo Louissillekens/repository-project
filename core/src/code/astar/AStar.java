@@ -59,4 +59,13 @@ public class AStar {
     public void computeScore(Node node){
         //TODO
     }
+
+    public List<Node> findRoadTo(Node node){
+        //TODO go back through the parents of this node to the root and put them in a list to find the road we take
+        return new ArrayList<Node>();
+    }
+
+    public void doIteration(Node node){
+        //TODO do one iteration of the algorithm
+    }
 }

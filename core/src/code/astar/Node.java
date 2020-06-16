@@ -26,13 +26,6 @@ public class Node {
         score = 0;
     }
 
-    public List<Node> findRoadToRoot(){
-
-        //TODO take the parents until you find the root and put all of them in a list (useful to find our answer once we get to the goal)
-        //temp so no errors ocuur
-        return new ArrayList<Node>();
-    }
-
     public void generateShot(){
         //TODO call generate angle and generate power to set these randomly
     }
