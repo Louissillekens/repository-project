@@ -1,4 +1,4 @@
-package code.NeuralNet;
+package code.NN;
 
 import code.Q_Learning.Agent;
 
@@ -13,7 +13,7 @@ import java.util.concurrent.ThreadLocalRandom;
 public class NeuralNet {
 
     Layer[] layers;
-    TrainingData data;
+    Data data;
 
     float nextStateQ; //Qval chosen and wich node it is
     float epsilon = 1.0f; // Exploring value TODO should decrease as it goes
@@ -28,20 +28,23 @@ public class NeuralNet {
     Agent originalAgent;
     Agent tempAgent;
 
+    /**
+     * Creates the Neural Network Infrastructure
+     */
     public NeuralNet(){
         // Set the range of the weights
         Neuron.setRangeWeight(-1,1);
 
         //Creating the layers
-        this.layers = new Layer[4]; //3 layers: input, hidden and output
-        this.layers[0] = null; // Input layer, no previous neurons: 0,2
-        this.layers[1] = new Layer(11,64); // Hidden layer: 2 neurons (input layer) coming in
-        this.layers[2] = new Layer(64,64); // Hidden layer: 2 neurons (input layer) coming in
-        this.layers[3] = new Layer(64, 10); // Output layer: 64 neurons (hidden layer), 2 neurons as final output
+        this.layers = new Layer[4]; //4 layers: input, hidden and output
+        this.layers[0] = null; // Input layer
+        this.layers[1] = new Layer(11,64); // Hidden layer
+        this.layers[2] = new Layer(64,64); // Hidden layer
+        this.layers[3] = new Layer(64, 110); // Output layer
         System.out.println("NeuralNet: Created");
     }
 
-    public void createTrainingData(Agent agent, boolean original) {
+    /*public void createTrainingData() {
 
         float [] sensors = agent.getSensors();
 
@@ -62,13 +65,17 @@ public class NeuralNet {
         }
         System.out.println("Dataset: Created");
     }
+*/
 
-
-    /** Forward propagation
-     * @param original if it's the original agent, we'll store the outputs of the first forward prop as Qval
+    /**
+     * @param nn Input nn caracteristics (layers, so values, weights...)
+     * @param t Input data float vector
+     * @return outputs data float vector
      */
-    public void forward(boolean original){
+    public float[] forward(NeuralNet nn, float[] t){
+        this.layers = nn.layers; //Have the characteristics of the input nn
 
+        Data data = new Data(t, new float[layers[layers.length-1].neurons.length]);
         layers[0] = new Layer(data.getDataInput()); // Loads the input of the data into the input layer (layer[0])
 
         for (int i = 1; i < layers.length; i++){ // Loop true all the layers (hidden and output) (=I)
@@ -82,22 +89,13 @@ public class NeuralNet {
 
                 if (i == layers.length-1){
                     layers[i].neurons[j].value = sum;
+                    data.setDataOutput(sum,j);
                 }else
                     //TODO should the last layer have the sum or an activation function or scaled
                     layers[i].neurons[j].value = MathWork.sigmoid(sum); // New value of the neuron by taking the sigmoid function
             }
         }
-        if (original == true) {
-            //save the original output layer and data pos won't change
-            float tempVal[] = new float[originalAgent.getQval().length];
-            for (int i = 0; i < layers[layers.length - 1].neurons.length; i++) {
-                tempVal[i] = layers[layers.length - 1].neurons[i].value;
-            }
-            originalAgent.setQval(tempVal);
-            originalAgent.setLayers(layers);
-        }
-        //Visuals.printNeuronValue(layers, layers.length-1);
-        //Visuals.printWeights(layers);
+        return data.getDataOutput();
     }
 
     /** Finding all max(q(s',q'))
@@ -114,17 +112,18 @@ public class NeuralNet {
             tempAgent.giveAction(i); //will perform action i mapped to it, update itself and get new sensors values
             createTrainingData(tempAgent, false); //create the new dataset with the tempagent sensor
             forward(false);
-            originalAgent.setNextQmaxVal(i, maxQVal());
+            originalAgent.setNextQmaxVal(i, getMaxQVal());
         }
     }
+
 
 
     /**
      * @return maximum value of the output layer AND COMPUTES THE REWARDS
      */
-    float maxQVal(){
+    float getMaxQVal(){
         float max = 0;
-        Neuron [] neur = layers[layers.length-1].neurons;
+        Neuron[] neur = layers[layers.length-1].neurons;
         List<Float> list = new ArrayList<Float>();
 
         for (int i = 0; i < neur.length; i++){
@@ -144,7 +143,7 @@ public class NeuralNet {
 
 
     /*TODO implement rewards and costs
-       *https://stats.stackexchange.com/questions/200006/q-learning-with-neural-network-as-function-approximation
+     *https://stats.stackexchange.com/questions/200006/q-learning-with-neural-network-as-function-approximation
      */
     /** Backward propagation
      * Hardest part to implement and understand
@@ -178,7 +177,7 @@ public class NeuralNet {
                 float error = delta*previous_output;
                 layers[nMin1Layers].neurons[i].weightsCache[j] = layers[nMin1Layers].neurons[i].weights[j] - learningRate*error; // Formula: New weight = old weight — Derivative * learning rate
                 //Visuals.printWeights(layers,3);
-                            }
+            }
             // Update bias
 
             layers[nMin1Layers].neurons[i].bias = delta*learningRate;
@@ -330,7 +329,7 @@ public class NeuralNet {
             System.out.println(numb);
             return new float[] {layers[layers.length-1].neurons[numb].value, numb};
         } else{
-            Neuron [] neur = layers[layers.length-1].neurons;
+            Neuron[] neur = layers[layers.length-1].neurons;
             List<Float> list = new ArrayList<Float>();
 
             for (int i = 0; i < neur.length; i++){
