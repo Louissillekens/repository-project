@@ -60,7 +60,9 @@ public class AStar {
                 //each iteration create a random shot and make a node of where the ball arrives
                 node.generateShot();
                 double[] locData = node.executeShot();
-                this.addNode(new Node(node, locData[0], locData[1]));
+                Node nextNode = new Node(node, locData[0], locData[1]);
+                this.computeScore(nextNode);
+                this.addNode(nextNode);
                 count++;
             }
 
@@ -74,6 +76,7 @@ public class AStar {
      */
     public void computeScore(Node node){
         //TODO we must decide what our heuristics are
+        //we compute the score and add set this in the node
     }
 
     public List<Node> findRoadTo(Node node){
@@ -89,8 +92,43 @@ public class AStar {
         return list;
     }
 
-    public void doIteration(Node node){
-        //TODO do one iteration of the algorithm
+    /**
+     * find the best node from the list that is not checked yet
+     * @return the best scoring node from the list, must be unchecked
+     */
+    public Node chooseBestNode(){
+
+        Node best = nodes.get(0);
+
+        for(Node node : nodes){
+            if(!node.isChecked()){
+                if(node.getScore() > best.getScore()) best = node;
+            }
+        }
+
+        return best;
+    }
+
+    public boolean withinRangeOfGoal(Node node){
+
+        //TODO check if the node is within the range of the goal
+
+        //temp return
+        return false;
+    }
+
+    public void doIteration(){
+
+        Node best = this.chooseBestNode();
+
+        if(withinRangeOfGoal(best)){
+            this.findRoadTo(best);
+            //TODO do something with the path (return as this is the answer)
+        }
+
+        else{
+
+        }
     }
 
     public int getAmOfNodes(){
