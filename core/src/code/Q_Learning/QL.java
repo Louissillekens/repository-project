@@ -12,6 +12,7 @@ public class QL {
     static float yFlag = 7;
 
     static int maxEp = 200;
+    static int maxSteps = 15;
 
 
     public static void main(String[] args) {
@@ -21,20 +22,23 @@ public class QL {
         Agent agentOriginal = new Agent(xStart, yStart, xFlag, yFlag); //TODO has to update it's sensors imed in constructor
         agentOriginal.setSensors(new float[]{1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11});
 
-        int episode = 0;
+        int episode = 0; //number of times we arrived to the flag
+        int ms = 0; //Number of steps before arriving at the goal
 
         while (episode < maxEp){
-            while (compareState(agentOriginal) == false){
+            while (compareState(agentOriginal) == false && ms < maxSteps){
                 neuralNet.createTrainingData(agentOriginal,true); //0 means original agent that we save
                 neuralNet.forward(true); //Original agent with Qval
                 neuralNet.forwardQMax(); //All maxQ val mapped with every action possible from the original agent
                 neuralNet.backprop(); //TODO fix the backprop completely. Bias >0 and values ridiculous big. cost is q-q'**2
                 agentOriginal = neuralNet.update();
+                ms++;
             }
             //Reset position, reward
             agentOriginal.reset(xStart, yStart); //TODO implement reset sensor calc
             agentOriginal.setSensors(new float[]{1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11});
             episode++;
+            //decayepsilon
         }
 
 
