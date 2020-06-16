@@ -14,6 +14,8 @@ public class AStar {
     private final float flagPositionX;
     private final float flagPositionZ;
 
+    private final int amOfNodes = 10; //the amount of nodes we generate from a node each time
+
     //temp set to 0.5, these final doubles are here to work as a factor in computing the score of a node
     private final double distanceHeuristic = 0.5;
     private final double stepHeuristic = 0.5;
@@ -49,7 +51,21 @@ public class AStar {
      * @param node the node from which to start
      */
     public void generateNodes(Node node){
-        //TODO
+
+        //make sure that we didn't generate nodes already
+        if(!node.isChecked()){
+            int count = 0;
+            while(count < amOfNodes){
+
+                //each iteration create a random shot and make a node of where the ball arrives
+                node.generateShot();
+                double[] locData = node.executeShot();
+                this.addNode(new Node(node, locData[0], locData[1]));
+                count++;
+            }
+
+            node.setChecked(true);
+        }
     }
 
     /**
@@ -57,15 +73,27 @@ public class AStar {
      * @param node given Node on the field
      */
     public void computeScore(Node node){
-        //TODO
+        //TODO we must decide what our heuristics are
     }
 
     public List<Node> findRoadTo(Node node){
-        //TODO go back through the parents of this node to the root and put them in a list to find the road we take
-        return new ArrayList<Node>();
+
+        ArrayList<Node> list = new ArrayList<Node>();
+
+        while(node.hasParent()){
+            //adds the node to the start of the list and shifts existing nodes to the right
+            list.add(0,node);
+            node = node.getParent();
+        }
+
+        return list;
     }
 
     public void doIteration(Node node){
         //TODO do one iteration of the algorithm
+    }
+
+    public int getAmOfNodes(){
+        return amOfNodes;
     }
 }
