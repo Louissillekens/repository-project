@@ -5,10 +5,10 @@ import java.util.List;
 import java.util.Random;
 
 public class ReplayMemory {
-    int capacity; // Capacity of the memory at max capacity
-    int push_count; // Keep track of how many times we added an experience to the memory
+    private int capacity; // Capacity of the memory at max capacity
+    private int push_count; // Keep track of how many times we added an experience to the memory
 
-    List<Experience> memory ;
+    private List<Experience> memory ;
 
     /**
      * @param capacity The capacity of the memory = number of experiences it can hold

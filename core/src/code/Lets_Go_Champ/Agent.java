@@ -1,7 +1,6 @@
 package code.Lets_Go_Champ;
 
 import code.NN.MathWork;
-import code.NN.NeuralNet;
 
 import java.util.Random;
 
@@ -27,7 +26,7 @@ public class Agent {
         this.current_step = 0;
     }
 
-    int selectAction(float[] state, NeuralNet policy_nn){
+    int selectAction(float[] state, DQN policy_nn){
         Random random = new Random();
 
         float rate = strategy.getExplorationRate(current_step);
@@ -39,7 +38,8 @@ public class Agent {
             return rand.nextInt(nActions); // Explore
         }
         else {
-            float [] results = policy_nn.forward(policy_nn, state); //Exploit, find the best action
+
+            float [] results = policy_nn.forward(state); //Exploit, find the best action
             return MathWork.getMaxIndex(results); //  Return the position of that best action
         }
     }

@@ -1,5 +1,6 @@
 package code.NN;
 
+import code.Lets_Go_Champ.DQN;
 import code.Q_Learning.Agent;
 
 import java.util.ArrayList;
@@ -12,21 +13,17 @@ import java.util.concurrent.ThreadLocalRandom;
  */
 public class NeuralNet {
 
-    Layer[] layers;
+    Layer[] layers; //OK
+    float learningRate; //OK
+
     Data data;
 
     float nextStateQ; //Qval chosen and wich node it is
-    float epsilon = 1.0f; // Exploring value TODO should decrease as it goes
-    float decayEpsilon = 0.99f; //TODO implement this so that at each episode the epsilon does down
     float gamma = 0.8f; //How important furure rewards become (closer to 1 means giving more importance to future rewards)
-    float learningRate = 0.05f; // For the feedF and backP. Has nothing to do with alpha (no alpha in QLNN)
 
     //Under the rewards cat.
     float costStep = -8;
     float localReward;
-
-    Agent originalAgent;
-    Agent tempAgent;
 
     /**
      * Creates the Neural Network Infrastructure
@@ -89,57 +86,16 @@ public class NeuralNet {
 
                 if (i == layers.length-1){
                     layers[i].neurons[j].value = sum;
-                    data.setDataOutput(sum,j);
+                    data.setDataOutput(layers[i].neurons[j].value,j);
                 }else
                     //TODO should the last layer have the sum or an activation function or scaled
                     layers[i].neurons[j].value = MathWork.sigmoid(sum); // New value of the neuron by taking the sigmoid function
             }
         }
+        //TODO check if outputs come out
         return data.getDataOutput();
     }
 
-    /** Finding all max(q(s',q'))
-     * for every output neuron = action possible (action mapped with node number)
-     * create a new agent with original position, take action mapped, update internal state
-     * (agents has new pos if action taken so update position and so the sensors)
-     * we take the sensors back from the new state -> nn -> get max Q'value
-     * and finally add that value to the qMaxVal arr in out original agent.
-     * We each time create a new tempagent because we wanna come back to the previous state
-     */
-    public void forwardQMax() {
-        for (int i = 0; i < originalAgent.getQval().length; i++){
-            tempAgent = originalAgent;
-            tempAgent.giveAction(i); //will perform action i mapped to it, update itself and get new sensors values
-            createTrainingData(tempAgent, false); //create the new dataset with the tempagent sensor
-            forward(false);
-            originalAgent.setNextQmaxVal(i, getMaxQVal());
-        }
-    }
-
-
-
-    /**
-     * @return maximum value of the output layer AND COMPUTES THE REWARDS
-     */
-    float getMaxQVal(){
-        float max = 0;
-        Neuron[] neur = layers[layers.length-1].neurons;
-        List<Float> list = new ArrayList<Float>();
-
-        for (int i = 0; i < neur.length; i++){
-            list.add(neur[i].value);
-        }
-        return (rewards() + gamma*Collections.max(list));
-    }
-
-    float rewards(){
-        localReward = costStep;
-
-        //Perform the distance calc between the old state and the new one to check if the ball has advanced or not
-        MathWork math = new MathWork();
-        localReward += (math.pythFlag(originalAgent.getxPos(), originalAgent.getyPos()) - math.pythFlag(tempAgent.getxPos(), tempAgent.getyPos()));
-        return localReward;
-    }
 
 
     /*TODO implement rewards and costs
@@ -296,63 +252,10 @@ public class NeuralNet {
     }
 
 
-    // Forward propagation FOR THE VISUAL CLASS
-    public void forwardVisuals(float [] dataInput){
-        layers[0] = new Layer(dataInput); // Loads the input of the data into the input layer (layer[0])
-
-        for (int i = 1; i < layers.length; i++){ // Loop true all the layers (hidden and output) (=I)
-            for (int j = 0; j < layers[i].neurons.length; j++){ // Loop true all the neurons in that layer
-                float sum = 0;
-
-                for (int k = 0; k < layers[i-1].neurons.length; k++){ // Loops true the neurons of each layer, starting from the input layer (1 layer earlier than j)
-                    sum += (layers[i-1].neurons[k].value)*(layers[i].neurons[j].weights[k]); // Formula: SUM(all_weights*value_prev_neuron)
-                }
-                sum += layers[i].neurons[j].bias;
-                layers[i].neurons[j].value = MathWork.sigmoid(sum); // New value of the neuron by taking the sigmoid function
-            }
-        }
-        //Visuals.printAllWeights(layers);
-    }
-
-
-    /** Exploration/Exploitation dilemma
-     * TODO should decrease the epsilon over time or shouldn't i in a nn?
-     * @return array of [Qval, pos Qval]
+    /**
+     * @param learningRate set the learning rate for the network
      */
-    float[] epsilonSelection(){
-        //INFO he nn has been re-updated in the backprop
-
-        float random = (float) Math.random();
-
-        if (random < epsilon){
-            int numb = ThreadLocalRandom.current().nextInt(0, layers[layers.length-1].neurons.length);
-            System.out.println(numb);
-            return new float[] {layers[layers.length-1].neurons[numb].value, numb};
-        } else{
-            Neuron[] neur = layers[layers.length-1].neurons;
-            List<Float> list = new ArrayList<Float>();
-
-            for (int i = 0; i < neur.length; i++){
-                list.add(neur[i].value);
-            }
-            //find pos of that max val
-            float max = Collections.max(list);
-            int numb = 0;
-            for (int i = 0; i < neur.length; i++){
-                if (neur[i].value == max){
-                    numb = i;
-                    break;
-                }
-            }
-            return new float[]{max, numb};
-        }
-    }
-
-    public Agent update() {
-        tempAgent = originalAgent;
-        tempAgent.giveAction((int) epsilonSelection()[1]); //will perform action i mapped to it, update itself and get new sensors values
-        originalAgent = tempAgent;
-
-        return originalAgent;
+    public void setLearningRate(float learningRate) {
+        this.learningRate = learningRate;
     }
 }

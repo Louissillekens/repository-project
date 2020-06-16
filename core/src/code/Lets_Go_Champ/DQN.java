@@ -3,7 +3,9 @@ package code.Lets_Go_Champ;
 import code.NN.NeuralNet;
 
 public class DQN {
-    NeuralNet nn;
+
+    private NeuralNet nn;
+    private boolean trainingMode; //TODO use this to check if it can backprop
 
     //Create the neural network
     DQN(){
@@ -11,7 +13,27 @@ public class DQN {
         this.nn = nn;
     }
 
-    float [] forward(NeuralNet nn, float[] t){
+    float [] forward(float[] t){
         return nn.forward(nn, t);
+    }
+
+    public void copyLayers(DQN policy){
+        this.nn = policy.nn;
+    }
+
+    public void setTrainingMode(boolean trainingMode) {
+        this.trainingMode = trainingMode;
+    }
+
+    public void setLR(float lr){
+        nn.setLearningRate(lr);
+    }
+
+    public NeuralNet getNn() {
+        return nn;
+    }
+
+    public void setNn(NeuralNet nn) {
+        this.nn = nn;
     }
 }

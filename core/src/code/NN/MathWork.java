@@ -120,6 +120,7 @@ public class MathWork extends NeuralNet {
     }
 
 
+
     /**
      * @return The the max value of an array
      */
