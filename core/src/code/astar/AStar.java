@@ -8,7 +8,7 @@ import java.util.List;
 public class AStar {
 
     private List<Node> nodes;
-    //still need acces to the data of the field (sizes, objects, location of ball and goal)
+    //still need access to the data of the field (sizes, objects, location of ball and goal)
     private final float ballPositionX;
     private final float ballPositionZ;
     private final float flagPositionX;
