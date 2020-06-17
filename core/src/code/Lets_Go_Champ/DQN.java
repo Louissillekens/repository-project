@@ -8,7 +8,7 @@ import code.NN.NeuralNet;
 public class DQN {
 
     private NeuralNet nn;
-    private boolean trainingMode; //TODO use this to check if it can backprop
+    private boolean trainingMode; // Check if it can backpropagate
 
     //Create the neural network
     DQN(){
@@ -23,7 +23,10 @@ public class DQN {
     }
 
     void backprop(float[] loss, float[] actionCache){
-        nn.backprop(loss, actionCache);
+        if (this.trainingMode == true){
+            nn.backprop(loss, actionCache);
+        } else
+            System.out.println("This network has not the permission to train");
     }
 
     public void copyLayers(DQN policy){
@@ -44,5 +47,9 @@ public class DQN {
 
     public void setNn(NeuralNet nn) {
         this.nn = nn;
+    }
+
+    public void setActivationFunction(String activation_function){
+        this.nn.setActivationFunction(activation_function);
     }
 }

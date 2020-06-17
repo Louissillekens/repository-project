@@ -14,6 +14,8 @@ public class Visuals extends NeuralNet {
         }
         System.out.println("- - - - -");
     }
+
+
     public static void printAllWeights(Layer[] layers){
         for (int i = 0; i < layers.length; i++){
             for (int j = 0; j < layers[i].neurons.length; j++){
@@ -22,6 +24,7 @@ public class Visuals extends NeuralNet {
         }
         System.out.println("- - - - -");
     }
+
 
     // Print the bias of the nn
     public static void printBias(Layer[] layers){
@@ -33,9 +36,11 @@ public class Visuals extends NeuralNet {
         System.out.println("- - - - -");
     }
 
+
     public static void printNeuronValue(Layer[] layers, int layerN){
         for (int i = 0; i < layers[layerN].neurons.length; i++){
             System.out.println(layers[layerN].neurons[i].value);
         }
     }
+
 }

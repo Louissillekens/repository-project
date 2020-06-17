@@ -2,6 +2,7 @@ package code.NN;
 
 /**
  * @author Alexandre Martens
+ * Hols the data of the input and output layers
  */
 public class Data {
     private  float[] dataInput;

@@ -1,15 +1,14 @@
 package code.RRT;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 
 public class RRT {
 
     //TODO sync pos smaller bfs with actual terrain
-    int xDomain = 100;
-    int yDomain = 100;
+    int xDomain = 111;
+    int yDomain = 111;
     int xFlag = 99;
-    int yFlag = 99;
+    int yFlag = 58;
 
 
     int[][] grid;
@@ -19,7 +18,6 @@ public class RRT {
             return 1;
         else{
             float value =  (float)(((Math.sin(x) + Math.sin(y))/4));
-
             // TODO Should also check if there is an object at that place
             if(value < 0){
                 return 0;
@@ -58,7 +56,7 @@ public class RRT {
 
     public static void main(String[] args) {
         RRT bot = new RRT();
-        bot.genGrid( 1, "function");
+        bot.genGrid( 1, "flat");
 
         for (int i = 0; i < bot.grid.length; i++)
             System.out.println(Arrays.deepToString(new int[][]{bot.grid[i]}));

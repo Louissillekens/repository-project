@@ -70,7 +70,7 @@ public class GameManager {
     }
 
 
-    public float getRewards_total() {
+    public float getTotalRewards() {
         return rewards_total;
     }
 
