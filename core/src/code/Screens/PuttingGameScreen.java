@@ -54,7 +54,7 @@ public class PuttingGameScreen implements Screen {
     private ModelInstance ballInstance;
     private float startingPositionX = 2;
     private float startingPositionZ = 2;
-    private float ballSize = 0.2f;
+    private static float ballSize = 0.2f;
     private float ballPositionX = startingPositionX;
     private float ballPositionZ = startingPositionZ;
     private float newBallPositionX;
@@ -160,7 +160,7 @@ public class PuttingGameScreen implements Screen {
     private boolean isDetectorCollision11 = false;
     private int numberOfLinesSensors = 50;
 
-    private int numberOfTree = 20;
+    private int numberOfTree = 100;
     private static float[] treePositionX;
     private static float[] treePositionZ;
 
@@ -170,7 +170,14 @@ public class PuttingGameScreen implements Screen {
     private static float[] maxPositionZ = new float[11];
     private float[] minEucldieanDist = new float[11];
     private float[] sensorsAngleX = new float[11];
+    private float[] sensorsAngleY = new float[11];
     private float[] sensorsAngleZ = new float[11];
+    private float[] sensorUpX = new float[11];
+    private float[] sensorUpY = new float[11];
+    private float[] sensorUpZ = new float[11];
+    private float[] sensorPositionX = new float[11];
+    private float[] sensorPositionY = new float[11];
+    private float[] sensorPositionZ = new float[11];
 
     private Array<ModelInstance> sensors = new Array<>();
 
@@ -353,10 +360,10 @@ public class PuttingGameScreen implements Screen {
      */
     public static float defineFunction(double x, double y) {
 
-        float field0 = (float) (0.5);
+        //float field0 = (float) (0.5);
         float field1 = (float) (((Math.sin(x) + Math.sin(y))/4)+0.3);
-        float field2 = (float) ((Math.sin(x))/3)+0.5f;
-        float field3 = (float) (((Math.atan(x) + Math.atan(y))/2)+0.5);
+        //float field2 = (float) ((Math.sin(x))/3)+0.2f;
+        //float field3 = (float) (((Math.atan(x) + Math.atan(y))/2)+0.5);
         float ripple1 = (float) ((0.4)+Math.sin((0.4)*(Math.pow(x,2)+Math.pow(y,2))/10)+1);
 
         return field1;
@@ -462,7 +469,7 @@ public class PuttingGameScreen implements Screen {
      * @param positionZ the second coordinate of the ball
      * @return true if the ball falls into water, false otherwise
      */
-    public boolean isInWater(float positionX, float positionZ) {
+    public static boolean isInWater(float positionX, float positionZ) {
 
         if(defineFunction(positionX, positionZ) < 0) return true;
         return false;
@@ -474,9 +481,9 @@ public class PuttingGameScreen implements Screen {
      * @param positionZ the second coordinate of the ball
      * @return true if the ball go out of the field, false otherwise
      */
-    public boolean outOfField(float positionX, float positionZ) {
+    public static boolean outOfField(float positionX, float positionZ) {
 
-        if(positionX > gridDepth-ballSize || positionZ > gridWidth-ballSize || positionX < ballSize || positionZ < ballSize) {
+        if(positionX > gridDepth- 2*ballSize || positionZ > gridWidth-2*ballSize || positionX < 2*ballSize || positionZ < 2*ballSize) {
             return true;
         }
         else {
@@ -778,14 +785,16 @@ public class PuttingGameScreen implements Screen {
         float allowableRange = 1f;
         float i = allowableRange;
         float power = 1;
+        float newX = 0;
+        float newZ = 0;
 
         while (!check) {
 
             RK4.setValues(x, z, vx*i, vz*i);
             RK4.RK4();
 
-            float newX = (float) RK4.getX();
-            float newZ = (float) RK4.getY();
+            newX = (float) RK4.getX();
+            newZ = (float) RK4.getY();
 
             if ((newX < x1+allowableRange && newX > x1-allowableRange) && (newZ < z1+allowableRange && newZ > z1-allowableRange)) {
                 check = true;
@@ -794,7 +803,11 @@ public class PuttingGameScreen implements Screen {
             i+=allowableRange;
         }
 
-        return power-((15/100f)*power);
+        if (outOfField(newX, newZ) || isInWater(newX, newZ)) {
+            power-=((15/100f)*power);
+        }
+
+        return power;
     }
 
     /**
@@ -1226,6 +1239,7 @@ public class PuttingGameScreen implements Screen {
             arrowInstance = new ModelInstance(arrow);
             modelBatch.render(arrowInstance, environment);
 
+
             if (!findFlag && ballStop) {
 
                 canTranslateCam = false;
@@ -1243,7 +1257,7 @@ public class PuttingGameScreen implements Screen {
                 if (euclideanDistFlag(finalPositionArrowX, finalPositionArrowZ) < minDistanceArrowFlag) {
 
                     camera.rotateAround(vector1 = new Vector3(ballPositionX, defineFunction(ballPositionX, ballPositionZ), ballPositionZ),
-                            vector2 = new Vector3(0f, 1f, 0f), 0.3f);
+                            vector2 = new Vector3(0f, 1f, 0f), 0.5f);
                     camera.lookAt(ballPositionX, defineFunction(ballPositionX, ballPositionZ), ballPositionZ);
 
                     minDistanceArrowFlag = euclideanDistFlag(finalPositionArrowX, finalPositionArrowZ);
@@ -1261,7 +1275,17 @@ public class PuttingGameScreen implements Screen {
                     camPositionFlagZ = camera.position.z;
 
                     sensorsAngleX[5] = camDirectionFlagX;
+                    sensorsAngleY[5] = camDirectionFlagY;
                     sensorsAngleZ[5] = camDirectionFlagZ;
+
+                    sensorUpX[5] = camUpFlagX;
+                    sensorUpY[5] = camUpFlagY;
+                    sensorUpZ[5] = camUpFlagZ;
+
+                    sensorPositionX[5] = camDirectionFlagX;
+                    sensorPositionY[5] = camDirectionFlagY;
+                    sensorPositionZ[5] = camDirectionFlagZ;
+
 
                     if (count > 1) {
                         check = true;
@@ -1306,24 +1330,53 @@ public class PuttingGameScreen implements Screen {
                 }
             }
 
-            float timePeriod = 1.5f;
-            float camVelocity = 7f;
+            /*
+            if (!findFlag && ballStop) {
 
-            if (sensorsReady) {
+                canTranslateCam = false;
 
-                modelBatch.render(sensors, environment);
+                if (bestSensor == 5) {
+                    findFlag = true;
+                }
+
+                if (countForFlag < 1) {
+                    minDistanceArrowFlag = euclideanDistFlag(ballPositionX, ballPositionZ);
+                }
+
+                countForFlag++;
+
+                float timePeriod = 2f;
+                float camVelocity = 5f;
 
                 if (botTimer1 < timePeriod) {
 
-                    for (int i = 0; i < sensorsSize.length; i++) {
+                    if (euclideanDistFlag(finalPositionArrowX, finalPositionArrowZ) < minDistanceArrowFlag) {
 
-                        if (euclideanDistSensors(finalPositionArrowX, finalPositionArrowZ, i) < minEucldieanDist[i]) {
+                        minDistanceArrowFlag = euclideanDistFlag(finalPositionArrowX, finalPositionArrowZ);
 
-                            minEucldieanDist[i] = euclideanDistSensors(finalPositionArrowX, finalPositionArrowZ, i);
+                        camDirectionFlagX = camera.direction.x;
+                        camDirectionFlagY = camera.direction.y;
+                        camDirectionFlagZ = camera.direction.z;
 
-                            sensorsAngleX[i] = camera.direction.x;
-                            sensorsAngleZ[i] = camera.direction.z;
-                        }
+                        camUpFlagX = camera.up.x;
+                        camUpFlagY = camera.up.y;
+                        camUpFlagZ = camera.up.z;
+
+                        camPositionFlagX = camera.position.x;
+                        camPositionFlagY = camera.position.y;
+                        camPositionFlagZ = camera.position.z;
+
+                        sensorsAngleX[5] = camDirectionFlagX;
+                        sensorsAngleY[5] = camDirectionFlagY;
+                        sensorsAngleZ[5] = camDirectionFlagZ;
+
+                        sensorUpX[5] = camUpFlagX;
+                        sensorUpY[5] = camUpFlagY;
+                        sensorUpZ[5] = camUpFlagZ;
+
+                        sensorPositionX[5] = camDirectionFlagX;
+                        sensorPositionY[5] = camDirectionFlagY;
+                        sensorPositionZ[5] = camDirectionFlagZ;
                     }
 
                     camera.rotateAround(vector1 = new Vector3(ballPositionX, defineFunction(ballPositionX, ballPositionZ), ballPositionZ),
@@ -1335,15 +1388,33 @@ public class PuttingGameScreen implements Screen {
 
                 if (botTimer1 > timePeriod && botTimer2 < timePeriod) {
 
-                    for (int i = 0; i < sensorsSize.length; i++) {
+                    if (euclideanDistFlag(finalPositionArrowX, finalPositionArrowZ) < minDistanceArrowFlag) {
 
-                        if (euclideanDistSensors(finalPositionArrowX, finalPositionArrowZ, i) < minEucldieanDist[i]) {
+                        minDistanceArrowFlag = euclideanDistFlag(finalPositionArrowX, finalPositionArrowZ);
 
-                            minEucldieanDist[i] = euclideanDistSensors(finalPositionArrowX, finalPositionArrowZ, i);
+                        camDirectionFlagX = camera.direction.x;
+                        camDirectionFlagY = camera.direction.y;
+                        camDirectionFlagZ = camera.direction.z;
 
-                            sensorsAngleX[i] = camera.direction.x;
-                            sensorsAngleZ[i] = camera.direction.z;
-                        }
+                        camUpFlagX = camera.up.x;
+                        camUpFlagY = camera.up.y;
+                        camUpFlagZ = camera.up.z;
+
+                        camPositionFlagX = camera.position.x;
+                        camPositionFlagY = camera.position.y;
+                        camPositionFlagZ = camera.position.z;
+
+                        sensorsAngleX[5] = camDirectionFlagX;
+                        sensorsAngleY[5] = camDirectionFlagY;
+                        sensorsAngleZ[5] = camDirectionFlagZ;
+
+                        sensorUpX[5] = camUpFlagX;
+                        sensorUpY[5] = camUpFlagY;
+                        sensorUpZ[5] = camUpFlagZ;
+
+                        sensorPositionX[5] = camDirectionFlagX;
+                        sensorPositionY[5] = camDirectionFlagY;
+                        sensorPositionZ[5] = camDirectionFlagZ;
                     }
 
                     camera.rotateAround(vector1 = new Vector3(ballPositionX, defineFunction(ballPositionX, ballPositionZ), ballPositionZ),
@@ -1367,6 +1438,93 @@ public class PuttingGameScreen implements Screen {
                     camera.position.y = camPositionFlagY;
                     camera.position.z = camPositionFlagZ;
 
+                    checkForSensors = true;
+                    findFlag = true;
+                }
+            }
+            */
+
+            float timePeriod = 1f;
+            float camVelocity = 7f;
+
+            if (sensorsReady) {
+
+                modelBatch.render(sensors, environment);
+
+                if (botTimer1 < timePeriod) {
+
+                    for (int i = 0; i < sensorsSize.length; i++) {
+
+                        if (euclideanDistSensors(finalPositionArrowX, finalPositionArrowZ, i) < minEucldieanDist[i]) {
+
+                            minEucldieanDist[i] = euclideanDistSensors(finalPositionArrowX, finalPositionArrowZ, i);
+
+                            sensorsAngleX[i] = camera.direction.x;
+                            sensorsAngleY[i] = camera.direction.y;
+                            sensorsAngleZ[i] = camera.direction.z;
+
+                            sensorUpX[i] = camera.up.x;
+                            sensorUpY[i] = camera.up.y;
+                            sensorUpZ[i] = camera.up.z;
+
+                            sensorPositionX[i] = camera.position.x;
+                            sensorPositionY[i] = camera.position.y;
+                            sensorPositionZ[i] = camera.position.z;
+                        }
+                    }
+
+                    camera.rotateAround(vector1 = new Vector3(ballPositionX, defineFunction(ballPositionX, ballPositionZ), ballPositionZ),
+                            vector2 = new Vector3(0f, 1f, 0f), camVelocity);
+                    camera.lookAt(ballPositionX, defineFunction(ballPositionX, ballPositionZ), ballPositionZ);
+
+                    botTimer1 += Gdx.graphics.getDeltaTime();
+                }
+
+                if (botTimer1 > timePeriod && botTimer2 < timePeriod+0.5f) {
+
+                    for (int i = 0; i < sensorsSize.length; i++) {
+
+                        if (euclideanDistSensors(finalPositionArrowX, finalPositionArrowZ, i) < minEucldieanDist[i]) {
+
+                            minEucldieanDist[i] = euclideanDistSensors(finalPositionArrowX, finalPositionArrowZ, i);
+
+                            sensorsAngleX[i] = camera.direction.x;
+                            sensorsAngleY[i] = camera.direction.y;
+                            sensorsAngleZ[i] = camera.direction.z;
+
+                            sensorUpX[i] = camera.up.x;
+                            sensorUpY[i] = camera.up.y;
+                            sensorUpZ[i] = camera.up.z;
+
+                            sensorPositionX[i] = camera.position.x;
+                            sensorPositionY[i] = camera.position.y;
+                            sensorPositionZ[i] = camera.position.z;
+                        }
+                    }
+
+                    camera.rotateAround(vector1 = new Vector3(ballPositionX, defineFunction(ballPositionX, ballPositionZ), ballPositionZ),
+                            vector2 = new Vector3(0f, 1f, 0f), -camVelocity);
+                    camera.lookAt(ballPositionX, defineFunction(ballPositionX, ballPositionZ), ballPositionZ);
+
+                    botTimer2 += Gdx.graphics.getDeltaTime();
+                }
+
+                if (botTimer1 > timePeriod && botTimer2 > timePeriod+0.5f) {
+
+                    /*
+                    camera.direction.x = camDirectionFlagX;
+                    camera.direction.y = camDirectionFlagY;
+                    camera.direction.z = camDirectionFlagZ;
+
+                    camera.up.x = camUpFlagX;
+                    camera.up.y = camUpFlagY;
+                    camera.up.z = camUpFlagZ;
+
+                    camera.position.x = camPositionFlagX;
+                    camera.position.y = camPositionFlagY;
+                    camera.position.z = camPositionFlagZ;
+                    */
+
                     botReady = true;
                     sensorsReady = false;
                 }
@@ -1382,6 +1540,18 @@ public class PuttingGameScreen implements Screen {
                 float[] newPositions = bot.startBot();
 
                 bestSensor = bot.getBestSensor();
+
+                camera.direction.x = sensorsAngleX[bestSensor];
+                camera.direction.y = sensorsAngleY[bestSensor];
+                camera.direction.z = sensorsAngleZ[bestSensor];
+
+                camera.up.x = sensorUpX[bestSensor];
+                camera.up.y = sensorUpY[bestSensor];
+                camera.up.z = sensorUpZ[bestSensor];
+
+                camera.position.x = sensorPositionX[bestSensor];
+                camera.position.y = sensorPositionY[bestSensor];
+                camera.position.z = sensorPositionZ[bestSensor];
 
                 newBallPositionX = newPositions[0];
                 newBallPositionZ = newPositions[1];
