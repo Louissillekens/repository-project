@@ -12,7 +12,7 @@ public class GameManager {
 
     private boolean done; // Tracks if we reached the flag = ended the episode
     private boolean current_screen; // Tracks if the game just started, meaning no prev actions //TODO utille pour non CNN?
-
+    private float rewards_total;
 
     /**
      * @param xStart fixed starting position of the ball
@@ -33,6 +33,7 @@ public class GameManager {
 
         this.done = false;
         this.current_screen = false;
+        this.rewards_total = 0;
     }
 
     int takeAction(int action){
@@ -48,6 +49,7 @@ public class GameManager {
             * (comes after the reward calc because we still need the 'old' state)
             * Use the commented reward method
             * render the new position
+            * +== add reward to totalreward, used in the main
             *
          */
         return reward;
@@ -68,12 +70,18 @@ public class GameManager {
     }
 
 
+    public float getRewards_total() {
+        return rewards_total;
+    }
+
     /**
      * Reset the position of the agent to a starting state
      */
     void reset(){
         this.xPos = xStart;
         this.yPos = yStart;
+
+        this.rewards_total = 0;
     }
 
     /**

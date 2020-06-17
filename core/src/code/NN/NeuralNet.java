@@ -67,151 +67,97 @@ public class NeuralNet {
 
 
     /** Backward propagation
-     * Hardest part to implement and understand
+     * FIXED
      * Going from the end of the nn to the front, layer by layer going backwards
-     * Methodology: Calculate output layer weights -> calculate the hidden layers weights -> update all weights
+     * Methodology: Calculate the derivative, weights -> update all weights
      * Documentation source: https://mattmazur.com/2015/03/17/a-step-by-step-backpropagation-example/
-     * TODO improve the backpropagate gradient: https://medium.com/datathings/neural-networks-and-backpropagation-explained-in-a-simple-way-f540a3611f5e
      * TODO implement rewards and costs
      *  https://stats.stackexchange.com/questions/200006/q-learning-with-neural-network-as-function-approximation
      */
-    public void backprop(float[] loss, float[] actionCache){
-
+    public void backprop(float[] loss, float[] actionCache) {
         int nMin1Layers = layers.length-1; // All hidden layers and the output layer
 
         // Go true each sample
-        for(int s = 0; s < loss.length; s++){
+        for(int s = 0; s < loss.length; s++) {
 
-            // Update the output layer first
-            // For all neurons in that layers
-            for (int i = 0; i < layers[nMin1Layers].neurons.length; i++){
-                float delta = loss[s]; //TODO can i use loss as delta here?
+            // Update the output layer first and each neuron
+            for (int n = 0; n < layers[nMin1Layers].neurons.length; n++) {
+                float partialDerivative;
 
-                layers[nMin1Layers].neurons[i].gradient = delta;
-
-                // And for all their weights
-                for (int j = 0; j < layers[nMin1Layers].neurons[i].weights.length; j++) {
-                    float previous_output = layers[nMin1Layers - 1].neurons[j].value;
-                    float error = delta * previous_output;
-                    layers[nMin1Layers].neurons[i].weightsCache[j] = layers[nMin1Layers].neurons[i].weights[j] - learningRate * error; // Formula: New weight = old weight — Derivative * learning rate
+                // First calc the partial derivative to sigmoid
+                if (n == actionCache[n]) { // Node is the action we took
+                    float y = layers[layers.length-1].neurons[n].value; // = output policy network
+                    partialDerivative = loss[s] * y * (1 - y); // Formula for the partial derivative for output: LOSS*derivative respect to function sigmoid and output
+                } else {
+                    partialDerivative = 0; // Node isn't the action we took. 0 because if loss = 0, all is 0 (look formula above)
                 }
 
-                layers[nMin1Layers].neurons[i].bias = delta*learningRate; // Update bias
+                layers[nMin1Layers].neurons[n].gradient = partialDerivative;
+
+                // calculate all the new weights of n (not assigning them yet)
+                for (int w = 0; w < layers[nMin1Layers].neurons[n].weights.length; w++) {
+                    float prevY = layers[nMin1Layers - 1].neurons[w].value;
+
+                    float deltaWeight = learningRate * partialDerivative * prevY; // Formula
+
+                    float newWeight = layers[nMin1Layers].neurons[n].weights[w] - deltaWeight; // Formula
+                    layers[nMin1Layers].neurons[n].weightsCache[w] = newWeight;
+                }
+                // Update bias
+                float bias_correction = partialDerivative*learningRate;
+                layers[nMin1Layers].neurons[n].bias -= bias_correction;
             }
 
 
             // Update the hidden layers
-            for(int i = nMin1Layers-1; i > 0; i--) {
+            for (int l = nMin1Layers - 1; l > 0; l--) {
+                // Go trough each neuron
+                for (int n = 0; n < layers[l].neurons.length; n++) {
+                    float y = layers[l].neurons[n].value; // = output policy network
+                    float sumOutputs = sumGradient(n, l + 1); // sum all outputs gradient connecting n to next layer
+                    float partialDerivative = y * (1 - y) * sumOutputs;  // Formula for the partial derivative for hidden l: LOSS*derivative respect to function sigmoid and output
 
-                // For all neurons in that layers
-                for(int j = 0; j < layers[i].neurons.length; j++) {
-                    float local_output = layers[i].neurons[j].value;
-                    float gradient_sum = sumGradient(j,i+1);
-                    float delta = (gradient_sum)*(local_output *(1- local_output));
+                    layers[l].neurons[n].gradient = partialDerivative;
 
-                    layers[i].neurons[j].gradient = delta;
+                    // calculate all the new weights of n (not assigning them yet)
+                    for (int w = 0; w < layers[l].neurons[n].weights.length; w++) {
+                        float pervY = layers[l - 1].neurons[w].value;
 
-                    // And for all their weights
-                    for(int k = 0; k < layers[i].neurons[j].weights.length; k++) {
-                        float previous_output = layers[i-1].neurons[k].value;
-                        float error = delta*previous_output;
-                        layers[i].neurons[j].weightsCache[k] = layers[i].neurons[j].weights[k] - learningRate*error;
+                        float deltaWeight = learningRate * partialDerivative * pervY;
+
+                        float newWeight = layers[l].neurons[n].weights[w] - deltaWeight;
+                        layers[l].neurons[n].weightsCache[w] = newWeight;
                     }
-
-                    layers[i].neurons[j].bias = delta*learningRate; // Update bias
+                    // Update bias
+                    float bias_correction = partialDerivative*learningRate;
+                    layers[l].neurons[n].bias -= bias_correction;
                 }
             }
 
-            // Update all the weights
-            for(int i = 0; i< layers.length;i++) {
-                for(int j = 0; j < layers[i].neurons.length;j++) {
+
+            // Update the weights
+            for (int i = 0; i < layers.length; i++) {
+                for (int j = 0; j < layers[i].neurons.length; j++) {
                     layers[i].neurons[j].updateWeights();
                 }
             }
         }
     }
 
-    /* Alternative backprop i need to recheck
-    public void applyBackpropagation() {
-        int nMin1Layers = layers.length-1; // All hidden layers and the output layer
 
-        float [] targets_OutLAYER = originalAgent.getNextQmaxVal();// maxQvalnextstate
-        float [] outputs_OutLAYER = originalAgent.getQval();// Qval output orgininal bot
-
-        layers = originalAgent.getLayers(); // Put the nn back to it's state
-
-        for (int n = 0; n < layers[nMin1Layers].neurons.length; n++) {
-
-            float y = outputs_OutLAYER[n];
-            float dy = targets_OutLAYER[n];
-            float partialDerivative = (dy - y) * y * (1 - y);
-
-            layers[nMin1Layers].neurons[n].gradient = partialDerivative;
-
-            for (int connection = 0; connection < layers[nMin1Layers].neurons[n].weights.length; connection++) {
-                float prevY = layers[nMin1Layers-1].neurons[connection].value;
-
-                float deltaWeight = learningRate * partialDerivative * prevY;
-
-                float newWeight = layers[nMin1Layers].neurons[n].weights[connection] + deltaWeight;
-                layers[nMin1Layers].neurons[n].weightsCache[connection] = newWeight;
-                //connection.setWeight(newWeight + momentum * connection.getPrevDeltaWeight());
-            }
-
-            // Update bias
-            layers[nMin1Layers].neurons[n].bias = partialDerivative*learningRate;
-        }
-
-        for (int l = nMin1Layers - 1; l > 0; l--) { //TODO >=0 should be >0 maybe prob
-
-            //recheck if needed
-            for (int n = 0; n < layers[l].neurons.length; n++) {
-                float y = layers[l].neurons[n].value;
-
-                float sumOutputs = sumGradient(n,l+1);
-                float partialDerivative = y * (1 - y) * sumOutputs;
-
-                layers[l].neurons[n].gradient = partialDerivative;
-
-                for (int connection = 0; connection < layers[l].neurons[n].weights.length; connection++) {
-                    float pervY = layers[l-1].neurons[connection].value;
-                    float deltaWeight = learningRate * partialDerivative * pervY;
-                    float newWeight = layers[l].neurons[n].weights[connection] + deltaWeight;
-
-                    layers[l].neurons[n].weightsCache[connection] = newWeight;
-
-                    //connection.setWeight(newWeight + momentum * connection.getPrevDeltaWeight());
-                }
-                // Update bias
-                layers[l].neurons[n].bias = partialDerivative*learningRate;
-            }
-        }
-
-
-        // Update the weights
-        for(int i = 0; i< layers.length;i++) {
-            for(int j = 0; j < layers[i].neurons.length;j++) {
-                layers[i].neurons[j].updateWeights();
-            }
-        }
-        Visuals.printBias(layers);
-
-    }*/
-
-
-    /** Sums of all the gradient connecting a given neuron in a given layer
+    /** Sums of all the gradients connecting a given neuron to a given layer+1 (we'll loop through all of them to get the wieghts)
      * @param neuronIndex position of the neuron
-     * @param layerIndex layer
-     * @return sum of the gradients
+     * @param next_layerIndex next layer index
+     * @return sum of the gradients to the next layer
      */
-    // Sums of all the gradient connecting a given neuron in a given layer
-    public  float sumGradient(int neuronIndex, int layerIndex) {
+    public  float sumGradient(int neuronIndex, int next_layerIndex) {
         float gradient_sum = 0;
-        Layer current_layer = layers[layerIndex];
 
-        for(int i = 0; i < current_layer.neurons.length; i++) {
-            Neuron current_neuron = current_layer.neurons[i];
-            gradient_sum += current_neuron.weights[neuronIndex]*current_neuron.gradient;
+        // Go trough all the neurons of that next layer
+        // allN = neuron
+        for(int allN = 0; allN < layers[next_layerIndex].neurons.length; allN++) {
+            Neuron neuron = layers[next_layerIndex].neurons[allN]; // Neuron neuron = neuron in the allN'th place of the next layer
+            gradient_sum += neuron.weights[neuronIndex]* neuron.gradient; // Grab the weight of neuron connecting neuronIndex * Grab the gradient of neuron
         }
         return gradient_sum;
     }

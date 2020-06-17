@@ -29,6 +29,8 @@ public class Main {
     private static final float xFlag = 19;
     private static final float yFlag = 17;
 
+    private static int maxSteps = 25;
+
     public static void main(String[] args) {
         GameManager gm = new GameManager(xStart,yStart,xFlag,yFlag); // Create the game manager
         EpsilonGreedyStrat strategy = new EpsilonGreedyStrat(eps_start, eps_end, eps_decay); // Create the strat
@@ -49,7 +51,7 @@ public class Main {
         // Set the learning rate of our policy_net
         policy_net.setLR(lr);
 
-        float[] totalR = new float[num_episodes]; //TODO Stores the total rewards obtained per episode
+        float[] total_rewards_episodes = new float[num_episodes]; //TODO Stores the total rewards obtained per episode
 
         for (int e = 0; e < num_episodes; e++){
             gm.reset(); //We start from the starting position
@@ -78,13 +80,14 @@ public class Main {
 
                 }
 
-
             }
 
             // Update the target_net
             if (e % target_update == 0){
                 target_net.copyLayers(policy_net);
             }
+
+            total_rewards_episodes[e] = gm.getRewards_total(); // Store the total rewards of an episode
 
         }
 
