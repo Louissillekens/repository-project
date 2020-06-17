@@ -20,6 +20,7 @@ public class Rungekuttasolver{
 
         Rungekuttasolver solver = new Rungekuttasolver();
         solver.setValues(0,0,3.9726,8.519);
+        int i = 0;
         while (!hasStopped) {
             solver.RK4();
             System.out.println("x: "+solver.getX());
@@ -27,6 +28,10 @@ public class Rungekuttasolver{
             System.out.println();
             System.out.println("vx: " + solver.getVx());
             System.out.println("vy: " + solver.getVy());
+            if (solver.getVx() < 0.1 && solver.getVy() < 0.1) {
+                System.out.println("i = " + i);
+            }
+            i++;
         }
         System.out.println("the x and y coordinates are:");
         System.out.println("x: "+solver.getX());
