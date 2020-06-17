@@ -160,7 +160,7 @@ public class PuttingGameScreen implements Screen {
     private boolean isDetectorCollision11 = false;
     private int numberOfLinesSensors = 50;
 
-    private int numberOfTree = 100;
+    private int numberOfTree = 30;
     private static float[] treePositionX;
     private static float[] treePositionZ;
 
@@ -202,9 +202,10 @@ public class PuttingGameScreen implements Screen {
     private boolean findFlag = false;
     private boolean check = false;
 
-    private int countForFlag = 0;
     private float botTimer1 = 0;
     private float botTimer2 = 0;
+    private float agentPower = 0;
+    private int countForFlag = 0;
     private int countForBot = 0;
     private int bestSensor = 0;
     private int count = 0;
@@ -527,15 +528,28 @@ public class PuttingGameScreen implements Screen {
                 ((ballPositionXround != newBallPositionXround) && (ballPositionZround != newBallPositionZround))) &&
                 (canTranslateCam)) {
 
-            // Scalar factor used for the camera translation
-            float scaleFactor = 50;
             ballPositionX += ballStepXmean;
             ballPositionZ += ballStepZmean;
             camera.lookAt(ballPositionX, defineFunction(ballPositionX, ballPositionZ), ballPositionZ);
-            camera.translate((newBallPositionX - ballPositionX) / scaleFactor, 0.001f / scaleFactor, (newBallPositionZ - ballPositionZ) / scaleFactor);
+            if (BotScreen.getBotName().equals("agent")) {
 
-            sumX += (newBallPositionX - ballPositionX) / (scaleFactor);
-            sumZ += (newBallPositionZ - ballPositionZ) / (scaleFactor);
+                float scaleFactor;
+                if (agentPower >= 2000) {
+                    scaleFactor = 53;
+                }
+                else {
+                    scaleFactor = 50;
+                }
+                camera.translate((newBallPositionX - ballPositionX) / scaleFactor, 0.001f / scaleFactor, (newBallPositionZ - ballPositionZ) / scaleFactor);
+                sumX += (newBallPositionX - ballPositionX) / (scaleFactor);
+                sumZ += (newBallPositionZ - ballPositionZ) / (scaleFactor);
+            }
+            else if (gameMode.gameName.equals("Single_Player")) {
+                float scaleFactor = 50;
+                camera.translate((newBallPositionX - ballPositionX) / scaleFactor, 0.001f / scaleFactor, (newBallPositionZ - ballPositionZ) / scaleFactor);
+                sumX += (newBallPositionX - ballPositionX) / (scaleFactor);
+                sumZ += (newBallPositionZ - ballPositionZ) / (scaleFactor);
+            }
 
             translateX[countIndex - 1] = sumX;
             translateZ[countIndex - 1] = sumZ;
@@ -804,7 +818,7 @@ public class PuttingGameScreen implements Screen {
         }
 
         if (outOfField(newX, newZ) || isInWater(newX, newZ)) {
-            power-=((15/100f)*power);
+            power-=((30/100f)*power);
         }
 
         return power;
@@ -1444,7 +1458,7 @@ public class PuttingGameScreen implements Screen {
             }
             */
 
-            float timePeriod = 1f;
+            float timePeriod = 2f;
             float camVelocity = 7f;
 
             if (sensorsReady) {
@@ -1538,6 +1552,8 @@ public class PuttingGameScreen implements Screen {
                 AgentBot bot = new AgentBot(sensorsSize, sensorsAngleX, sensorsAngleZ, maxPositionX, maxPositionZ, canHitFlag, ballPositionX, ballPositionZ);
 
                 float[] newPositions = bot.startBot();
+
+                agentPower = bot.getPowerScalar();
 
                 bestSensor = bot.getBestSensor();
 
