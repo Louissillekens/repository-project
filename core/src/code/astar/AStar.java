@@ -8,11 +8,13 @@ import java.util.List;
 public class AStar {
 
     private List<Node> nodes;
-    //still need acces to the data of the field (sizes, objects, location of ball and goal)
+    //still need access to the data of the field (sizes, objects, location of ball and goal)
     private final float ballPositionX;
     private final float ballPositionZ;
     private final float flagPositionX;
     private final float flagPositionZ;
+
+    private final int amOfNodes = 10; //the amount of nodes we generate from a node each time
 
     //temp set to 0.5, these final doubles are here to work as a factor in computing the score of a node
     private final double distanceHeuristic = 0.5;
@@ -49,7 +51,23 @@ public class AStar {
      * @param node the node from which to start
      */
     public void generateNodes(Node node){
-        //TODO
+
+        //make sure that we didn't generate nodes already
+        if(!node.isChecked()){
+            int count = 0;
+            while(count < amOfNodes){
+
+                //each iteration create a random shot and make a node of where the ball arrives
+                node.generateShot();
+                double[] locData = node.executeShot();
+                Node nextNode = new Node(node, locData[0], locData[1]);
+                this.computeScore(nextNode);
+                this.addNode(nextNode);
+                count++;
+            }
+
+            node.setChecked(true);
+        }
     }
 
     /**
@@ -57,6 +75,63 @@ public class AStar {
      * @param node given Node on the field
      */
     public void computeScore(Node node){
-        //TODO
+        //TODO we must decide what our heuristics are
+        //we compute the score and add set this in the node
+    }
+
+    public List<Node> findRoadTo(Node node){
+
+        ArrayList<Node> list = new ArrayList<Node>();
+
+        while(node.hasParent()){
+            //adds the node to the start of the list and shifts existing nodes to the right
+            list.add(0,node);
+            node = node.getParent();
+        }
+
+        return list;
+    }
+
+    /**
+     * find the best node from the list that is not checked yet
+     * @return the best scoring node from the list, must be unchecked
+     */
+    public Node chooseBestNode(){
+
+        Node best = nodes.get(0);
+
+        for(Node node : nodes){
+            if(!node.isChecked()){
+                if(node.getScore() > best.getScore()) best = node;
+            }
+        }
+
+        return best;
+    }
+
+    public boolean withinRangeOfGoal(Node node){
+
+        //TODO check if the node is within the range of the goal
+
+        //temp return
+        return false;
+    }
+
+    public void doIteration(){
+
+        Node best = this.chooseBestNode();
+
+        if(withinRangeOfGoal(best)){
+            this.findRoadTo(best);
+            //TODO do something with the path (return as this is the answer)
+        }
+
+        else{
+
+        }
+    }
+
+    public int getAmOfNodes(){
+        return amOfNodes;
     }
 }

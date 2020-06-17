@@ -1,22 +1,45 @@
 package code.Q_Learning;
 
+import code.NeuralNet.Layer;
+
 public class Agent {
-    double xPos;
-    double yPos;
-    double xFlag;
-    double yFlag;
+    float xPos;
+    float yPos;
+    float xFlag;
+    float yFlag;
 
-    double [] sensors;
+    float rewards;
 
+    float [] sensors;
 
-    Agent(double xStart, double yStart, double xFlag, double yFlag){
-        sensors  = new double[11];
+    float [] Qval; //Used to store the originalAgent Qvalues to avoid losing them
+    float [] nextQmaxVal; //Used to store the (Reward + maxQ(s',a')) of each Qval
+
+    Layer [] layers; //Save the whole network bias, weights and values //TODO optimise this by removing the qval i think
+
+    Agent(float xStart, float yStart, float xFlag, float yFlag){
+        sensors  = new float[11];
+
+        rewards = 0;
 
         this.xFlag = xFlag;
         this.yFlag = yFlag;
 
         this.xPos = xStart;
         this.yPos = yStart;
+
+        Qval = new float[sensors.length*10];
+        nextQmaxVal = new float[Qval.length];
+    }
+
+    public void giveAction(int actionNumber){
+        /*TODO
+            * map the actionN to the velocity and angle the ball needs to take
+            * enter that angle and velo in the solver
+            * get the new pos and move the agent to that pos
+            * update the position of the agent and it's sensors
+            *
+        * */
     }
 
     void updatePos(int x, int y){
@@ -24,32 +47,69 @@ public class Agent {
         this.yPos += y;
     }
 
-    void updateSensors(double [] sensors){
+    void updateSensors(float [] sensors){
         this.sensors = sensors;
     }
 
-    void reset(int xStart, int yStart){
+    void reset(float xStart, float yStart){
         this.xPos = xStart;
         this.yPos = yStart;
+
+        this.rewards = 0;
+
+        float [] sensors = null;
+        float [] Qval = null;
+        float [] nextQmaxVal = null;
+
+        Layer [] layers = null;
+
     }
 
-    public double getxPos() {
+    public void setSensors(float[] sensors) {
+        this.sensors = sensors;
+    }
+
+    public void setQval(float[] qval) {
+        Qval = qval;
+    }
+
+    public void setNextQmaxVal(int position, float maxQval) {
+        nextQmaxVal[position] = maxQval;
+    }
+
+    public void setLayers(Layer[] layers) {
+        this.layers = layers;
+    }
+
+    public Layer[] getLayers() {
+        return layers;
+    }
+
+    public float getxPos() {
         return xPos;
     }
 
-    public double getyPos() {
+    public float getyPos() {
         return yPos;
     }
 
-    public double getxFlag() {
+    public float getxFlag() {
         return xFlag;
     }
 
-    public double getyFlag() {
+    public float getyFlag() {
         return yFlag;
     }
 
-    public double[] getSensors() {
+    public float[] getSensors() {
         return sensors;
+    }
+
+    public float[] getQval() {
+        return Qval;
+    }
+
+    public float[] getNextQmaxVal() {
+        return nextQmaxVal;
     }
 }

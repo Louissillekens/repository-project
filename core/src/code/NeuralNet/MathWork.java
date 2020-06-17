@@ -7,7 +7,7 @@ import java.util.List;
 /**
  * @author Alexandre Martens
  */
-public class MathWork {
+public class MathWork extends NeuralNet {
 
     /**
      * @param min minimum value in the range inclusive
@@ -55,14 +55,14 @@ public class MathWork {
         return sum;
     }
 
-    public static float squareMCalc(float output, float target) {
+    public static float squaredCalc(float output, float target) {
         float calc = (float) Math.pow((target - output),2);
         return calc;
     }
 
     // Used to calculate the overall error rate
     public static float meanSquaredError(float output, float target) {
-        return squareMCalc(output, target);
+        return squaredCalc(output, target);
     }
 
     //Random shuffle an array
@@ -97,6 +97,13 @@ public class MathWork {
         }
 
         return data;
+    }
+
+    public float pythFlag(float xO, float yO){
+        float deltaX = originalAgent.getxFlag() - xO;
+        float deltaY = originalAgent.getyFlag() - yO;
+
+        return (float) Math.sqrt(Math.pow(deltaX,2) + Math.pow(deltaY,2));
     }
 
     // Min-Max descaling

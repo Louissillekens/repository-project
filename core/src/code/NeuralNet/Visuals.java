@@ -37,12 +37,18 @@ public class Visuals extends NeuralNet {
 
     // Print the whole dataset, input and outputs
     public static void printDataSet(TrainingData data){
-            System.out.println(Arrays.toString(data.dataInput) +
-                    " -> " + Arrays.toString(data.dataOutput));
+        System.out.println(Arrays.toString(data.dataInput) +
+                " -> " + Arrays.toString(data.dataOutput));
     }
 
     // Print the weights of the nn
-    public static void showWeights(Layer[] layers){
+    public static void printWeights(Layer[] layers, int layerN){
+        for (int i = 0; i < layers[layerN].neurons.length; i++){
+            System.out.println(Arrays.toString(layers[layerN].neurons[i].weights));
+        }
+        System.out.println("- - - - -");
+    }
+    public static void printAllWeights(Layer[] layers){
         for (int i = 0; i < layers.length; i++){
             for (int j = 0; j < layers[i].neurons.length; j++){
                 System.out.println(Arrays.toString(layers[i].neurons[j].weights));
@@ -52,7 +58,7 @@ public class Visuals extends NeuralNet {
     }
 
     // Print the bias of the nn
-    public static void showBias(Layer[] layers){
+    public static void printBias(Layer[] layers){
         for (int i = 0; i < layers.length; i++){
             for (int j = 0; j < layers[i].neurons.length; j++){
                 System.out.println(layers[i].neurons[j].bias);
@@ -66,7 +72,7 @@ public class Visuals extends NeuralNet {
         System.out.println("Mean Square Error: " + MathWork.meanSquaredError(outputs, targets));
     }
 
-    public static void neuronValue(Layer[] layers, int layerN){
+    public static void printNeuronValue(Layer[] layers, int layerN){
         for (int i = 0; i < layers[layerN].neurons.length; i++){
             System.out.println(layers[layerN].neurons[i].value);
         }

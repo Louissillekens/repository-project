@@ -132,12 +132,13 @@ public class Rungekuttasolver{
     public double getY(){
         return y;
     }
-
-    public double getVx() {
+    
+    public double getVx(){
         return vx;
     }
 
-    public double getVy() {
+    public double getVy(){
         return vy;
     }
+
 }

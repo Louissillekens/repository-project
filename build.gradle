@@ -1,5 +1,4 @@
 buildscript {
-    
 
     repositories {
         mavenLocal()
@@ -10,7 +9,6 @@ buildscript {
         google()
     }
     dependencies {
-        
 
     }
 }
@@ -41,7 +39,6 @@ allprojects {
 project(":desktop") {
     apply plugin: "java-library"
 
-
     dependencies {
         implementation project(":core")
         api "com.badlogicgames.gdx:gdx-backend-lwjgl:$gdxVersion"
@@ -49,19 +46,20 @@ project(":desktop") {
         api "com.badlogicgames.gdx:gdx-box2d-platform:$gdxVersion:natives-desktop"
         api "com.badlogicgames.gdx:gdx-bullet-platform:$gdxVersion:natives-desktop"
         api "com.badlogicgames.gdx:gdx-tools:$gdxVersion"
-        
+        implementation "org.deeplearning4j:deeplearning4j-core:1.0.0-beta6"
     }
 }
 
 project(":core") {
     apply plugin: "java-library"
 
-
     dependencies {
         api "com.badlogicgames.gdx:gdx:$gdxVersion"
         api "com.badlogicgames.gdx:gdx-box2d:$gdxVersion"
         api "com.badlogicgames.gdx:gdx-bullet:$gdxVersion"
         api "com.badlogicgames.gdx:gdx-ai:$aiVersion"
+        implementation "org.deeplearning4j:deeplearning4j-core:1.0.0-beta6"
+        implementation "org.nd4j:nd4j-native-platform:1.0.0-beta6"
         
     }
 }
