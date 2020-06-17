@@ -1,7 +1,4 @@
 package code.Lets_Go_Champ;
-import code.NN.MathWork;
-import org.deeplearning4j.nn.api.OptimizationAlgorithm;
-
 //TODO need to adapt this
 public class GameManager {
 
@@ -17,6 +14,12 @@ public class GameManager {
     private boolean current_screen; // Tracks if the game just started, meaning no prev actions //TODO utille pour non CNN?
 
 
+    /**
+     * @param xStart fixed starting position of the ball
+     * @param yStart fixed starting position of the ball
+     * @param xFlag fixed flag position
+     * @param yFlag fixed flag position
+     */
     GameManager(float xStart, float yStart, float xFlag, float yFlag){
 
         this.xStart = xStart;
@@ -39,26 +42,29 @@ public class GameManager {
             * Calc final position
             * Calc if we're in a final position: this.done = a method that checks it.
             * Calc reward with the substraction of A-A' where A is distance hole-agent
+            * => Check the commented MathWorks method 'pyth'
             * I should also add penalties by taking more steps
             * updatePosition(xnew, ynew); From the new position
             * (comes after the reward calc because we still need the 'old' state)
+            * Use the commented reward method
             * render the new position
             *
          */
         return reward;
     }
 
-    int rewards(){
+    /*int rewards(){
         localReward = costStep;
 
         //Perform the distance calc between the old state and the new one to check if the ball has advanced or not
         MathWork math = new MathWork();
         localReward += (math.pythFlag(originalAgent.getxPos(), originalAgent.getyPos()) - math.pythFlag(tempAgent.getxPos(), tempAgent.getyPos()));
         return localReward;
-    }
+    }*/
 
     float[] getState(){
         //TODO returns the sensors of this agent at that position
+        return null; //RETURNS NULL, WAITING TO IMPLEMETN THE AGENT OF CLEMENT
     }
 
 

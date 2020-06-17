@@ -1,7 +1,12 @@
 package code.Lets_Go_Champ;
 
+import code.NN.MathWork;
+
 import java.util.List;
 
+/**
+ * @author Alexandre Martens
+ */
 public class Main {
 
     static int memory_size = 100000; // Size of the number of experieces we can store
@@ -37,7 +42,7 @@ public class Main {
         // Set weights of target_net(downer one) = policy_net(upper one)
         target_net.copyLayers(policy_net);
 
-        // Set the network train ability
+        // Set the network train ability (extra security)
         policy_net.setTrainingMode(true); // Train and evaluate
         target_net.setTrainingMode(false); // Only for evaluation
 
@@ -63,8 +68,13 @@ public class Main {
                     List<Experience> experiences = memory.getSample(batch_size);
 
                     //First get arrays of Q(s'a) and Q'(s',a)
-                    float[] current_q_values = Qvalues.getCurrent(policy_net, experiences);
-                    float[] current_q_values =
+                    float[] current_q_values = Qvalues.getCurrent(policy_net, experiences); // Compute the current Q values
+                    float[] next_q_values = Qvalues.getNext(target_net, experiences); // Compute the next state action pair Q max value
+
+                    float[] target_q_values = Qvalues.getTarget(next_q_values, experiences, gamma); // Apply the formula to it
+                    float[] loss = MathWork.squaredError(current_q_values, target_q_values); // Compute the loss for every current-target pair
+
+                    policy_net.backprop(loss, Qvalues.getActionCache()); // Backprop the loss to update the weights and bias
 
                 }
 

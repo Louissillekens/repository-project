@@ -1,7 +1,6 @@
 package code.NN;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
@@ -25,7 +24,10 @@ public class MathWork extends NeuralNet {
             return -number;
     }
 
-    // Sigmoid function
+    /** Sigmoid activation function
+     * @param s input value we wanna squeeze between 0-1
+     * @return squeezed s
+     */
     public static float sigmoid(float s) {
         return (float) (1 / (1 + Math.pow(Math.E, -s)));
     }
@@ -35,7 +37,10 @@ public class MathWork extends NeuralNet {
         return sigmoid(s) * (1 - sigmoid(s));
     }
 
-    // Re function
+    /** Relu activation function
+     * @param s value for the relu funciton
+     * @return floaat that is not negative
+     */
     public static float relu(float s) {
         return (float) Math.max(0.0, s);
     }
@@ -56,56 +61,35 @@ public class MathWork extends NeuralNet {
         return sum;
     }
 
-    public static float squaredCalc(float output, float target) {
-        float calc = (float) Math.pow((target - output),2);
-        return calc;
-    }
 
+    /** Loss function SE for ARRAYS!
+     * @param output takes an array with 1pos = 1 output
+     * @param target takes an array with 1pos = 1 target
+     * @return array with 1 pos = mse for that specific output pos and target pos
+     */
     // Used to calculate the overall error rate
-    public static float meanSquaredError(float output, float target) {
-        return squaredCalc(output, target);
-    }
+    public static float[] squaredError(float[] output, float[] target) {
+        float[] se = new float[output.length];
 
-    //Random shuffle an array
-    public static Data[] randomShuffle(Data[] data) {
-        List<Data> list = Arrays.asList(data); // Convert array to list
-        Collections.shuffle(list); // Shuffle the list
-
-        //Convert list to array
-        data = new Data[list.size()];
-        data = list.toArray(data);
-
-        return data;
-    }
-
-    // Min-Max scaling
-    public static Data sensorScaling(Data data, int minVal, int maxVal) {
-
-        // Scale the data
-        for (int i = 0; i < data.dataInput.length; i++) { // Loop true the dataset
-            data.dataInput[i] = (data.dataInput[i] - minVal) / (maxVal - minVal);
+        for (int i = 0; i < se.length; i++){
+            se[i] = (float) Math.pow((target[i] - output[i]),2); // Calc SE for every output-target pair
         }
 
-        return data;
+        return se;
     }
 
-    // Min-Max descaling
-    public static Data sensorDescaling(Data data, int minVal, int maxVal) {
 
-        // Descale the data
-        for (int i = 0; i < data.dataInput.length; i++) { // Loop true the dataset
-            data.dataInput[i] = (data.dataInput[i] * (maxVal - minVal) + minVal);
-        }
-
-        return data;
-    }
-
-    public float pythFlag(float xO, float yO){
+    /**
+     * @param xO position next state x
+     * @param yO position next state y
+     * @return //TODO is this returning the difference of 2 distance values?
+     */
+    /*   public float pythFlag(float xO, float yO){
         float deltaX = originalAgent.getxFlag() - xO;
         float deltaY = originalAgent.getyFlag() - yO;
 
         return (float) Math.sqrt(Math.pow(deltaX,2) + Math.pow(deltaY,2));
-    }
+    }*/
 
     /**
      * @return The the max index of an array
@@ -120,7 +104,6 @@ public class MathWork extends NeuralNet {
     }
 
 
-
     /**
      * @return The the max value of an array
      */
@@ -133,40 +116,4 @@ public class MathWork extends NeuralNet {
         return Collections.max(list);
     }
 
-    // Min-Max descaling
-/*
-    public static TrainingData[] minMaxDescaling(TrainingData[] data, String IorO) {
-
-        if (IorO == "input") {
-            // Descale the input data
-            for (int i = 0; i < data.length; i++) { // Loop true the dataset
-                data[i].dataInput[0] = (data[i].dataInput[0] * (maxInput1 - minInput1) + minInput1);
-            }
-            for (int i = 0; i < data.length; i++) { // Loop true the dataset
-                data[i].dataInput[1] = (data[i].dataInput[1] * (maxInput2 - minInput2) + minInput2);
-            }
-            return data;
-
-        } else {
-            // Descale the output data
-            for (int i = 0; i < data.length; i++) { // Loop true the dataset
-                data[i].dataOutput[0] = (data[i].dataOutput[0] * (maxOutput1 - minOutput1) + minOutput1);
-            }
-            for (int i = 0; i < data.length; i++) { // Loop true the dataset
-                data[i].dataOutput[1] = (data[i].dataOutput[1] * (maxOutput2 - minOutput2) + minOutput2);
-            }
-            return data;
-        }
-    }
-*/
-
-/*
-    public static float minMaxDescalingIndividual(float val, String IorO) {
-        if (IorO == "input"){
-            return ((val) * (maxInput1 - minInput1) + minInput1);
-        } else {
-            return ((val) * (maxOutput1 - minOutput1) + minOutput1);
-        }
-    }
-*/
 }

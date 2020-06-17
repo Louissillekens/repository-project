@@ -1,13 +1,5 @@
 package code.NN;
 
-import code.Lets_Go_Champ.DQN;
-import code.Q_Learning.Agent;
-
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.concurrent.ThreadLocalRandom;
-
 /**
  * @author Alexandre Martens
  */
@@ -40,29 +32,6 @@ public class NeuralNet {
         this.layers[3] = new Layer(64, 110); // Output layer
         System.out.println("NeuralNet: Created");
     }
-
-    /*public void createTrainingData() {
-
-        float [] sensors = agent.getSensors();
-
-        float [] dataInput = new float[sensors.length];
-        //TODO do smth with the dataoutup
-        float [] dataOutput = new float[layers[layers.length-1].neurons.length]; // Will stay empty for init because no target valuese ftm
-        // Fill all the data inputs of the NN
-        for (int i = 0; i < sensors.length; i++){
-            dataInput[i] = (float) sensors[i];
-        }
-
-        data = new TrainingData(dataInput, dataOutput);
-
-        data = MathWork.sensorScaling(data, 0, sensors.length);
-
-        if (original == true){
-            originalAgent = agent;
-        }
-        System.out.println("Dataset: Created");
-    }
-*/
 
     /**
      * @param nn Input nn caracteristics (layers, so values, weights...)
@@ -97,80 +66,72 @@ public class NeuralNet {
     }
 
 
-
-    /*TODO implement rewards and costs
-     *https://stats.stackexchange.com/questions/200006/q-learning-with-neural-network-as-function-approximation
-     */
     /** Backward propagation
      * Hardest part to implement and understand
      * Going from the end of the nn to the front, layer by layer going backwards
      * Methodology: Calculate output layer weights -> calculate the hidden layers weights -> update all weights
      * Documentation source: https://mattmazur.com/2015/03/17/a-step-by-step-backpropagation-example/
      * TODO improve the backpropagate gradient: https://medium.com/datathings/neural-networks-and-backpropagation-explained-in-a-simple-way-f540a3611f5e
+     * TODO implement rewards and costs
+     *  https://stats.stackexchange.com/questions/200006/q-learning-with-neural-network-as-function-approximation
      */
-    public void backprop(){
+    public void backprop(float[] loss, float[] actionCache){
 
         int nMin1Layers = layers.length-1; // All hidden layers and the output layer
 
-        float [] targets_OutLAYER = originalAgent.getNextQmaxVal();// maxQvalnextstate
-        float [] outputs_OutLAYER = originalAgent.getQval();// Qval output orgininal bot
-        outputs_OutLAYER = new float[]{62,107,93,94,89,102,39,78,67,2,65,0,40,56,36,12,98,8,67,3,44,30,109,105,69,109,85,86,13,92,79,30,35,76,14,96,79,40,40,77,3,46,92,89,11,64,42,55,103,48,106,50,6,68,61,17,83,3,99,61,6,87,90,25,13,17,45,106,48,33,15,41,71,53,44,2,46,103,62,8,60,21,59,58,58,32,106,83,73,30,78,86,58,31,66,30,59,60,19,56,97,63,4,103,83,0,41,20,68,100}; //TODO remove this shit its for testing
-        layers = originalAgent.getLayers(); // Put the nn back to it's state
+        // Go true each sample
+        for(int s = 0; s < loss.length; s++){
 
-        // Update the output layer first
-        for (int i = 0; i < layers[nMin1Layers].neurons.length; i++){
-
-            float output = outputs_OutLAYER[i]; // Value of the current neuron
-            float target = targets_OutLAYER[i]; // Expected value (good answer)
-
-            float derivative = target - output; // Calc how close we are from the actual expectation
-            float delta = derivative *(output*(1-output));
-
-            layers[nMin1Layers].neurons[i].gradient = delta;
-
-            for (int j = 0; j < layers[nMin1Layers].neurons[i].weights.length; j++){
-                float previous_output = layers[nMin1Layers-1].neurons[j].value;
-                float error = delta*previous_output;
-                layers[nMin1Layers].neurons[i].weightsCache[j] = layers[nMin1Layers].neurons[i].weights[j] - learningRate*error; // Formula: New weight = old weight — Derivative * learning rate
-                //Visuals.printWeights(layers,3);
-            }
-            // Update bias
-
-            layers[nMin1Layers].neurons[i].bias = delta*learningRate;
-        }
-
-
-        // Update the hidden layers
-        for(int i = nMin1Layers-1; i > 0; i--) {
+            // Update the output layer first
             // For all neurons in that layers
-            for(int j = 0; j < layers[i].neurons.length; j++) {
-                float output = layers[i].neurons[j].value;
-                float gradient_sum = sumGradient(j,i+1);
-                float delta = (gradient_sum)*(output*(1-output));
+            for (int i = 0; i < layers[nMin1Layers].neurons.length; i++){
+                float delta = loss[s]; //TODO can i use loss as delta here?
 
-                layers[i].neurons[j].gradient = delta;
+                layers[nMin1Layers].neurons[i].gradient = delta;
 
                 // And for all their weights
-                for(int k = 0; k < layers[i].neurons[j].weights.length; k++) {
-                    float previous_output = layers[i-1].neurons[k].value;
-                    float error = delta*previous_output;
-                    layers[i].neurons[j].weightsCache[k] = layers[i].neurons[j].weights[k] - learningRate*error;
+                for (int j = 0; j < layers[nMin1Layers].neurons[i].weights.length; j++) {
+                    float previous_output = layers[nMin1Layers - 1].neurons[j].value;
+                    float error = delta * previous_output;
+                    layers[nMin1Layers].neurons[i].weightsCache[j] = layers[nMin1Layers].neurons[i].weights[j] - learningRate * error; // Formula: New weight = old weight — Derivative * learning rate
                 }
 
-                // Update bias
-                layers[i].neurons[j].bias = delta*learningRate;
+                layers[nMin1Layers].neurons[i].bias = delta*learningRate; // Update bias
+            }
+
+
+            // Update the hidden layers
+            for(int i = nMin1Layers-1; i > 0; i--) {
+
+                // For all neurons in that layers
+                for(int j = 0; j < layers[i].neurons.length; j++) {
+                    float local_output = layers[i].neurons[j].value;
+                    float gradient_sum = sumGradient(j,i+1);
+                    float delta = (gradient_sum)*(local_output *(1- local_output));
+
+                    layers[i].neurons[j].gradient = delta;
+
+                    // And for all their weights
+                    for(int k = 0; k < layers[i].neurons[j].weights.length; k++) {
+                        float previous_output = layers[i-1].neurons[k].value;
+                        float error = delta*previous_output;
+                        layers[i].neurons[j].weightsCache[k] = layers[i].neurons[j].weights[k] - learningRate*error;
+                    }
+
+                    layers[i].neurons[j].bias = delta*learningRate; // Update bias
+                }
+            }
+
+            // Update all the weights
+            for(int i = 0; i< layers.length;i++) {
+                for(int j = 0; j < layers[i].neurons.length;j++) {
+                    layers[i].neurons[j].updateWeights();
+                }
             }
         }
-
-        // Update the weights
-        for(int i = 0; i< layers.length;i++) {
-            for(int j = 0; j < layers[i].neurons.length;j++) {
-                layers[i].neurons[j].updateWeights();
-            }
-        }
-
     }
 
+    /* Alternative backprop i need to recheck
     public void applyBackpropagation() {
         int nMin1Layers = layers.length-1; // All hidden layers and the output layer
 
@@ -235,9 +196,14 @@ public class NeuralNet {
         }
         Visuals.printBias(layers);
 
-    }
+    }*/
 
 
+    /** Sums of all the gradient connecting a given neuron in a given layer
+     * @param neuronIndex position of the neuron
+     * @param layerIndex layer
+     * @return sum of the gradients
+     */
     // Sums of all the gradient connecting a given neuron in a given layer
     public  float sumGradient(int neuronIndex, int layerIndex) {
         float gradient_sum = 0;
@@ -246,7 +212,6 @@ public class NeuralNet {
         for(int i = 0; i < current_layer.neurons.length; i++) {
             Neuron current_neuron = current_layer.neurons[i];
             gradient_sum += current_neuron.weights[neuronIndex]*current_neuron.gradient;
-
         }
         return gradient_sum;
     }

@@ -2,6 +2,9 @@ package code.Lets_Go_Champ;
 
 import code.NN.NeuralNet;
 
+/**
+ * @author Alexandre Martens
+ */
 public class DQN {
 
     private NeuralNet nn;
@@ -11,10 +14,16 @@ public class DQN {
     DQN(){
         NeuralNet nn = new NeuralNet();
         this.nn = nn;
+
+        this.trainingMode = true;
     }
 
     float [] forward(float[] t){
         return nn.forward(nn, t);
+    }
+
+    void backprop(float[] loss, float[] actionCache){
+        nn.backprop(loss, actionCache);
     }
 
     public void copyLayers(DQN policy){
