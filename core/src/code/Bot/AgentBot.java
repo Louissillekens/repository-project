@@ -34,11 +34,11 @@ public class AgentBot {
         this.sensorsWeight[0] = 15;
         this.sensorsWeight[1] = 10;
         this.sensorsWeight[2] = 7;
-        this.sensorsWeight[3] = 4;
+        this.sensorsWeight[3] = 3;
         this.sensorsWeight[4] = 2;
         this.sensorsWeight[5] = 1;
         this.sensorsWeight[6] = 2;
-        this.sensorsWeight[7] = 4;
+        this.sensorsWeight[7] = 3;
         this.sensorsWeight[8] = 7;
         this.sensorsWeight[9] = 10;
         this.sensorsWeight[10] = 15;
