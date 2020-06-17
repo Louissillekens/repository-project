@@ -15,8 +15,6 @@ public class Agent {
      * @param strategy EpsilonGreedyStrat for the epsilon and will use this to
      *                 choose if it should explore or exploit
      * @param nActions All the possible actions the agent can take (110)
-     *                 //TODO IN THE CURRENT STATE needs to check the possible actions?
-     *                    NO!! if it takes wrong shit, give big negative reward
      */
     Agent(EpsilonGreedyStrat strategy, int nActions){
 
@@ -26,6 +24,11 @@ public class Agent {
         this.current_step = 0;
     }
 
+    /**
+     * @param state current state of the agent
+     * @param policy_nn policy network to get the max Q val if needed
+     * @return
+     */
     int selectAction(float[] state, DQN policy_nn){
         Random random = new Random();
 

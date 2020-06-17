@@ -1,5 +1,7 @@
 package code.Lets_Go_Champ;
 
+import code.NN.MathWork;
+
 /**
  * @author: Alexandre Martens
  */
@@ -35,41 +37,66 @@ public class GameManager {
         this.yPos = yStart;
 
         this.done = false;
-        this.current_screen = false;
+        this.current_screen = true;
         this.rewards_total = 0;
     }
 
+    /**
+     * @param action action number we took [0-109]
+     * @return reward of that action
+     */
     int takeAction(int action){
         int reward = 0;
         /* TODO
-            * Map action to the velo/angle
-            * Calc final position
-            * Calc if we're in a final position: this.done = a method that checks it.
-            * Calc reward with the substraction of A-A' where A is distance hole-agent
-            * => Check the commented MathWorks method 'pyth'
-            * I should also add penalties by taking more steps
-            * updatePosition(xnew, ynew); From the new position
-            * (comes after the reward calc because we still need the 'old' state)
-            * Use the commented reward method
-            * render the new position
-            * +== add reward to rewards_total, used in the main
-            *
+             * Bot takes as input: action. (action [0-109])
+             *   The bot then find the corresponding velocity and angle to execute
+             *   The bot executes the action and updates itself on the gui
+             * The bot returns: final position and boolean: arrived destination and boolean collision
+             *
+             * If final destination is true: this.done = true;
+             *                             : updatePosition(finalPosX, finalPosY); // From bot return
+             *                             : int doneReward = 100;
+             *                             : rewards_total += doneReward;
+             *                             : return doneReward;
+             *
+             * else if final destination is false and collision is false: // this.done is not updated = still false
+             *                              : int reward = rewards(newXpos, newYpos);
+             *                              : rewards_total += reward;  //add reward to rewards_total, used in the main
+             *                              : updatePosition(finalPosX, finalPosY); // from bot return
+             *                              : return reward;
+             *
+             * else final destination is false and collision is true: // this.done is not updated = still false
+             *                              : int collision_reward = -100;
+             *                              : rewards_total += collision_reward;  //add reward to rewards_total, used in the main
+             *                              : DO NOT UPDATE AGENT POSTITION
+             *                              : return collision_reward;
          */
         return reward;
     }
 
-    /*int rewards(){
-        localReward = costStep;
+    /**
+     * @param newXpos new x position of the agent after the shot
+     * @param newYpos new y postition of the agent after the shot
+     * @return reward of that change in postition
+     */
+    int rewards(float newXpos, float newYpos){
 
-        //Perform the distance calc between the old state and the new one to check if the ball has advanced or not
-        MathWork math = new MathWork();
-        localReward += (math.pythFlag(originalAgent.getxPos(), originalAgent.getyPos()) - math.pythFlag(tempAgent.getxPos(), tempAgent.getyPos()));
-        return localReward;
-    }*/
+        // Calculate the rewards of going forward
+        float distanceReward = 2 * MathWork.distanceGain(xPos, yPos, newXpos, newYpos, xFlag, yFlag);
 
+        float cost_per_step = -5f; // Cost of each time hitting the ball
+
+        float localReward = cost_per_step + distanceReward;
+
+        return (int) localReward;
+    }
+
+    /**
+     * @return sensor state values
+     */
     float[] getState(){
-        //TODO returns the sensors of this agent at that position
-        return null; //RETURNS NULL, WAITING TO IMPLEMETN THE AGENT OF CLEMENT
+        //float [] sensors = bot.getSensors; //TODO returns the sensors of this agent at that position
+        return null; // return sensors;
     }
 
 
@@ -84,18 +111,16 @@ public class GameManager {
         this.xPos = xStart;
         this.yPos = yStart;
 
+        this.done = false;
         this.rewards_total = 0;
     }
+
 
     /**
      * @return boolean if we started in a new state or not
      */
     boolean justStarting(){
         return current_screen;
-    }
-
-    // TODO Should send the final action taken and render it on the gui (Agent moved)
-    void render(){
     }
 
 
@@ -113,13 +138,15 @@ public class GameManager {
      * @return number of actions possible for the agent
      */
     int numActionsAvailable(){
-        return 110; //TODO should find a way to not make this like it is, method to calc
+        return 110;
     }
 
+
     /**
-     * @return bolean if the target state/final state is reached
+     * @return boolean if the target state/final state is reached
      */
     public boolean isDone() {
         return done;
-    } //TODO if agent is in final state change done
+    }
+
 }

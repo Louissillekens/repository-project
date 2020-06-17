@@ -38,7 +38,7 @@ public class DQN {
     }
 
     public void setLR(float lr){
-        nn.setLearningRate(lr);
+        this.nn.setLearningRate(lr);
     }
 
     public NeuralNet getNn() {

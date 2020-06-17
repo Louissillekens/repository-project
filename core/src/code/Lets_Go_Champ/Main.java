@@ -18,10 +18,11 @@ public class Main {
     static float eps_end = 0.01f;
     static float eps_decay = 0.001f;
 
-    static  int target_update = 10; // updating the target network every 10 episodes
+    static  int target_network_update = 10; // updating the target network every 10 episodes
     static  float lr = 0.01f; // Policy nn learning rate
 
     static int num_episodes = 1000; // Max number of episodes
+
 
     //TODO remove these TESTING PURPOSES
     private static final float xStart = 10;
@@ -62,7 +63,7 @@ public class Main {
             float[] state= gm.getState(); // Get the starting state
 
             while (!gm.isDone()){ //Not in an ending state //TODO should put a limit of number of moves possible
-                int action = agent.selectAction(state, policy_net); // Get an action [0;109] (The agent didnt move yet)
+                int action = agent.selectAction(state, policy_net); // Decide an action [0;109] from Q(s,a) = policy net (The agent didnt move yet)
                 int reward = gm.takeAction(action); //Get the reward from that action
                 float[] next_state = gm.getState(); // Get the new state (has been updated in takeAction)
 
@@ -87,7 +88,7 @@ public class Main {
             total_rewards_episodes[e] = gm.getTotalRewards(); // Store the total rewards of an episode
 
             // Update the target_net check
-            if (e % target_update == 0){
+            if (e % target_network_update == 0){
                 target_net.copyLayers(policy_net);
             }
 

@@ -121,17 +121,33 @@ public class MathWork extends NeuralNet {
     }
 
 
-    /**
-     * @param xO position next state x
-     * @param yO position next state y
-     * @return //TODO is this returning the difference of 2 distance values?
+    /** Perform the distance calc between the old state and the new one to check if the ball has advanced or not
+     * @param xO Original x position of the agent in state S
+     * @param yO Original y position of the agent in state S
+     * @param xO_next next state x position of the agent in state S'
+     * @param yO_next next state y position of the agent in state S'
+     * @param xF x position flag
+     * @param yF y position flag
+     * @return gained distance between (S,flag) & (S', flag)
      */
-    /*   public float pythFlag(float xO, float yO){
-        float deltaX = originalAgent.getxFlag() - xO;
-        float deltaY = originalAgent.getyFlag() - yO;
+    public static float distanceGain(float xO, float yO, float xO_next, float yO_next, float xF, float yF){
 
-        return (float) Math.sqrt(Math.pow(deltaX,2) + Math.pow(deltaY,2));
-    }*/
+        // Calc distance original state to flag
+        float deltaX =xF - xO;
+        float deltaY = yF - yO;
+        float distanceX0f = (float) Math.sqrt(Math.pow(deltaX,2) + Math.pow(deltaY,2));
+
+        // Calc distance new state to flag
+        float deltaX_next = xF - xO_next;
+        float deltaY_next = yF - yO_next;
+        float distanceX0_nextf = (float) Math.sqrt(Math.pow(deltaX_next,2) + Math.pow(deltaY_next,2));
+
+        // Take the difference between the 2
+        float distanceGained =  distanceX0f - distanceX0_nextf;
+
+        return distanceGained;
+    }
+
 
     /**
      * @return The the max index of an array

@@ -5,14 +5,11 @@ package code.NN;
  */
 public class NeuralNet {
 
-    Layer[] layers; //OK
-    float learningRate; //OK
+    Layer[] layers;
+    float learningRate;
 
-    private String activationFunction; // relu by default OK
+    private String activationFunction; // relu by default
 
-    //Under the rewards cat.
-    float costStep = -8;
-    float localReward;
 
     /**
      * Creates the Neural Network Infrastructure
@@ -70,8 +67,7 @@ public class NeuralNet {
      * Going from the end of the nn to the front, layer by layer going backwards
      * Methodology: Calculate the derivative, weights -> update all weights
      * Documentation source: https://mattmazur.com/2015/03/17/a-step-by-step-backpropagation-example/
-     * TODO implement rewards and costs
-     *  https://stats.stackexchange.com/questions/200006/q-learning-with-neural-network-as-function-approximation
+     *
      */
     public void backprop(float[] loss, float[] actionCache) {
         int nMin1Layers = layers.length-1; // All hidden layers and the output layer

@@ -36,7 +36,7 @@ public class Qvalues {
      */
     static float[] getNext(DQN target_net, List<Experience> experiences){
         float[] max_q_values = new float[experiences.size()]; // Store all max Qvalues of state'
-        //TODO something important with states
+
         //For each sample
         for (int i = 0; i < experiences.size(); i++){
             float[] inputs = experiences.get(i).getNextState(); // Get the next state
