@@ -15,6 +15,7 @@ public class AgentBot {
     private float[] sensorsWeight;
     private float ballX;
     private float ballZ;
+    private float powerScalar;
     private int bestSensor;
 
     private boolean[] canHitFlag;
@@ -32,15 +33,15 @@ public class AgentBot {
 
         this.sensorsWeight = new float[sensorsSize.length];
         this.sensorsWeight[0] = 15;
-        this.sensorsWeight[1] = 10;
-        this.sensorsWeight[2] = 7;
+        this.sensorsWeight[1] = 7;
+        this.sensorsWeight[2] = 5;
         this.sensorsWeight[3] = 3;
         this.sensorsWeight[4] = 2;
         this.sensorsWeight[5] = 1;
         this.sensorsWeight[6] = 2;
         this.sensorsWeight[7] = 3;
-        this.sensorsWeight[8] = 7;
-        this.sensorsWeight[9] = 10;
+        this.sensorsWeight[8] = 5;
+        this.sensorsWeight[9] = 7;
         this.sensorsWeight[10] = 15;
 
         System.out.println("sensorsSize = " + Arrays.toString(sensorsSize));
@@ -71,14 +72,16 @@ public class AgentBot {
         System.out.println("bestSensor = " + (bestSensor+1));
         System.out.println("best angle x = " + sensorsAngleX[bestSensor]);
         System.out.println("best angle z = " + sensorsAngleZ[bestSensor]);
-        System.out.println();
 
         Rungekuttasolver RK4 = new Rungekuttasolver();
 
-        float powerScalar = PuttingGameScreen.evaluatePowerRK4(ballX, ballZ, maxPositionX[bestSensor], maxPositionZ[bestSensor], sensorsAngleX[bestSensor], sensorsAngleZ[bestSensor]);
+        powerScalar = PuttingGameScreen.evaluatePowerRK4(ballX, ballZ, maxPositionX[bestSensor], maxPositionZ[bestSensor], sensorsAngleX[bestSensor], sensorsAngleZ[bestSensor]);
+
+        System.out.println("powerScalar = " + powerScalar);
+        System.out.println();
 
         if (sensorsCost[bestSensor] == 0) {
-            powerScalar += (1/(sensorSize[bestSensor]/3))*powerScalar;
+            powerScalar += (1/(sensorSize[bestSensor]))*powerScalar;
         }
 
         RK4.setValues(ballX, ballZ, (sensorsAngleX[bestSensor]*powerScalar), (sensorsAngleZ[bestSensor]*powerScalar));
@@ -108,5 +111,9 @@ public class AgentBot {
 
     public int getBestSensor() {
         return bestSensor;
+    }
+
+    public float getPowerScalar() {
+        return powerScalar;
     }
 }
