@@ -7,40 +7,6 @@ import java.util.Arrays;
  */
 public class Visuals extends NeuralNet {
 
-    // Print the final result in the output layer
-    public void printOutput(Data[] trainingDataSet, int nFirst, String whatToPrint){
-        /*TrainingData[] test = MathWork.minMaxDescaling(trainingDataSet, "input");
-        test = MathWork.minMaxDescaling(test, "output");*/
-        if (whatToPrint == "target"){
-            System.out.println("First '" + nFirst + "' target values:");
-
-            for (int i = 0; i < nFirst; i++){
-                System.out.println(Arrays.toString(trainingDataSet[i].dataOutput));
-            }
-            System.out.println();
-        }
-
-        else if (whatToPrint == "results"){
-            System.out.println("\n" + "First '" + nFirst + "' output values after training:");
-            System.out.println("\t" + "Goal:" + "\t" + "Output:");
-
-            for (int i = 0; i < nFirst; i++){
-                forwardVisuals(trainingDataSet[i].dataInput);
-                //float result = MathWork.minMaxDescalingIndividual(layers[2].neurons[0].value, "output");
-                //float goal = MathWork.minMaxDescalingIndividual(trainingDataSet[i].dataOutput[0],"output");
-                //System.out.println("\t" + goal + "\t" + result);
-            }
-            System.out.println();
-        }
-    }
-
-
-    // Print the whole dataset, input and outputs
-    public static void printDataSet(Data data){
-        System.out.println(Arrays.toString(data.dataInput) +
-                " -> " + Arrays.toString(data.dataOutput));
-    }
-
     // Print the weights of the nn
     public static void printWeights(Layer[] layers, int layerN){
         for (int i = 0; i < layers[layerN].neurons.length; i++){
@@ -65,11 +31,6 @@ public class Visuals extends NeuralNet {
             }
         }
         System.out.println("- - - - -");
-    }
-
-    // Print the mean square error
-    public static void loss(float outputs, float targets){
-        System.out.println("Mean Square Error: " + MathWork.meanSquaredError(outputs, targets));
     }
 
     public static void printNeuronValue(Layer[] layers, int layerN){
