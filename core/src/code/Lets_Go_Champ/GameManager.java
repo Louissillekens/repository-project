@@ -1,5 +1,8 @@
 package code.Lets_Go_Champ;
-//TODO need to adapt this
+
+/**
+ * @author: Alexandre Martens
+ */
 public class GameManager {
 
     private final float xStart;
@@ -49,7 +52,7 @@ public class GameManager {
             * (comes after the reward calc because we still need the 'old' state)
             * Use the commented reward method
             * render the new position
-            * +== add reward to totalreward, used in the main
+            * +== add reward to rewards_total, used in the main
             *
          */
         return reward;
@@ -70,7 +73,7 @@ public class GameManager {
     }
 
 
-    public float getRewards_total() {
+    public float getTotalRewards() {
         return rewards_total;
     }
 
@@ -93,7 +96,6 @@ public class GameManager {
 
     // TODO Should send the final action taken and render it on the gui (Agent moved)
     void render(){
-        //TODO complete here
     }
 
 

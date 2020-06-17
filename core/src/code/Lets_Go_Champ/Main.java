@@ -48,10 +48,14 @@ public class Main {
         policy_net.setTrainingMode(true); // Train and evaluate
         target_net.setTrainingMode(false); // Only for evaluation
 
+        // Set the activation function for the networks
+        policy_net.setActivationFunction("relu"); // set activation function, relu by default
+        target_net.setActivationFunction("relu"); // set activation function, relu by default
+
         // Set the learning rate of our policy_net
         policy_net.setLR(lr);
 
-        float[] total_rewards_episodes = new float[num_episodes]; //TODO Stores the total rewards obtained per episode
+        float[] total_rewards_episodes = new float[num_episodes];
 
         for (int e = 0; e < num_episodes; e++){
             gm.reset(); //We start from the starting position
@@ -77,17 +81,15 @@ public class Main {
                     float[] loss = MathWork.squaredError(current_q_values, target_q_values); // Compute the loss for every current-target pair
 
                     policy_net.backprop(loss, Qvalues.getActionCache()); // Backprop the loss to update the weights and bias
-
                 }
-
             }
 
-            // Update the target_net
+            total_rewards_episodes[e] = gm.getTotalRewards(); // Store the total rewards of an episode
+
+            // Update the target_net check
             if (e % target_update == 0){
                 target_net.copyLayers(policy_net);
             }
-
-            total_rewards_episodes[e] = gm.getRewards_total(); // Store the total rewards of an episode
 
         }
 

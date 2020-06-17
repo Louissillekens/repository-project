@@ -33,7 +33,7 @@ public class BFS {
         // Check if the nxt destination of the cell is valid (=1)
         if (grid[init.x][init.y] != 1 || grid[finalDest.x][finalDest.y] != 1) {
             //System.out.println(grid[init.x][init.y] + "  " + grid[finalDest.x][finalDest.y]);
-            return -1;
+            return -10;
         }
 
         boolean [][]visited = new boolean[grid.length][grid[0].length];

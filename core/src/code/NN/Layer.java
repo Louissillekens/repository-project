@@ -1,10 +1,9 @@
 package code.NN;
 
-// The purpose of this class is to hold all the neurons
-// Only for fully connected feed forward nn
-
 /**
  * @author Alexandre Martens
+ * The purpose of this class is to hold all the neurons
+ * Only for fully connected feed forward nn
  */
 public class Layer {
     public Neuron[] neurons;
@@ -29,14 +28,15 @@ public class Layer {
              */
             float[] weights = new float[numberWeights];
             for (int j = 0; j < numberWeights; j++){
-                weights[j] = MathWork.randomN(Neuron.minWeightValue, Neuron.maxWeightValue); // Initialise the weights at random
+
+                weights[j] = MathWork.he_et_al_initialisation(numberWeights); // Initialise method
             }
             /*
              * Assign the weights that we just randomly initialised to that neuron.
-             * Assign a random bias value between 0-1
+             * Assign a bias value to 0.01 to ensure it fires for relu
              * It's the hidden/output constructor in the class Neuron.java.
              */
-            neurons[i] = new Neuron(weights, MathWork.randomN(0,1));
+            neurons[i] = new Neuron(weights, 0.01f);
         }
     }
 

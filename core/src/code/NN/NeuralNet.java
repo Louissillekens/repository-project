@@ -8,10 +8,7 @@ public class NeuralNet {
     Layer[] layers; //OK
     float learningRate; //OK
 
-    Data data;
-
-    float nextStateQ; //Qval chosen and wich node it is
-    float gamma = 0.8f; //How important furure rewards become (closer to 1 means giving more importance to future rewards)
+    private String activationFunction; // relu by default OK
 
     //Under the rewards cat.
     float costStep = -8;
@@ -30,8 +27,10 @@ public class NeuralNet {
         this.layers[1] = new Layer(11,64); // Hidden layer
         this.layers[2] = new Layer(64,64); // Hidden layer
         this.layers[3] = new Layer(64, 110); // Output layer
-        System.out.println("NeuralNet: Created");
+
+        this.activationFunction = "relu"; // relu by default
     }
+
 
     /**
      * @param nn Input nn caracteristics (layers, so values, weights...)
@@ -41,6 +40,7 @@ public class NeuralNet {
     public float[] forward(NeuralNet nn, float[] t){
         this.layers = nn.layers; //Have the characteristics of the input nn
 
+        // Need to change of data structure
         Data data = new Data(t, new float[layers[layers.length-1].neurons.length]);
         layers[0] = new Layer(data.getDataInput()); // Loads the input of the data into the input layer (layer[0])
 
@@ -53,15 +53,14 @@ public class NeuralNet {
                 }
                 sum += layers[i].neurons[j].bias;
 
+                // Avoid getting a activation function in the last layer
                 if (i == layers.length-1){
                     layers[i].neurons[j].value = sum;
-                    data.setDataOutput(layers[i].neurons[j].value,j);
+                    data.setDataOutput(layers[i].neurons[j].value,j); // Add these values in the array we'll return
                 }else
-                    //TODO should the last layer have the sum or an activation function or scaled
-                    layers[i].neurons[j].value = MathWork.sigmoid(sum); // New value of the neuron by taking the sigmoid function
+                    layers[i].neurons[j].value = MathWork.activationFunction(activationFunction, sum); // New value of the neuron by taking the sigmoid function
             }
         }
-        //TODO check if outputs come out
         return data.getDataOutput();
     }
 
@@ -87,7 +86,7 @@ public class NeuralNet {
                 // First calc the partial derivative to sigmoid
                 if (n == actionCache[n]) { // Node is the action we took
                     float y = layers[layers.length-1].neurons[n].value; // = output policy network
-                    partialDerivative = loss[s] * y * (1 - y); // Formula for the partial derivative for output: LOSS*derivative respect to function sigmoid and output
+                    partialDerivative = loss[s] * MathWork.activationFunctionDerivative(activationFunction, y); // Formula for the partial derivative for output: LOSS*derivative respect to function and output
                 } else {
                     partialDerivative = 0; // Node isn't the action we took. 0 because if loss = 0, all is 0 (look formula above)
                 }
@@ -115,7 +114,7 @@ public class NeuralNet {
                 for (int n = 0; n < layers[l].neurons.length; n++) {
                     float y = layers[l].neurons[n].value; // = output policy network
                     float sumOutputs = sumGradient(n, l + 1); // sum all outputs gradient connecting n to next layer
-                    float partialDerivative = y * (1 - y) * sumOutputs;  // Formula for the partial derivative for hidden l: LOSS*derivative respect to function sigmoid and output
+                    float partialDerivative = sumOutputs * MathWork.activationFunctionDerivative(activationFunction, y);  // Formula for the partial derivative for hidden l: LOSS*derivative respect to function and output
 
                     layers[l].neurons[n].gradient = partialDerivative;
 
@@ -150,7 +149,7 @@ public class NeuralNet {
      * @param next_layerIndex next layer index
      * @return sum of the gradients to the next layer
      */
-    public  float sumGradient(int neuronIndex, int next_layerIndex) {
+    public float sumGradient(int neuronIndex, int next_layerIndex) {
         float gradient_sum = 0;
 
         // Go trough all the neurons of that next layer
@@ -168,5 +167,13 @@ public class NeuralNet {
      */
     public void setLearningRate(float learningRate) {
         this.learningRate = learningRate;
+    }
+
+
+    /**
+     * @param activationFunction the activation function the network has to adapt
+     */
+    public void setActivationFunction(String activationFunction){
+        this.activationFunction = activationFunction;
     }
 }
