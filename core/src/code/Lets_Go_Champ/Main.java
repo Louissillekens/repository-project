@@ -55,7 +55,7 @@ public class Main {
         // Set the learning rate of our policy_net
         policy_net.setLR(lr);
 
-        float[] total_rewards_episodes = new float[num_episodes]; //TODO Stores the total rewards obtained per episode
+        float[] total_rewards_episodes = new float[num_episodes];
 
         for (int e = 0; e < num_episodes; e++){
             gm.reset(); //We start from the starting position
