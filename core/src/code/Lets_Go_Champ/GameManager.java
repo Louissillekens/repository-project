@@ -111,5 +111,5 @@ public class GameManager {
      */
     public boolean isDone() {
         return done;
-    }
+    } //TODO if agent is in final state change done
 }
