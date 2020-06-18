@@ -52,9 +52,10 @@ public class AStar {
             while(count < amOfNodes){
 
                 Node cloneNode = node.partialClone();
+                nodes.add(cloneNode);
                 //each iteration create a random shot and make a node of where the ball arrives
-                cloneNode.generateShot();
-                double[] locData = node.executeShot();
+                cloneNode.generateShot( 0.25, game.getMAX_SPEED()); //min is set to 0.5 as values lower than this will not make the ball move all that much
+                double[] locData = node.executeShot(game);
                 Node nextNode = new Node(cloneNode, locData[0], locData[1]);
                 this.computeScore(nextNode);
                 this.addNode(nextNode);
@@ -77,17 +78,18 @@ public class AStar {
     }
 
     /**
-     *
-     * @param node //TODO
-     * @return
+     * puts all the nodes which lead to the solution in the right order in a list
+     * @param node the node for which we want to know the path to from its root
+     * @return a list containing all nodes we pass from root to node (root and node included)
      */
     public List<Node> findRoadTo(Node node){
 
         ArrayList<Node> list = new ArrayList<Node>();
-        list.add(node);
+        //we don't add the last node as it contains the location and is not an actual shot to be taken
+        //list.add(node);
 
         while(node.hasParent()){
-            //adds the node to the start of the list and shifts existing nodes to the right
+            //adds the node's parent to the start of the list and shifts existing nodes to the right
             list.add(0,node.getParent());
             node = node.getParent();
         }
@@ -112,14 +114,21 @@ public class AStar {
         return best;
     }
 
+    /**
+     * checks whether a given node is within the reach of the goal (a.k.a. we found a solution)
+     * @param node the node to be checked
+     * @return a boolean indicating whether the node is in range
+     */
     public boolean withinRangeOfGoal(Node node){
 
-        //TODO check if the node is within the range of the goal
-
-        //temp return
+        if(game.isWin((float)node.getX(), (float)node.getZ())) return true;
         return false;
     }
 
+    /**
+     * do one iteration of the A* algorithm
+     * @return a boolean whether an iteration can be executed, returns false when a solution is found
+     */
     public boolean doIteration(){
 
         Node best = this.chooseBestNode();
@@ -134,6 +143,11 @@ public class AStar {
         }
     }
 
+    /**
+     * the running method of the algorithm
+     * creates the initial node and then executes iterations until a solution is found
+     * @return a List of nodes that forms the solution
+     */
     public List<Node> findRoute(){
 
         makeInitialNode();
@@ -152,6 +166,31 @@ public class AStar {
         return answer;
     }
 
+    /**
+     * method that will find how many steps were taken to get to this node
+     * @param node given node
+     * @return int holding the amount of shots taken to get here
+     */
+    public int amOfSteps(Node node){
+
+        int steps = 0;
+
+        //we take into account that the last node is not a shot that is taken
+        //rather it holds the location of where the last shot ended, thus does not have to be taken into account
+        while(node.hasParent()){
+
+            steps += 1;
+            node = node.getParent();
+        }
+
+        return steps;
+    }
+
+    /**
+     * getter for the amOfNodes variable
+     * this variable holds how many new nodes we create for each layer of the algorithm
+     * @return an int containing the amount of nodes
+     */
     public int getAmOfNodes(){
         return amOfNodes;
     }
