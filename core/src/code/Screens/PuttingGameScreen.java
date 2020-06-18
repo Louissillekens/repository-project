@@ -23,6 +23,7 @@ import com.badlogic.gdx.physics.bullet.Bullet;
 import com.badlogic.gdx.utils.Array;
 import com.game.game.Game;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Random;
 
@@ -95,7 +96,7 @@ public class PuttingGameScreen implements Screen {
     private ModelInstance flag2Instance;
     private static float flagPositionX;
     private static float flagPositionZ;
-    private static float winRadius = 2;
+    private static float winRadius = 3;
 
     // Instances variables used to store the different positions of the ball
     private static int countIndex = 0;
@@ -165,6 +166,7 @@ public class PuttingGameScreen implements Screen {
     private static float[] treePositionZ;
 
     private boolean[] canHitFlag = new boolean[11];
+    private boolean[] isSensorOnSand = new boolean[11];
     private float[] sensorsSize = new float[11];
     private static float[] maxPositionX = new float[11];
     private static float[] maxPositionZ = new float[11];
@@ -204,12 +206,23 @@ public class PuttingGameScreen implements Screen {
 
     private float botTimer1 = 0;
     private float botTimer2 = 0;
-    private float agentPower = 0;
     private int countForFlag = 0;
     private int countForBot = 0;
     private int bestSensor = 0;
     private int count = 0;
+    private int countForSensors = 0;
 
+    private float[] stepPositionX = new float[sensorsSize.length*10];
+    private float[] stepPositionZ = new float[sensorsSize.length*10];
+
+    ArrayList<float[]> sensorsData = new ArrayList<>();
+
+    private static int sandPitSize = 10;
+    private static int amountOfSandPit = 5;
+    private static float[] sandPitX1 = new float[amountOfSandPit];
+    private static float[] sandPitZ1 = new float[amountOfSandPit];
+    private static float[] sandPitX2 = new float[amountOfSandPit];
+    private static float[] sandPitZ2 = new float[amountOfSandPit];
 
     /**
      * Constructor that creates a new instance of the putting game screen
@@ -378,6 +391,9 @@ public class PuttingGameScreen implements Screen {
      */
     public static float getFriction(double x, double z) {
 
+        if (isOnSand((float) x, (float) z)) {
+            return 100f;
+        }
         return 0.13f;
     }
 
@@ -391,23 +407,42 @@ public class PuttingGameScreen implements Screen {
         Vector3 pos1,pos2,pos3,pos4;
         Vector3 nor1,nor2,nor3,nor4;
         MeshPartBuilder.VertexInfo v1,v2,v3,v4;
-        for(int i = 0; i < gridWidth; i++) {
-            for (int j = 0; j < gridDepth; j++) {
+
+        amountOfSandPit = 5;
+        int count = 0;
+
+        for (int i = 0; i < amountOfSandPit; i++) {
+
+            float[] sandPitPosition = generateSandPitPosition();
+            sandPitX1[count] = sandPitPosition[0];
+            sandPitZ1[count] = sandPitPosition[1];
+            sandPitX2[count] = sandPitPosition[2];
+            sandPitZ2[count] = sandPitPosition[3];
+            count++;
+        }
+        System.out.println("sandPitX1 = " + Arrays.toString(sandPitX1));
+        System.out.println("sandPitX2 = " + Arrays.toString(sandPitX2));
+        System.out.println("sandPitZ1 = " + Arrays.toString(sandPitZ1));
+        System.out.println("sandPitZ2 = " + Arrays.toString(sandPitZ2));
+
+        float step = 1f;
+        for(float i = 0; i < ((step*(1/step))*gridDepth); i+=step) {
+            for (float j = 0; j < ((step*(1/step))*gridWidth); j+=step) {
 
                 pos1 = new Vector3(i, defineFunction(i, j), j);
-                pos2 = new Vector3(i, defineFunction(i, j + 1), j+1);
-                pos3 = new Vector3(i+1, defineFunction(i + 1, j + 1), j+1);
-                pos4 = new Vector3(i+1, defineFunction(i + 1, j), j);
+                pos2 = new Vector3(i, defineFunction(i, j+step), j+step);
+                pos3 = new Vector3(i+step, defineFunction(i+step, j+step), j+step);
+                pos4 = new Vector3(i+step, defineFunction(i+step, j), j);
 
-                nor1 = new Vector3(-defineFunction(i, 0), 1, -defineFunction(0, j));
-                nor2 = new Vector3(-defineFunction(i, 0), 1, -defineFunction(0, j + 1));
-                nor3 = new Vector3(-defineFunction(i + 1, 0), 1, -defineFunction(0, j + 1));
-                nor4 = new Vector3(-defineFunction(i + 1, 0), 1, -defineFunction(0, j));
+                nor1 = new Vector3(-defineFunction(i, 0), step, -defineFunction(0, j));
+                nor2 = new Vector3(-defineFunction(i, 0), step, -defineFunction(0, j+step));
+                nor3 = new Vector3(-defineFunction(i+step, 0), step, -defineFunction(0, j+step));
+                nor4 = new Vector3(-defineFunction(i+step, 0), step, -defineFunction(0, j));
 
-                v1 = new MeshPartBuilder.VertexInfo().setPos(pos1).setNor(nor1).setCol(null).setUV(0.5f, 0.0f);
+                v1 = new MeshPartBuilder.VertexInfo().setPos(pos1).setNor(nor1).setCol(null).setUV(step/2, 0.0f);
                 v2 = new MeshPartBuilder.VertexInfo().setPos(pos2).setNor(nor2).setCol(null).setUV(0.0f, 0.0f);
-                v3 = new MeshPartBuilder.VertexInfo().setPos(pos3).setNor(nor3).setCol(null).setUV(0.0f, 0.5f);
-                v4 = new MeshPartBuilder.VertexInfo().setPos(pos4).setNor(nor4).setCol(null).setUV(0.5f, 0.5f);
+                v3 = new MeshPartBuilder.VertexInfo().setPos(pos3).setNor(nor3).setCol(null).setUV(0.0f, step/2);
+                v4 = new MeshPartBuilder.VertexInfo().setPos(pos4).setNor(nor4).setCol(null).setUV(step/2, step/2);
 
                 float meanX = (pos1.x + pos2.x + pos3.x + pos4.x)/4;
                 float meanZ = (pos1.z + pos2.z + pos3.z + pos4.z)/4;
@@ -417,6 +452,14 @@ public class PuttingGameScreen implements Screen {
                 }
                 else {
                     fieldColor = Color.GREEN;
+                }
+
+                for (int k = 0; k < amountOfSandPit; k++) {
+                    for (int l = 0; l < sandPitSize; l++) {
+                        if (pos1.x >= sandPitX1[k] && pos4.x <= sandPitX2[k] && pos2.z >= sandPitZ1[k] && pos3.z <= sandPitZ2[k]) {
+                            fieldColor = Color.YELLOW;
+                        }
+                    }
                 }
 
                 MeshPartBuilder b = modelBuilder.part("field", GL_TRIANGLES,
@@ -492,6 +535,19 @@ public class PuttingGameScreen implements Screen {
         }
     }
 
+    public static boolean isOnSand(float positionX, float positionZ) {
+
+        boolean check = false;
+        for (int k = 0; k < amountOfSandPit; k++) {
+            for (int l = 0; l < sandPitSize; l++) {
+                if (positionX >= sandPitX1[k] && positionX <= sandPitX2[k] && positionZ >= sandPitZ1[k] && positionZ <= sandPitZ2[k]) {
+                    check = true;
+                }
+            }
+        }
+        return check;
+    }
+
     /**
      * Method used to reset the shot to the previous one
      */
@@ -532,13 +588,14 @@ public class PuttingGameScreen implements Screen {
             ballPositionZ += ballStepZmean;
             camera.lookAt(ballPositionX, defineFunction(ballPositionX, ballPositionZ), ballPositionZ);
 
-            if (gameMode.gameName.equals("Single_Player")) {
+            //if (gameMode.gameName.equals("Single_Player")) {
                 float scaleFactor = 50;
                 camera.translate((newBallPositionX - ballPositionX) / scaleFactor, 0.001f / scaleFactor, (newBallPositionZ - ballPositionZ) / scaleFactor);
                 sumX += (newBallPositionX - ballPositionX) / (scaleFactor);
                 sumZ += (newBallPositionZ - ballPositionZ) / (scaleFactor);
-            }
+            //}
 
+            /*
             else if (BotScreen.getBotName().equals("agent")) {
 
                 float scaleFactor;
@@ -552,6 +609,7 @@ public class PuttingGameScreen implements Screen {
                 sumX += (newBallPositionX - ballPositionX) / (scaleFactor);
                 sumZ += (newBallPositionZ - ballPositionZ) / (scaleFactor);
             }
+            */
 
             translateX[countIndex - 1] = sumX;
             translateZ[countIndex - 1] = sumZ;
@@ -685,6 +743,10 @@ public class PuttingGameScreen implements Screen {
             canHitFlag[num] = false;
         }
 
+        if (isOnSand(ballPositionX + rotationX2, ballPositionZ + rotationZ2)) {
+            isSensorOnSand[num] = true;
+        }
+
         if (num == 0) {
             if (collision) {
                 isDetectorCollision1 = true;
@@ -798,8 +860,8 @@ public class PuttingGameScreen implements Screen {
         Rungekuttasolver RK4 = new Rungekuttasolver();
 
         boolean check = false;
-        float allowableRange = 1f;
-        float i = allowableRange;
+        float allowableRange = 0.5f;
+        float i = 0;
         float power = 1;
         float newX = 0;
         float newZ = 0;
@@ -812,11 +874,14 @@ public class PuttingGameScreen implements Screen {
             newX = (float) RK4.getX();
             newZ = (float) RK4.getY();
 
+            //System.out.println("newX = " + newX);
+            //System.out.println("newZ = " + newZ);
+
             if ((newX < x1+allowableRange && newX > x1-allowableRange) && (newZ < z1+allowableRange && newZ > z1-allowableRange)) {
                 check = true;
                 power = i;
             }
-            i+=allowableRange;
+            i+=0.1;
         }
 
         if (outOfField(newX, newZ) || isInWater(newX, newZ)) {
@@ -824,6 +889,29 @@ public class PuttingGameScreen implements Screen {
         }
 
         return power;
+    }
+
+    public static float[] generateSandPitPosition() {
+
+        Random rand = new Random();
+        int randomX1 = rand.nextInt((40)+1);
+        int randomZ1 = rand.nextInt((40)+1);
+        int randomX2 = randomX1+sandPitSize;
+        int randomZ2 = randomZ1+sandPitSize;
+
+        /*
+        boolean checkPosition = false;
+
+        while (!checkPosition) {
+            randomX1 = rand.nextInt((45-5)+1)+5;
+            randomZ1 = rand.nextInt((45-5)+1)+5;
+
+            if ((defineFunction(randomX1, randomZ1) > -0.1) && ((defineFunction(randomX2, randomZ2) > -0.1)) && ((defineFunction(randomX1, randomZ2) > -0.1)) && ((defineFunction(randomX2, randomZ1) > -0.1))) {
+                checkPosition = true;
+            }
+        }
+        */
+        return new float[]{randomX1, randomZ1, randomX2, randomZ2};
     }
 
     /**
@@ -935,6 +1023,10 @@ public class PuttingGameScreen implements Screen {
                             canHitFlag[5] = false;
                         }
 
+                        if (isOnSand(ballPositionX + stepX + stepX1, ballPositionZ + stepZ + stepZ1)) {
+                            isSensorOnSand[5] = true;
+                        }
+
                         if (!isDetectorCollision6) {
                             sensors.add(lineInstance);
                         }
@@ -983,6 +1075,20 @@ public class PuttingGameScreen implements Screen {
 
                     i++;
                 }
+
+                for (int j = 0; j < 11; j++) {
+                    float stepSensorX = (maxPositionX[j] - ballPositionX)/10;
+                    float stepSensorZ = (maxPositionZ[j] - ballPositionZ)/10;
+                    for (int k = 0; k < 10; k++) {
+                        int stepIndex = ((j+1)*10)-(k+1);
+                        stepPositionX[stepIndex] = maxPositionX[j] - ((k)*stepSensorX);
+                        stepPositionZ[stepIndex] = maxPositionZ[j] - ((k)*stepSensorZ);
+                    }
+                }
+                //System.out.println("stepPositionX = " + Arrays.toString(stepPositionX));
+                //System.out.println("stepPositionZ = " + Arrays.toString(stepPositionZ));
+
+                //System.out.println("isSensorOnSand = " + Arrays.toString(isSensorOnSand));
 
                 isDetectorCollision1 = false;
                 isDetectorCollision2 = false;
@@ -1465,13 +1571,36 @@ public class PuttingGameScreen implements Screen {
 
             if (sensorsReady) {
 
+                if (countForSensors < 1) {
+                    for (int j = 0; j < sensorsSize.length; j++) {
+                        minEucldieanDist[j] = 100;
+                    }
+                }
+
+                countForSensors++;
+
                 modelBatch.render(sensors, environment);
 
                 if (botTimer1 < timePeriod) {
 
                     for (int i = 0; i < sensorsSize.length; i++) {
 
+                        /*
+                        if (i==0 || i==10) {
+                        System.out.println("i = " + i);
+                        System.out.println("real dist = " + euclideanDistSensors(finalPositionArrowX, finalPositionArrowZ, i));
+                        System.out.println("theoric dist  = " + minEucldieanDist[i]);
+                        System.out.println();
+                        }
+                        */
+
                         if (euclideanDistSensors(finalPositionArrowX, finalPositionArrowZ, i) < minEucldieanDist[i]) {
+
+                            /*
+                            if (i==0 || i==10) {
+                                System.out.println("Is ok");
+                            }
+                            */
 
                             minEucldieanDist[i] = euclideanDistSensors(finalPositionArrowX, finalPositionArrowZ, i);
 
@@ -1548,14 +1677,47 @@ public class PuttingGameScreen implements Screen {
 
             if (botReady) {
 
+                for (int i = 0; i < sensorsSize.length; i++) {
+                    for (int j = 0; j < 10; j++) {
+                        int stepIndex = (i*10)+j;
+                        float[] stepData = new float[3];
+                        for (int k = 0; k < 3; k++) {
+                            if (k==0) {
+                                stepData[k] = sensorsAngleX[i];
+                            }
+                            if (k==1) {
+                                stepData[k] = sensorsAngleZ[i];
+                            }
+                            if (k==2) {
+                                /*
+                                System.out.println("not ok");
+                                System.out.println("sensorsAngleX = " + Arrays.toString(sensorsAngleX));
+                                System.out.println("sensorsAngleZ = " + Arrays.toString(sensorsAngleZ));
+                                System.out.println("sensorsAngleX[i] = " + sensorsAngleX[i]);
+                                System.out.println("sensorsAngleZ[i] = " + sensorsAngleZ[i]);
+                                System.out.println("stepPositionX = " + stepPositionX[stepIndex]);
+                                System.out.println("stepPositionZ = " + stepPositionZ[stepIndex]);
+                                */
+
+                                float velocity = evaluatePowerRK4(ballPositionX,ballPositionZ,stepPositionX[stepIndex],stepPositionZ[stepIndex],sensorsAngleX[i],sensorsAngleZ[i]);
+                                stepData[k] = velocity;
+                                //System.out.println("ok");
+                            }
+                        }
+                        sensorsData.add(stepData);
+                    }
+                }
+
+                for (int i = 0; i < sensorsData.size(); i++) {
+                    System.out.println("sensorsData = " + Arrays.toString(sensorsData.get(i)));
+                }
+
                 countIndex++;
                 ballStop = false;
 
                 AgentBot bot = new AgentBot(sensorsSize, sensorsAngleX, sensorsAngleZ, maxPositionX, maxPositionZ, canHitFlag, ballPositionX, ballPositionZ);
 
                 float[] newPositions = bot.startBot();
-
-                agentPower = bot.getPowerScalar();
 
                 bestSensor = bot.getBestSensor();
 
@@ -1586,21 +1748,20 @@ public class PuttingGameScreen implements Screen {
                 ballStepXmean = (positionArrayX[countIndex] - positionArrayX[countIndex - 1]) / ballStep;
                 ballStepZmean = (positionArrayZ[countIndex] - positionArrayZ[countIndex - 1]) / ballStep;
 
-                for (int j = 0; j < sensorsSize.length; j++) {
-                    minEucldieanDist[j] = 100;
-                }
-
                 sumX = 0;
                 sumZ = 0;
                 count = 0;
                 botTimer1 = 0;
                 botTimer2 = 0;
+                countForSensors = 0;
 
                 check = false;
                 botReady = false;
                 findFlag = false;
 
                 countForFlag = 0;
+
+                isSensorOnSand = new boolean[11];
             }
         }
 
