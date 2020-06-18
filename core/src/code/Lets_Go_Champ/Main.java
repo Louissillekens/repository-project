@@ -1,9 +1,7 @@
 package code.Lets_Go_Champ;
 
 import code.NN.ExportNeuralNets;
-import code.NN.ImportNeuralNet;
 import code.NN.MathWork;
-import code.NN.Visuals;
 
 import java.util.List;
 
@@ -44,15 +42,6 @@ public class Main {
         DQN policy_net = new DQN(); // Create the policy network
         DQN target_net = new DQN(); // Create the target network
 
-        Visuals.printDQN(target_net);
-        Visuals.printDQN(policy_net);
-
-        ExportNeuralNets.exportNetworks(policy_net, target_net);
-
-        Visuals.printDQN(ImportNeuralNet.importNetwork("target_network"));
-        Visuals.printDQN(ImportNeuralNet.importNetwork("policy_network"));
-
-        System.exit(0);
         // Set weights of target_net(downer one) = policy_net(upper one)
         target_net.copyLayers(policy_net);
 
@@ -67,6 +56,7 @@ public class Main {
         // Set the learning rate of our policy_net
         policy_net.setLR(lr);
 
+        // Save the networks
         ExportNeuralNets.exportNetworks(policy_net, target_net);
 
 
@@ -105,9 +95,7 @@ public class Main {
             if (e % target_network_update == 0){
                 target_net.copyLayers(policy_net);
             }
+            ExportNeuralNets.exportNetworks(policy_net, target_net);
         }
-        // ExportNeuralNet.exportNetworks(policy_net, target_net);
-        // DQN policy_network = ImportNeuralNet.importNetwork("policy_network");
-
     }
 }

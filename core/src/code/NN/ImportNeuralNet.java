@@ -23,6 +23,7 @@ public class ImportNeuralNet {
             // Close the file
             file_network.close();
 
+            System.out.println(" ===> " + network + " imported");
             return loaded_network;
 
         } catch (FileNotFoundException e) {
@@ -30,7 +31,7 @@ public class ImportNeuralNet {
         } catch (IOException | ClassNotFoundException e) {
             System.out.println("Error initializing stream");
         }
-
+        System.out.println(" ! ===> NO NETWORK IMPORTED");
         return null;
     }
 }
