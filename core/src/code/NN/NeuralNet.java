@@ -1,9 +1,11 @@
 package code.NN;
 
+import java.io.Serializable;
+
 /**
  * @author Alexandre Martens
  */
-public class NeuralNet {
+public class NeuralNet implements Serializable {
 
     Layer[] layers;
     float learningRate;
@@ -17,6 +19,7 @@ public class NeuralNet {
     public NeuralNet(){
         // Set the range of the weights
         Neuron.setRangeWeight(-1,1);
+        
 
         //Creating the layers
         this.layers = new Layer[4]; //4 layers: input, hidden and output
@@ -26,6 +29,8 @@ public class NeuralNet {
         this.layers[3] = new Layer(64, 110); // Output layer
 
         this.activationFunction = "relu"; // relu by default
+
+        //System.out.println(Arrays.toString(layers[2].neurons[4].weights));
     }
 
 

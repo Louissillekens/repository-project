@@ -1,10 +1,12 @@
 package code.NN;
 
+import java.io.Serializable;
+
 /**
  * @author Alexandre Martens
  * Hols the data of the input and output layers
  */
-public class Data {
+public class Data implements Serializable {
     private  float[] dataInput;
     private float[] dataOutput;
 

@@ -1,6 +1,8 @@
 package code.Lets_Go_Champ;
 
+import code.NN.ExportNeuralNet;
 import code.NN.MathWork;
+import code.NN.Visuals;
 
 import java.util.List;
 
@@ -30,7 +32,6 @@ public class Main {
     private static final float xFlag = 19;
     private static final float yFlag = 17;
 
-    private static int maxSteps = 25;
 
     public static void main(String[] args) {
         GameManager gm = new GameManager(xStart,yStart,xFlag,yFlag); // Create the game manager
@@ -44,6 +45,8 @@ public class Main {
 
         // Set weights of target_net(downer one) = policy_net(upper one)
         target_net.copyLayers(policy_net);
+        Visuals.printDQN(target_net);
+        Visuals.printDQN(policy_net);
 
         // Set the network train ability (extra security)
         policy_net.setTrainingMode(true); // Train and evaluate
@@ -55,6 +58,9 @@ public class Main {
 
         // Set the learning rate of our policy_net
         policy_net.setLR(lr);
+
+        ExportNeuralNet.exportNetworks(policy_net, target_net);
+
 
         float[] total_rewards_episodes = new float[num_episodes];
 
@@ -91,8 +97,9 @@ public class Main {
             if (e % target_network_update == 0){
                 target_net.copyLayers(policy_net);
             }
-
         }
+        // ExportNeuralNet.exportNetworks(policy_net, target_net);
+        // DQN policy_network = ImportNeuralNet.importNetwork("policy_network");
 
     }
 }
