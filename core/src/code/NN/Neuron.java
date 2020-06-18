@@ -1,9 +1,11 @@
 package code.NN;
 
+import java.io.Serializable;
+
 /**
  * @author Alexandre Martens
  */
-public class Neuron {
+public class Neuron implements Serializable {
 
     static float minWeightValue;
     static float maxWeightValue;
