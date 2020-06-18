@@ -1,6 +1,8 @@
 package code.astar;
 
 
+import java.util.Random;
+
 public class Node {
 
     private final Node parent;
@@ -47,9 +49,15 @@ public class Node {
         //TODO generate a number between 0 and 360 for the angle
     }
 
+    /**
+     * generate a random power for a shot within a given range
+     * @param min the minimum power
+     * @param max the maximum power
+     */
     public void generatePower(double min, double max){
-        //TODO generate a number between max power on the given course and the min power (perhaps slightly higher as 0.001 is not very useful)
-        //this is why the min and max power arte given
+
+        Random r = new Random();
+        power = min + (max - min) * r.nextDouble();
     }
 
     /**
