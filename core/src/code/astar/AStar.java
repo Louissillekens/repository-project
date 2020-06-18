@@ -8,11 +8,8 @@ import java.util.List;
 public class AStar {
 
     private List<Node> nodes;
-    //still need access to the data of the field (sizes, objects, location of ball and goal)
-    private final float ballPositionX;
-    private final float ballPositionZ;
-    private final float flagPositionX;
-    private final float flagPositionZ;
+    private PuttingGameScreen game;
+
 
     private final int amOfNodes = 10; //the amount of nodes we generate from a node each time
 
@@ -21,11 +18,8 @@ public class AStar {
     private final double stepHeuristic = 0.5;
 
     public AStar(PuttingGameScreen game){
-        //set the course
-        ballPositionX = game.getBallPositionX();
-        ballPositionZ = game.getBallPositionZ();
-        flagPositionX = game.getFlagPositionX();
-        flagPositionZ = game.getFlagPositionZ();
+
+        this.game = game;
         nodes = new ArrayList<Node>();
     }
 
@@ -33,7 +27,7 @@ public class AStar {
      * creates the first node as a node with no parent and the position as the ball is
      */
     public void makeInitialNode(){
-        nodes.add(new Node(null, ballPositionX, ballPositionZ));
+        nodes.add(new Node(null, game.getBallPositionX(), game.getBallPositionZ()));
     }
 
     public void addNode(Node node){
@@ -61,7 +55,7 @@ public class AStar {
                 //each iteration create a random shot and make a node of where the ball arrives
                 cloneNode.generateShot();
                 double[] locData = node.executeShot();
-                Node nextNode = new Node(node, locData[0], locData[1]);
+                Node nextNode = new Node(cloneNode, locData[0], locData[1]);
                 this.computeScore(nextNode);
                 this.addNode(nextNode);
                 cloneNode.setChecked(true);
@@ -82,13 +76,19 @@ public class AStar {
         //we compute the score and add set this in the node
     }
 
+    /**
+     *
+     * @param node //TODO
+     * @return
+     */
     public List<Node> findRoadTo(Node node){
 
         ArrayList<Node> list = new ArrayList<Node>();
+        list.add(node);
 
         while(node.hasParent()){
             //adds the node to the start of the list and shifts existing nodes to the right
-            list.add(0,node);
+            list.add(0,node.getParent());
             node = node.getParent();
         }
 
@@ -120,18 +120,36 @@ public class AStar {
         return false;
     }
 
-    public void doIteration(){
+    public boolean doIteration(){
 
         Node best = this.chooseBestNode();
 
         if(withinRangeOfGoal(best)){
-            this.findRoadTo(best);
-            //TODO do something with the path (return as this is the answer)
+            return false;
         }
 
         else{
             this.generateNodes(best);
+            return true;
         }
+    }
+
+    public List<Node> findRoute(){
+
+        makeInitialNode();
+        List<Node> answer = new ArrayList<Node>();
+
+        boolean inProgress = true;
+
+        while(inProgress){
+
+            if(!doIteration()){
+                Node best = this.chooseBestNode();
+                answer = this.findRoadTo(best);
+                inProgress = false;
+            }
+        }
+        return answer;
     }
 
     public int getAmOfNodes(){
