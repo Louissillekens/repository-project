@@ -1,5 +1,6 @@
 package code.Lets_Go_Champ;
 
+import code.NN.ExportNeuralNets;
 import code.NN.MathWork;
 
 import java.util.List;
@@ -30,9 +31,8 @@ public class Main {
     private static final float xFlag = 19;
     private static final float yFlag = 17;
 
-    private static int maxSteps = 25;
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws ExceptionHandeling {
         GameManager gm = new GameManager(xStart,yStart,xFlag,yFlag); // Create the game manager
         EpsilonGreedyStrat strategy = new EpsilonGreedyStrat(eps_start, eps_end, eps_decay); // Create the strat
         Agent agent = new Agent(strategy,gm.numActionsAvailable()); // Create the agent
@@ -55,6 +55,10 @@ public class Main {
 
         // Set the learning rate of our policy_net
         policy_net.setLR(lr);
+
+        // Save the networks
+        ExportNeuralNets.exportNetworks(policy_net, target_net);
+
 
         float[] total_rewards_episodes = new float[num_episodes];
 
@@ -91,8 +95,7 @@ public class Main {
             if (e % target_network_update == 0){
                 target_net.copyLayers(policy_net);
             }
-
+            ExportNeuralNets.exportNetworks(policy_net, target_net);
         }
-
     }
 }

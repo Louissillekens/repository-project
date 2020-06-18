@@ -2,10 +2,12 @@ package code.Lets_Go_Champ;
 
 import code.NN.NeuralNet;
 
+import java.io.Serializable;
+
 /**
  * @author Alexandre Martens
  */
-public class DQN {
+public class DQN implements Serializable {
 
     private NeuralNet nn;
     private boolean trainingMode; // Check if it can backpropagate
@@ -49,7 +51,10 @@ public class DQN {
         this.nn = nn;
     }
 
-    public void setActivationFunction(String activation_function){
-        this.nn.setActivationFunction(activation_function);
+    public void setActivationFunction(String activation_function) throws ExceptionHandeling {
+        if (activation_function == "relu" || activation_function == "sigmoid")
+            this.nn.setActivationFunction(activation_function);
+        else
+            throw new ExceptionHandeling("activation_function");
     }
 }

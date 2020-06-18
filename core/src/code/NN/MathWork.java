@@ -1,5 +1,6 @@
 package code.NN;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -8,7 +9,7 @@ import java.util.Random;
 /**
  * @author Alexandre Martens
  */
-public class MathWork extends NeuralNet {
+public class MathWork extends NeuralNet implements Serializable {
 
     /**
      * @param min minimum value in the range inclusive
@@ -33,7 +34,10 @@ public class MathWork extends NeuralNet {
      */
     public static float he_et_al_initialisation(int input_neurons){
         Random rand = new Random();
-        return (float) (rand.nextGaussian() * Math.sqrt(2 / input_neurons)); // Formula
+
+        double number = (double) 2/input_neurons;
+        return (float) (rand.nextGaussian() * Math.sqrt(number)); // Formula
+
     }
 
 

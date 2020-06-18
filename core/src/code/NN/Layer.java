@@ -1,11 +1,13 @@
 package code.NN;
 
+import java.io.Serializable;
+
 /**
  * @author Alexandre Martens
  * The purpose of this class is to hold all the neurons
  * Only for fully connected feed forward nn
  */
-public class Layer {
+public class Layer implements Serializable {
     public Neuron[] neurons;
 
     /**

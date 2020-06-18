@@ -1,11 +1,14 @@
 package code.NN;
 
+import code.Lets_Go_Champ.DQN;
+
+import java.io.Serializable;
 import java.util.Arrays;
 
 /**
  * @author Alexandre Martens
  */
-public class Visuals extends NeuralNet {
+public class Visuals extends NeuralNet implements Serializable {
 
     // Print the weights of the nn
     public static void printWeights(Layer[] layers, int layerN){
@@ -41,6 +44,15 @@ public class Visuals extends NeuralNet {
         for (int i = 0; i < layers[layerN].neurons.length; i++){
             System.out.println(layers[layerN].neurons[i].value);
         }
+    }
+
+    public static void printDQN(DQN nn){
+        Layer neuralnet = nn.getNn().layers[2];
+        System.out.println(Arrays.toString(neuralnet.neurons[4].weights));
+
+        /*for (int i = 0; i < neuralnet.neurons.length; i++){
+            System.out.println(Arrays.toString(neuralnet.neurons[i].weights));
+        }*/
     }
 
 }
