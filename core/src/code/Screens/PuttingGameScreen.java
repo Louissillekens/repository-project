@@ -19,11 +19,9 @@ import com.badlogic.gdx.graphics.g3d.utils.MeshPartBuilder;
 import com.badlogic.gdx.graphics.g3d.utils.ModelBuilder;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Vector3;
-import com.badlogic.gdx.physics.bullet.Bullet;
 import com.badlogic.gdx.utils.Array;
 import com.game.game.Game;
 
-import java.util.Arrays;
 import java.util.Random;
 
 import static com.badlogic.gdx.graphics.GL20.GL_TRIANGLES;
@@ -362,7 +360,7 @@ public class PuttingGameScreen implements Screen {
     public static float defineFunction(double x, double y) {
 
         //float field0 = (float) (0.5);
-        float field1 = (float) (((Math.sin(x) + Math.sin(y))/4)+0.3);
+        float field1 = (float) (((Math.sin(x) + Math.sin(y)))+2.0);
         //float field2 = (float) ((Math.sin(x))/3)+0.2f;
         //float field3 = (float) (((Math.atan(x) + Math.atan(y))/2)+0.5);
         float ripple1 = (float) ((0.4)+Math.sin((0.4)*(Math.pow(x,2)+Math.pow(y,2))/10)+1);
