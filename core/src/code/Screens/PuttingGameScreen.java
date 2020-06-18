@@ -531,7 +531,15 @@ public class PuttingGameScreen implements Screen {
             ballPositionX += ballStepXmean;
             ballPositionZ += ballStepZmean;
             camera.lookAt(ballPositionX, defineFunction(ballPositionX, ballPositionZ), ballPositionZ);
-            if (BotScreen.getBotName().equals("agent")) {
+
+            if (gameMode.gameName.equals("Single_Player")) {
+                float scaleFactor = 50;
+                camera.translate((newBallPositionX - ballPositionX) / scaleFactor, 0.001f / scaleFactor, (newBallPositionZ - ballPositionZ) / scaleFactor);
+                sumX += (newBallPositionX - ballPositionX) / (scaleFactor);
+                sumZ += (newBallPositionZ - ballPositionZ) / (scaleFactor);
+            }
+
+            else if (BotScreen.getBotName().equals("agent")) {
 
                 float scaleFactor;
                 if (agentPower >= 2000) {
@@ -540,12 +548,6 @@ public class PuttingGameScreen implements Screen {
                 else {
                     scaleFactor = 50;
                 }
-                camera.translate((newBallPositionX - ballPositionX) / scaleFactor, 0.001f / scaleFactor, (newBallPositionZ - ballPositionZ) / scaleFactor);
-                sumX += (newBallPositionX - ballPositionX) / (scaleFactor);
-                sumZ += (newBallPositionZ - ballPositionZ) / (scaleFactor);
-            }
-            else if (gameMode.gameName.equals("Single_Player")) {
-                float scaleFactor = 50;
                 camera.translate((newBallPositionX - ballPositionX) / scaleFactor, 0.001f / scaleFactor, (newBallPositionZ - ballPositionZ) / scaleFactor);
                 sumX += (newBallPositionX - ballPositionX) / (scaleFactor);
                 sumZ += (newBallPositionZ - ballPositionZ) / (scaleFactor);

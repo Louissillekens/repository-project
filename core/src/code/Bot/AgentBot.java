@@ -32,7 +32,7 @@ public class AgentBot {
         this.ballZ = ballZ;
 
         this.sensorsWeight = new float[sensorsSize.length];
-        this.sensorsWeight[0] = 15;
+        this.sensorsWeight[0] = 10;
         this.sensorsWeight[1] = 7;
         this.sensorsWeight[2] = 5;
         this.sensorsWeight[3] = 3;
@@ -42,7 +42,7 @@ public class AgentBot {
         this.sensorsWeight[7] = 3;
         this.sensorsWeight[8] = 5;
         this.sensorsWeight[9] = 7;
-        this.sensorsWeight[10] = 15;
+        this.sensorsWeight[10] = 10;
 
         System.out.println("sensorsSize = " + Arrays.toString(sensorsSize));
         System.out.println("sensorsAngleX = " + Arrays.toString(sensorsAngleX));
