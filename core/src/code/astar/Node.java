@@ -1,6 +1,8 @@
 package code.astar;
 
 
+import code.Screens.PuttingGameScreen;
+
 import java.util.Random;
 
 public class Node {
@@ -15,6 +17,12 @@ public class Node {
     //score should always be a double between 0 and 1
     private double score;
 
+    /**
+     * standard constructor for a node
+     * @param parent the parent of the node
+     * @param x the x-coordinate of the node
+     * @param z the z-coordinate of the node
+     */
     public Node(Node parent, double x, double z){
 
         this.parent = parent;
@@ -41,10 +49,19 @@ public class Node {
     //this allows us to be sure that when the goal and the ball have no object inbetween
     // at least one shot will go in the right direction
 
-    public void generateShot(){
-        //TODO call generate angle and generate power to set these randomly
+    /**
+     * generate a random shot with an angle and shot power
+     * @param min min shot power
+     * @param max max shot power
+     */
+    public void generateShot(double min, double max){
+        generateAngle();
+        generatePower(min, max);
     }
 
+    /**
+     * generate a random angle for the shot to be taken
+     */
     public void generateAngle(){
         //TODO generate a number between 0 and 360 for the angle
     }
@@ -83,7 +100,11 @@ public class Node {
         return Math.sqrt((x_dist*x_dist) + (y_dist*y_dist));
     }
 
-    public double[] executeShot(){
+    /**
+     * this method simulates the shot internally and returns the x and y coordinates of the resulting location
+     * @return returns a double array of length 2 holding an x and y coordinate
+     */
+    public double[] executeShot(PuttingGameScreen game){
         //TODO should use one of the solvers to execute the shot and then return the data of the new location
         //TODO in an array of length 2 (x and y)
         //temp
@@ -91,6 +112,10 @@ public class Node {
         return data;
     }
 
+    /**
+     * checks if the node has a parent
+     * @return boolean containing whether the node has a parent or not
+     */
     public boolean hasParent(){
         if(this.getParent() == null) return false;
         return true;
