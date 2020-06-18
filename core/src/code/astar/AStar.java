@@ -57,16 +57,18 @@ public class AStar {
             int count = 0;
             while(count < amOfNodes){
 
+                Node cloneNode = node.partialClone();
                 //each iteration create a random shot and make a node of where the ball arrives
-                node.generateShot();
+                cloneNode.generateShot();
                 double[] locData = node.executeShot();
                 Node nextNode = new Node(node, locData[0], locData[1]);
                 this.computeScore(nextNode);
                 this.addNode(nextNode);
+                cloneNode.setChecked(true);
                 count++;
             }
 
-            node.setChecked(true);
+            nodes.remove(node);
         }
     }
 

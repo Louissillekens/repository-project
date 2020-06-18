@@ -40,10 +40,13 @@ public class Node {
         //TODO
     }
 
-    public Node clone(){
-        //TODO clone all the fields of this node to a new node
-        //temp so no errors occur
-        return new Node(null,0,0);
+    /**
+     * this method makes a new node that has the same location and parent as the original node
+     * @return
+     */
+    public Node partialClone(){
+        Node answer = new Node(this.getParent(), this.getX(),this.getZ());
+        return answer;
     }
 
     /**
