@@ -23,6 +23,17 @@ public class Node {
         checked = false;
         score = 0;
     }
+
+    /**
+     * make a node with a given score
+     * P.S. this method exists so that we can make a node that scores 0 easily
+     * necessary for some methods to work correctly
+     * @param score the score this node has
+     */
+    public Node(double score){
+        this.parent = null;
+        this.score = score;
+    }
     //optimisation idea: make a method that creates a shot specifically directed towards the goal
     // we call this method to make one of the ten shots for each node
     //this allows us to be sure that when the goal and the ball have no object inbetween
@@ -33,11 +44,12 @@ public class Node {
     }
 
     public void generateAngle(){
-        //TODO
+        //TODO generate a number between 0 and 360 for the angle
     }
 
-    public void generatePower(){
-        //TODO
+    public void generatePower(double min, double max){
+        //TODO generate a number between max power on the given course and the min power (perhaps slightly higher as 0.001 is not very useful)
+        //this is why the min and max power arte given
     }
 
     /**

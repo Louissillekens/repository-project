@@ -68,6 +68,7 @@ public class AStar {
                 count++;
             }
 
+            //TODO make a node that shoots directly towards the goal as well instead of removing the original
             nodes.remove(node);
         }
     }
@@ -100,7 +101,7 @@ public class AStar {
      */
     public Node chooseBestNode(){
 
-        Node best = nodes.get(0);
+        Node best = new Node(0);
 
         for(Node node : nodes){
             if(!node.isChecked()){
@@ -129,7 +130,7 @@ public class AStar {
         }
 
         else{
-
+            this.generateNodes(best);
         }
     }
 
