@@ -51,7 +51,10 @@ public class DQN implements Serializable {
         this.nn = nn;
     }
 
-    public void setActivationFunction(String activation_function){
-        this.nn.setActivationFunction(activation_function);
+    public void setActivationFunction(String activation_function) throws ExceptionHandeling {
+        if (activation_function == "relu" || activation_function == "sigmoid")
+            this.nn.setActivationFunction(activation_function);
+        else
+            throw new ExceptionHandeling("activation_function");
     }
 }

@@ -19,7 +19,7 @@ public class NeuralNet implements Serializable {
     public NeuralNet(){
         // Set the range of the weights
         Neuron.setRangeWeight(-1,1);
-        
+
 
         //Creating the layers
         this.layers = new Layer[4]; //4 layers: input, hidden and output

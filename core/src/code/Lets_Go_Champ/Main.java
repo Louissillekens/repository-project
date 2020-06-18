@@ -1,6 +1,7 @@
 package code.Lets_Go_Champ;
 
-import code.NN.ExportNeuralNet;
+import code.NN.ExportNeuralNets;
+import code.NN.ImportNeuralNet;
 import code.NN.MathWork;
 import code.NN.Visuals;
 
@@ -33,7 +34,7 @@ public class Main {
     private static final float yFlag = 17;
 
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws ExceptionHandeling {
         GameManager gm = new GameManager(xStart,yStart,xFlag,yFlag); // Create the game manager
         EpsilonGreedyStrat strategy = new EpsilonGreedyStrat(eps_start, eps_end, eps_decay); // Create the strat
         Agent agent = new Agent(strategy,gm.numActionsAvailable()); // Create the agent
@@ -43,10 +44,17 @@ public class Main {
         DQN policy_net = new DQN(); // Create the policy network
         DQN target_net = new DQN(); // Create the target network
 
-        // Set weights of target_net(downer one) = policy_net(upper one)
-        target_net.copyLayers(policy_net);
         Visuals.printDQN(target_net);
         Visuals.printDQN(policy_net);
+
+        ExportNeuralNets.exportNetworks(policy_net, target_net);
+
+        Visuals.printDQN(ImportNeuralNet.importNetwork("target_network"));
+        Visuals.printDQN(ImportNeuralNet.importNetwork("policy_network"));
+
+        System.exit(0);
+        // Set weights of target_net(downer one) = policy_net(upper one)
+        target_net.copyLayers(policy_net);
 
         // Set the network train ability (extra security)
         policy_net.setTrainingMode(true); // Train and evaluate
@@ -59,7 +67,7 @@ public class Main {
         // Set the learning rate of our policy_net
         policy_net.setLR(lr);
 
-        ExportNeuralNet.exportNetworks(policy_net, target_net);
+        ExportNeuralNets.exportNetworks(policy_net, target_net);
 
 
         float[] total_rewards_episodes = new float[num_episodes];

@@ -26,7 +26,7 @@ public class ImportNeuralNet {
             return loaded_network;
 
         } catch (FileNotFoundException e) {
-            System.out.println("File not found");
+            System.out.println("File with name: " + network + " not found! Recheck spelling");
         } catch (IOException | ClassNotFoundException e) {
             System.out.println("Error initializing stream");
         }

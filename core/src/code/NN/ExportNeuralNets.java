@@ -7,7 +7,7 @@ import java.io.*;
 /**
  * @author Alexandre Martens
  */
-public class ExportNeuralNet {
+public class ExportNeuralNets {
 
     /**
      * Saves the network to a local file
@@ -41,5 +41,7 @@ public class ExportNeuralNet {
         } catch (IOException e) {
             System.out.println("Error initializing stream");
         }
+
+        System.out.println(" ===> All networks exported");
     }
 }
