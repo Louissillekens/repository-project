@@ -1,6 +1,7 @@
 package code.astar;
 
 
+import code.Physics.Rungekuttasolver;
 import code.Screens.PuttingGameScreen;
 
 import java.util.Random;
@@ -108,11 +109,23 @@ public class Node {
      * @return returns a double array of length 2 holding an x and y coordinate
      */
     public double[] executeShot(PuttingGameScreen game){
-        //TODO should use one of the solvers to execute the shot and then return the data of the new location
-        //TODO in an array of length 2 (x and y)
-        //temp
-        double[] data ={0,0};
+
+        double[] data = RK4(this);
         return data;
+    }
+
+    //Executes the RK4 class giving back the position of the ball
+    static double[] RK4(Node node){
+
+        //Convert degrees to radians, radians is the argument for Math.sin or Math.cos
+        double angle = (node.getAngle()*Math.PI)/180;
+
+        //Split the velocity vector into x,y components
+        double vxi = (node.getPower())*Math.cos(angle);
+        double vyi = (node.getPower())*Math.sin(angle);
+
+        Rungekuttasolver rk = new Rungekuttasolver();
+        return  rk.startRK4(node.getAngle(), node.getPower(), vxi, vyi);
     }
 
     /**
