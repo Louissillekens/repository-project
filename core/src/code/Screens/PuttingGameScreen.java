@@ -216,12 +216,14 @@ public class PuttingGameScreen implements Screen {
 
     ArrayList<float[]> sensorsData = new ArrayList<>();
 
-    private static int sandPitSize = 10;
-    private static int amountOfSandPit = 5;
+    private static int sandPitSize = 8;
+    private static int amountOfSandPit = 4;
     private static float[] sandPitX1 = new float[amountOfSandPit];
     private static float[] sandPitZ1 = new float[amountOfSandPit];
     private static float[] sandPitX2 = new float[amountOfSandPit];
     private static float[] sandPitZ2 = new float[amountOfSandPit];
+
+    private boolean checkSolver = false;
 
     /**
      * Constructor that creates a new instance of the putting game screen
@@ -390,9 +392,11 @@ public class PuttingGameScreen implements Screen {
      */
     public static float getFriction(double x, double z) {
 
+        /*
         if (isOnSand((float) x, (float) z)) {
             return 100f;
         }
+        */
         return 0.13f;
     }
 
@@ -407,7 +411,6 @@ public class PuttingGameScreen implements Screen {
         Vector3 nor1,nor2,nor3,nor4;
         MeshPartBuilder.VertexInfo v1,v2,v3,v4;
 
-        amountOfSandPit = 5;
         int count = 0;
 
         for (int i = 0; i < amountOfSandPit; i++) {
@@ -419,10 +422,12 @@ public class PuttingGameScreen implements Screen {
             sandPitZ2[count] = sandPitPosition[3];
             count++;
         }
+        /*
         System.out.println("sandPitX1 = " + Arrays.toString(sandPitX1));
         System.out.println("sandPitX2 = " + Arrays.toString(sandPitX2));
         System.out.println("sandPitZ1 = " + Arrays.toString(sandPitZ1));
         System.out.println("sandPitZ2 = " + Arrays.toString(sandPitZ2));
+        */
 
         float step = 1f;
         for(float i = 0; i < ((step*(1/step))*gridDepth); i+=step) {
@@ -574,6 +579,8 @@ public class PuttingGameScreen implements Screen {
         double ballPositionZround = (double)(Math.round(ballPositionZ*100))/10;
         double newBallPositionZround = (double)(Math.round(newBallPositionZ*100))/10;
 
+        float allowableRange = 0.1f;
+
         // Condition that checks if the new position of the ball is different from the current one
         // If it is the case, move the ball to that new position
         if (((((ballPositionX < newBallPositionX) && (ballPositionZ < newBallPositionZ)) ||
@@ -583,16 +590,40 @@ public class PuttingGameScreen implements Screen {
                 ((ballPositionXround != newBallPositionXround) && (ballPositionZround != newBallPositionZround))) &&
                 (canTranslateCam)) {
 
-            ballPositionX += ballStepXmean;
-            ballPositionZ += ballStepZmean;
+            float scaleFactor = 50;
+
+            if (isOnSand(ballPositionX, ballPositionZ)) {
+
+                newBallPositionX-=ballStepXmean/2;
+                newBallPositionZ-=ballStepZmean/2;
+
+                ballPositionX += ballStepXmean/2;
+                ballPositionZ += ballStepZmean/2;
+
+                camera.translate((newBallPositionX - ballPositionX) / (scaleFactor*2), 0.001f / (scaleFactor*2), (newBallPositionZ - ballPositionZ) / (scaleFactor*2));
+
+                sumX += (newBallPositionX - ballPositionX) / (scaleFactor*2);
+                sumZ += (newBallPositionZ - ballPositionZ) / (scaleFactor*2);
+            }
+            else {
+
+                ballPositionX += ballStepXmean;
+                ballPositionZ += ballStepZmean;
+
+                camera.translate((newBallPositionX - ballPositionX) / scaleFactor, 0.001f / scaleFactor, (newBallPositionZ - ballPositionZ) / scaleFactor);
+
+                sumX += (newBallPositionX - ballPositionX) / (scaleFactor);
+                sumZ += (newBallPositionZ - ballPositionZ) / (scaleFactor);
+            }
             camera.lookAt(ballPositionX, defineFunction(ballPositionX, ballPositionZ), ballPositionZ);
 
-            //if (gameMode.gameName.equals("Single_Player")) {
-                float scaleFactor = 50;
+            /*
+            if (gameMode.gameName.equals("Single_Player")) {
+
                 camera.translate((newBallPositionX - ballPositionX) / scaleFactor, 0.001f / scaleFactor, (newBallPositionZ - ballPositionZ) / scaleFactor);
                 sumX += (newBallPositionX - ballPositionX) / (scaleFactor);
                 sumZ += (newBallPositionZ - ballPositionZ) / (scaleFactor);
-            //}
+            }*/
 
             /*
             else if (BotScreen.getBotName().equals("agent")) {
@@ -610,16 +641,29 @@ public class PuttingGameScreen implements Screen {
             }
             */
 
+            positionArrayX[countIndex] = newBallPositionX;
+            positionArrayZ[countIndex] = newBallPositionZ;
+
             translateX[countIndex - 1] = sumX;
             translateZ[countIndex - 1] = sumZ;
 
             ballStop = false;
             sensorsReady = false;
+
         }
         else {
             ballStop = true;
+            if (countIndex > 0) {
+                ballPositionX = positionArrayX[countIndex];
+                ballPositionZ = positionArrayZ[countIndex];
+                /*
+                System.out.println("ballPositionX = " + ballPositionX);
+                System.out.println("ballPositionZ = " + ballPositionZ);
+                System.out.println("newBallPositionX = " + newBallPositionX);
+                System.out.println("newBallPositionZ = " + newBallPositionZ);
+                */
+            }
         }
-
     }
 
     /**
@@ -860,6 +904,7 @@ public class PuttingGameScreen implements Screen {
 
         boolean check = false;
         float allowableRange = 0.5f;
+        float increment = 0.1f;
         float i = 0;
         float power = 1;
         float newX = 0;
@@ -880,7 +925,12 @@ public class PuttingGameScreen implements Screen {
                 check = true;
                 power = i;
             }
-            i+=0.1;
+            i+=increment;
+
+            if (newX > x1+allowableRange && newZ > z1+allowableRange) {
+                power = i-increment;
+                check = true;
+            }
         }
 
         if (outOfField(newX, newZ) || isInWater(newX, newZ)) {
@@ -898,18 +948,19 @@ public class PuttingGameScreen implements Screen {
         int randomX2 = randomX1+sandPitSize;
         int randomZ2 = randomZ1+sandPitSize;
 
-        /*
         boolean checkPosition = false;
 
-        while (!checkPosition) {
-            randomX1 = rand.nextInt((45-5)+1)+5;
-            randomZ1 = rand.nextInt((45-5)+1)+5;
+        if (euclideanDistFlag(randomX1, randomZ1) <= sandPitSize) {
+            while (!checkPosition) {
+                randomX1 = rand.nextInt((40) + 1);
+                randomZ1 = rand.nextInt((40) + 1);
 
-            if ((defineFunction(randomX1, randomZ1) > -0.1) && ((defineFunction(randomX2, randomZ2) > -0.1)) && ((defineFunction(randomX1, randomZ2) > -0.1)) && ((defineFunction(randomX2, randomZ1) > -0.1))) {
-                checkPosition = true;
+                if (euclideanDistFlag(randomX1, randomZ1) > sandPitSize*2) {
+                    checkPosition = true;
+                }
             }
         }
-        */
+
         return new float[]{randomX1, randomZ1, randomX2, randomZ2};
     }
 
@@ -1118,6 +1169,7 @@ public class PuttingGameScreen implements Screen {
             }
             else {
                 modelBatch.render(sensors, environment);
+                checkSolver = false;
             }
         }
 
@@ -1714,7 +1766,7 @@ public class PuttingGameScreen implements Screen {
                 countIndex++;
                 ballStop = false;
 
-                AgentBot bot = new AgentBot(sensorsSize, sensorsAngleX, sensorsAngleZ, maxPositionX, maxPositionZ, canHitFlag, ballPositionX, ballPositionZ);
+                AgentBot bot = new AgentBot(sensorsSize, sensorsAngleX, sensorsAngleZ, maxPositionX, maxPositionZ, canHitFlag, isSensorOnSand, ballPositionX, ballPositionZ);
 
                 float[] newPositions = bot.startBot();
 
@@ -1790,12 +1842,32 @@ public class PuttingGameScreen implements Screen {
 
                         RK4.setValues(ballPositionX, ballPositionZ, (directionX*power)*500, (directionZ*power)*500);
 
+                        //float allowableRange = 0.000001f;
+
                         RK4.RK4();
+
                         newBallPositionX = (float) RK4.getX();
                         newBallPositionZ = (float) RK4.getY();
 
-                        vx = (float) RK4.getVx();
-                        vy = (float) RK4.getVy();
+                        /*
+                        while (!checkSolver) {
+                            if (vx > allowableRange || vy > allowableRange) {
+
+                                RK4.RK4();
+                                
+                                newBallPositionX = (float) RK4.getX();
+                                newBallPositionZ = (float) RK4.getY();
+
+                                vx = (float) RK4.getVx();
+                                vy = (float) RK4.getVy();
+                                System.out.println("ok");
+                            }
+                            else {
+                                System.out.println("ok1");
+                                checkSolver = true;
+                            }
+                        }
+                        */
                     }
 
                     // Instance of the Verlet solver
@@ -1840,10 +1912,10 @@ public class PuttingGameScreen implements Screen {
                 positionArrayX[countIndex] = newBallPositionX;
                 positionArrayZ[countIndex] = newBallPositionZ;
 
-                System.out.println("distance x = " + (positionArrayX[countIndex] - positionArrayX[countIndex-1]));
-                System.out.println("distance z = " + (positionArrayZ[countIndex] - positionArrayZ[countIndex-1]));
+                //System.out.println("distance x = " + (positionArrayX[countIndex] - positionArrayX[countIndex-1]));
+                //System.out.println("distance z = " + (positionArrayZ[countIndex] - positionArrayZ[countIndex-1]));
 
-                System.out.println("euclidean distance = " + Math.sqrt(Math.pow((positionArrayX[countIndex] - positionArrayX[countIndex-1]),2) + Math.pow((positionArrayZ[countIndex] - positionArrayZ[countIndex-1]),2)));
+                //System.out.println("euclidean distance = " + Math.sqrt(Math.pow((positionArrayX[countIndex] - positionArrayX[countIndex-1]),2) + Math.pow((positionArrayZ[countIndex] - positionArrayZ[countIndex-1]),2)));
 
                 ballPositionX = positionArrayX[countIndex -1];
                 ballPositionZ = positionArrayZ[countIndex -1];
@@ -1851,6 +1923,7 @@ public class PuttingGameScreen implements Screen {
                 int ballStep = 100;
                 ballStepXmean = (positionArrayX[countIndex]-positionArrayX[countIndex -1])/ ballStep;
                 ballStepZmean = (positionArrayZ[countIndex]-positionArrayZ[countIndex -1])/ ballStep;
+
 
                 // Reset the power after the shot
                 setShot_Power(getSTARTING_SHOT_POWER());
@@ -1876,18 +1949,22 @@ public class PuttingGameScreen implements Screen {
                     camera.rotateAround(vector1 = new Vector3(ballPositionX, defineFunction(ballPositionX, ballPositionZ), ballPositionZ),
                             vector2 = new Vector3(0f, -1f, 0f), 1f);
                     camera.lookAt(ballPositionX, defineFunction(ballPositionX, ballPositionZ), ballPositionZ);
+                    /*
                     System.out.println("Direction  X = " + camera.direction.x);
                     System.out.println("Direction  Z = " + camera.direction.z);
                     System.out.println();
+                    */
 
                 }
                 if(Gdx.input.isKeyPressed(Input.Keys.LEFT)) {
                     camera.rotateAround(vector1 = new Vector3(ballPositionX, defineFunction(ballPositionX, ballPositionZ), ballPositionZ),
                             vector2 = new Vector3(0f, 1f, 0f), 1f);
                     camera.lookAt(ballPositionX, defineFunction(ballPositionX, ballPositionZ), ballPositionZ);
+                    /*
                     System.out.println("Direction  X = " + camera.direction.x);
                     System.out.println("Direction  Z = " + camera.direction.z);
                     System.out.println();
+                    */
 
                     /*
                     if (camera.direction.x < minAngleX) {

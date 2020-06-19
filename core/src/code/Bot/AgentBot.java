@@ -19,8 +19,9 @@ public class AgentBot {
     private int bestSensor;
 
     private boolean[] canHitFlag;
+    private boolean[] isSensorOnSand;
 
-    public AgentBot(float[] sensorsSize, float[] sensorsAngleX, float[] sensorsAngleZ, float[] maxPositionX, float[] maxPositionZ,  boolean[] canHitFlag, float ballX, float ballZ) {
+    public AgentBot(float[] sensorsSize, float[] sensorsAngleX, float[] sensorsAngleZ, float[] maxPositionX, float[] maxPositionZ,  boolean[] canHitFlag, boolean[] isSensorOnSand, float ballX, float ballZ) {
 
         this.sensorSize = sensorsSize;
         this.sensorsAngleX = sensorsAngleX;
@@ -28,6 +29,7 @@ public class AgentBot {
         this.maxPositionX = maxPositionX;
         this.maxPositionZ = maxPositionZ;
         this.canHitFlag = canHitFlag;
+        this.isSensorOnSand = isSensorOnSand;
         this.ballX = ballX;
         this.ballZ = ballZ;
 
@@ -53,6 +55,12 @@ public class AgentBot {
     }
 
     public float[] startBot() {
+
+        for (int i = 0; i < sensorsWeight.length; i++) {
+            if (isSensorOnSand[i]) {
+                sensorsWeight[i] = sensorsWeight[i]*3;
+            }
+        }
 
         float[] sensorsCost = new float[sensorSize.length];
         for (int i = 0; i < sensorSize.length; i++) {
