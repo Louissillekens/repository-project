@@ -63,7 +63,10 @@ public class Node {
      * generate a random angle for the shot to be taken
      */
     public void generateAngle(){
-        //TODO generate a number between 0 and 360 for the angle
+        Random r = new Random();
+        int min = 0;
+        int max = 360;
+        power = min + (max - min) * r.nextDouble();
     }
 
     /**
@@ -92,7 +95,7 @@ public class Node {
      * @param z z-coordinate of location
      * @return distance between locations
      */
-    public double CalculateDistTo(int x, int z){
+    public double CalculateDistTo(double x, double z){
 
         double x_dist = Math.abs(x - this.getX());
         double y_dist = Math.abs(z - this.getZ());
