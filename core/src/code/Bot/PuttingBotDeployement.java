@@ -90,7 +90,7 @@ public class PuttingBotDeployement {
         }
     }
 
-    //Executes the RK4 class giving baack the position of the ball
+    //Executes the RK4 class giving back the position of the ball
     static double[] RK4(double [] individual){
 
         //Convert degrees to radians, radians is the argument for Math.sin or Math.cos
