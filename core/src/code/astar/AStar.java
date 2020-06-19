@@ -75,7 +75,7 @@ public class AStar {
     public void computeScore(Node node){
 
         double score = 0;
-        score += stepHeuristic*amOfSteps(node);
+        score -= stepHeuristic*amOfSteps(node);
         System.out.println(score);
         score += distanceHeuristic*(node.CalculateDistTo(game.getFlagPositionX(), game.getFlagPositionZ()));
         System.out.println(score);
