@@ -12,7 +12,7 @@ public class LinkAgentNN {
 
 
     public LinkAgentNN(int action){
-        constructorCalc(/* YOUR METHOD THAT RETURNS A FLOAT ARRAY*/);
+        //constructorCalc(/* YOUR METHOD THAT RETURNS A FLOAT ARRAY*/);
     }
 
     private void constructorCalc(float[] arr){
