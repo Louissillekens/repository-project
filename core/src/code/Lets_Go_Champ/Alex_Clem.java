@@ -26,7 +26,7 @@ public class Alex_Clem {
     int num_episodes = 1000; // Max number of episodes
 
 
-    Alex_Clem(float xStart, float yStart, float xFlag, float yFlag) throws ExceptionHandeling {
+    public Alex_Clem(float xStart, float yStart, float xFlag, float yFlag) throws ExceptionHandeling {
         this.xStart= xStart;
         this.yStart = yStart;
         this.xFlag = xFlag;

@@ -1,5 +1,10 @@
 package code.Screens;
 
+import code.Bot.Agent;
+import code.Lets_Go_Champ.Alex_Clem;
+import code.Lets_Go_Champ.ExceptionHandeling;
+import code.Lets_Go_Champ.GameManager;
+import code.astar.AStar;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.Screen;
@@ -15,7 +20,7 @@ import com.game.game.Game;
 
 public class BotScreen implements Screen {
 
-    private Game myGame;
+    private static Game myGame;
     private Stage stage;
 
     // Instances for the background and title images + textures
@@ -62,7 +67,7 @@ public class BotScreen implements Screen {
         agentButton.setSize(200, 60);
         stage.addActor(agentButton);
 
-        nnButton = new TextButton("NN bot", skin);
+        nnButton = new TextButton("Q Agent", skin);
         nnButton.setPosition(400, 300);
         nnButton.setSize(200, 60);
         stage.addActor(nnButton);
@@ -107,8 +112,19 @@ public class BotScreen implements Screen {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
 
-                //this.game.setScreen(new PuttingGameScreen(4,2));
+                PuttingGameScreen game = new PuttingGameScreen(2, 2);
+                this.game.setScreen(game);
+
+                /*
+                System.out.println("List = " + PuttingGameScreen.getSensorsOutput());
+                try {
+                    new Alex_Clem(PuttingGameScreen.getStartingPositionX(), PuttingGameScreen.getStartingPositionZ(), PuttingGameScreen.getFlagPositionX(), PuttingGameScreen.getFlagPositionZ());
+                } catch (ExceptionHandeling exceptionHandeling) {
+                    exceptionHandeling.printStackTrace();
+                }
                 this.screen.dispose();
+
+*/
                 //botName = "NN";
             }
         }
@@ -128,13 +144,19 @@ public class BotScreen implements Screen {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
 
-                this.game.setScreen(new PuttingGameScreen(myGame, new GameMode(gameMode.gameName)));
-                this.screen.dispose();
+                //AStar aStar = new AStar();
                 botName = "aStar";
             }
         }
         aStarButton.addListener(new aStarListener(game, this));
     }
+
+    /*
+    public static void displayGUI(float x, float y) {
+
+        myGame.setScreen(new PuttingGameScreen(x,y));
+    }
+    */
 
     public static String getBotName() {
         return botName;

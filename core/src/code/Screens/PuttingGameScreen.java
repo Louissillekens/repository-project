@@ -53,8 +53,8 @@ public class PuttingGameScreen implements Screen {
     // Instances variables for the ball in the game
     //private Model ball;
     private ModelInstance ballInstance;
-    private float startingPositionX = 2;
-    private float startingPositionZ = 2;
+    private static float startingPositionX = 2;
+    private static float startingPositionZ = 2;
     private static float ballSize = 0.2f;
     private float ballPositionX = startingPositionX;
     private float ballPositionZ = startingPositionZ;
@@ -250,7 +250,7 @@ public class PuttingGameScreen implements Screen {
 
     public static boolean finishAgent;
 
-    private String name;
+    private String name = "";
 
     /**
      * Constructor that creates a new instance of the putting game screen
@@ -1774,6 +1774,14 @@ public class PuttingGameScreen implements Screen {
         return sensorsData;
     }
 
+    public static float getStartingPositionX() {
+        return startingPositionX;
+    }
+
+    public static float getStartingPositionZ() {
+        return startingPositionZ;
+    }
+
     public class InputHandler {
 
         public void checkForAgentBot() {
@@ -2383,7 +2391,6 @@ public class PuttingGameScreen implements Screen {
                     }
                 }
                 //isBotReady = true;
-
 
                 for (int i = 0; i < sensorsOutput.size(); i++) {
                     System.out.println("sensorsOutput = " + Arrays.toString(sensorsOutput.get(i)));

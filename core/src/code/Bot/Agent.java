@@ -7,15 +7,15 @@ import java.util.Arrays;
 
 public class Agent {
 
-    private ArrayList<float[]> outputData;
+    private static ArrayList<float[]> outputData;
 
     public Agent() {
 
-        this.outputData = PuttingGameScreen.getSensorsOutput();
+        outputData = PuttingGameScreen.getSensorsOutput();
         System.out.println(Arrays.deepToString(new ArrayList[]{outputData}));
     }
 
-    public ArrayList<float[]> getOutputData() {
+    public static ArrayList<float[]> getOutputData() {
         return outputData;
     }
 }

@@ -9,7 +9,7 @@ public class Agent {
     private EpsilonGreedyStrat strategy;
 
     private int nActions;
-    private int current_step; // Agent current step number in the environment
+    private int current_step; // AgentTest current step number in the environment
 
     /**
      * @param strategy EpsilonGreedyStrat for the epsilon and will use this to

@@ -2,6 +2,7 @@ package code.Bridge;
 
 import code.Bot.Agent;
 import code.Lets_Go_Champ.GameManager;
+import code.Screens.BotScreen;
 import code.Screens.PuttingGameScreen;
 import com.game.game.Game;
 
@@ -19,9 +20,7 @@ public class LinkAgentNN {
     private float[] actionSensorOutput;
 
 
-    public LinkAgentNN(int action){
-
-        PuttingGameScreen bot = new PuttingGameScreen(GameManager.getxPos(), GameManager.getyPos());
+    public LinkAgentNN(int action) {
 
         // Object agent that (for now) can just return the output data from PuttingGameScreen
         Agent agent = new Agent();
