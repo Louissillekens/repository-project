@@ -2350,6 +2350,7 @@ public class PuttingGameScreen implements Screen {
                         //sensorsData.add(stepData);
                     }
                 }
+                // TODO CLEMENT LinkAgentNN bridge = new LinkAgentNN(sensorsOutput, sensorsData);
                 //isBotReady = true;
 
 

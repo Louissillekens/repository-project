@@ -1,5 +1,6 @@
 package code.Lets_Go_Champ;
 
+import code.Bridge.LinkAgentNN;
 import code.NN.MathWork;
 
 /**
@@ -47,31 +48,52 @@ public class GameManager {
      */
     int takeAction(int action){
         int reward = 0;
-        /* TODO
-             * Bot takes as input: action. (action [0-109])
-             *   The bot then find the corresponding velocity and angle to execute
-             *   The bot executes the action and updates itself on the gui
-             * The bot returns: final position and boolean: arrived destination and boolean collision
-             *
-             * If final destination is true: this.done = true;
-             *                             : updatePosition(finalPosX, finalPosY); // From bot return
-             *                             : int doneReward = 100;
-             *                             : rewards_total += doneReward;
-             *                             : return doneReward;
-             *
-             * else if final destination is false and collision is false: // this.done is not updated = still false
-             *                              : int reward = rewards(newXpos, newYpos);
-             *                              : rewards_total += reward;  //add reward to rewards_total, used in the main
-             *                              : updatePosition(finalPosX, finalPosY); // from bot return
-             *                              : return reward;
-             *
-             * else final destination is false and collision is true: // this.done is not updated = still false
-             *                              : int collision_reward = -100;
-             *                              : rewards_total += collision_reward;  //add reward to rewards_total, used in the main
-             *                              : DO NOT UPDATE AGENT POSTITION
-             *                              : return collision_reward;
-         */
-        return reward;
+
+        LinkAgentNN bridge = new LinkAgentNN(action);
+
+        boolean final_destination = bridge.getWinPosition();
+        boolean collision = bridge.getCollision();
+
+        float new_xPos = bridge.getxPosition();
+        float new_yPos = bridge.getyPosition();
+
+        // The ball is at the final destination
+        if (final_destination ==  true){
+            this.done = true;
+
+            updatePosition(new_xPos, new_yPos);
+
+            int doneReward = 100;
+            rewards_total += doneReward;
+
+            return doneReward;
+        }
+
+        // Valid move = the ball is not at the final destination and did not collide
+        else if (final_destination == false && collision == false){
+            // Do not update the this.done = false because it will stay false
+
+            reward = rewards(new_xPos, new_yPos);
+            rewards_total += reward;
+
+            updatePosition(new_xPos, new_yPos);
+
+            return reward;
+        }
+
+        // Invalid move (collision) = the ball is not at the final destination and did collide
+        else if (final_destination == false && collision == true){
+            // Do not update the this.done = false because it will stay false
+
+            int collision_reward = -100;
+            rewards_total += collision_reward;
+
+            // Do not update the position of the agent because when there is a collision it just start again
+            return collision_reward;
+        }
+
+        // If something goes wrong
+        return -100000;
     }
 
     /**
@@ -95,8 +117,7 @@ public class GameManager {
      * @return sensor state values
      */
     float[] getState(){
-        //float [] sensors = bot.getSensors; //TODO returns the sensors of this agent at that position
-        return null; // return sensors;
+        return LinkAgentNN.getSensors();
     }
 
 

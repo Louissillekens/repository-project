@@ -67,7 +67,8 @@ public class Node {
         Random r = new Random();
         int min = 0;
         int max = 360;
-        power = min + (max - min) * r.nextDouble();
+        angle = min + (max - min) * r.nextDouble();
+
     }
 
     /**
@@ -108,25 +109,21 @@ public class Node {
      * this method simulates the shot internally and returns the x and y coordinates of the resulting location
      * @return returns a double array of length 2 holding an x and y coordinate
      */
-    public double[] executeShot(PuttingGameScreen game){
-
-        double[] data = RK4(this);
-        return data;
-    }
-
-    //Executes the RK4 class giving back the position of the ball
-    static double[] RK4(Node node){
+    public double[] executeShot(){
 
         //Convert degrees to radians, radians is the argument for Math.sin or Math.cos
-        double angle = (node.getAngle()*Math.PI)/180;
+        double angle = (getAngle()*Math.PI)/180;
 
         //Split the velocity vector into x,y components
-        double vxi = (node.getPower())*Math.cos(angle);
-        double vyi = (node.getPower())*Math.sin(angle);
+        double vxi = (getPower())*Math.cos(angle);
+        double vyi = (getPower())*Math.sin(angle);
 
         Rungekuttasolver rk = new Rungekuttasolver();
-        return  rk.startRK4(node.getAngle(), node.getPower(), vxi, vyi);
+        System.out.println("starts calculations for location now");
+        return  rk.startRK4(getX(), getZ(), vxi, vyi);
     }
+
+
 
     /**
      * checks if the node has a parent
@@ -179,5 +176,13 @@ public class Node {
 
     public void setScore(double score) {
         this.score = score;
+    }
+
+    @Override
+    public String toString(){
+        //deliberately did not give info about parent as it would give too much info
+        return "Node with coordinates (" + getX() + ", " + getZ() + "),\n" +
+                " an angle of " + getAngle() + " and a power of " + getPower() +
+                "It has a score of " + getScore();
     }
 }
