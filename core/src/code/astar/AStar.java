@@ -14,8 +14,8 @@ public class AStar {
     private final int amOfNodes = 10; //the amount of nodes we generate from a node each time
 
     //temp set to 0.5, these final doubles are here to work as a factor in computing the score of a node
-    private final double distanceHeuristic = 1;
-    private final double stepHeuristic = 1;
+    private final double distanceHeuristic = 0.25;
+    private final double stepHeuristic = 2;
 
     public AStar(PuttingGameScreen game){
 
@@ -74,10 +74,10 @@ public class AStar {
      */
     public void computeScore(Node node){
 
-        double score = 0;
-        score -= stepHeuristic*amOfSteps(node);
+        double score = 100;
+        score -= distanceHeuristic*(node.CalculateDistTo(game.getFlagPositionX(), game.getFlagPositionZ()));
         System.out.println(score);
-        score += distanceHeuristic*(node.CalculateDistTo(game.getFlagPositionX(), game.getFlagPositionZ()));
+        score -= stepHeuristic*amOfSteps(node);
         System.out.println(score);
         node.setScore(score);
     }
