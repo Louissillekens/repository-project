@@ -6,7 +6,7 @@ public class LinkAgentNN {
     private static boolean win_position;
     private static float xPosition;
     private static float yPosition;
-    private static int action;
+    private static float[] sensors;
 
 
     public LinkAgentNN(int action){
@@ -29,6 +29,9 @@ public class LinkAgentNN {
         // Update the position
         this.xPosition = arr[5];
         this.yPosition = arr[6];
+
+        // Sensor Calculation
+        this.sensors = 
     }
 
     public static float getxPosition() {
