@@ -1,5 +1,7 @@
 package code.NN;
 
+import code.Lets_Go_Champ.TrainingData;
+
 import java.io.Serializable;
 
 /**
@@ -43,7 +45,7 @@ public class NeuralNet implements Serializable {
         this.layers = nn.layers; //Have the characteristics of the input nn
 
         // Need to change of data structure
-        Data data = new Data(t, new float[layers[layers.length-1].neurons.length]);
+        TrainingData data = new TrainingData(t, new float[layers[layers.length-1].neurons.length]);
         layers[0] = new Layer(data.getDataInput()); // Loads the input of the data into the input layer (layer[0])
 
         for (int i = 1; i < layers.length; i++){ // Loop true all the layers (hidden and output) (=I)
