@@ -2,7 +2,6 @@ package code.Screens;
 
 import code.Bot.AgentBot;
 import code.Bot.PuttingBotDeployement;
-import code.Bridge.LinkAgentNN;
 import code.Physics.Rungekuttasolver;
 import code.Physics.VerletSolver;
 import code.util.Util;
@@ -24,7 +23,6 @@ import com.badlogic.gdx.utils.Array;
 import com.game.game.Game;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Random;
 
 import static com.badlogic.gdx.graphics.GL20.GL_TRIANGLES;
@@ -2290,7 +2288,7 @@ public class PuttingGameScreen implements Screen {
                         sensorsData.add(stepData);
                     }
                 }
-                LinkAgentNN bridge = new LinkAgentNN(sensorsOutput, sensorsData);
+                // TODO CLEMENT LinkAgentNN bridge = new LinkAgentNN(sensorsOutput, sensorsData);
 
                 /*
                 for (int i = 0; i < sensorsData.size(); i++) {
