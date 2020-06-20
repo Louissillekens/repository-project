@@ -55,7 +55,7 @@ public class AStar {
                 nodes.add(cloneNode);
                 //each iteration create a random shot and make a node of where the ball arrives
                 cloneNode.generateShot( 0.25, game.getMAX_SPEED()); //min is set to 0.5 as values lower than this will not make the ball move all that much
-                double[] locData = node.executeShot(game);
+                double[] locData = node.executeShot();
                 Node nextNode = new Node(cloneNode, locData[0], locData[1]);
                 this.computeScore(nextNode);
                 this.addNode(nextNode);
