@@ -4,7 +4,6 @@ import code.Bot.Agent;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Arrays;
 
 public class LinkAgentNN {
 
@@ -24,8 +23,11 @@ public class LinkAgentNN {
 
         // ArrayList of float[] that corresponds to the 0-109 different actions
         sensorsOutput = agent.getOutputData();
-        // Simple float[] that contains data you need for that specific action
-        actionSensorOutput = sensorsOutput.get(action);
+        System.out.println(sensorsOutput.getClass().getSimpleName());
+// Simple float[] that contains data you need for that specific action
+        constructorCalc(sensorsOutput.get(action));
+
+
     }
 
     private void constructorCalc(float[] arr){
