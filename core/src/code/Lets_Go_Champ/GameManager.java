@@ -117,8 +117,7 @@ public class GameManager {
      * @return sensor state values
      */
     float[] getState(){
-        //float [] sensors = bot.getSensors; //TODO returns the sensors of this agent at that position
-        return null; // return sensors;
+        return LinkAgentNN.getSensors();
     }
 
 

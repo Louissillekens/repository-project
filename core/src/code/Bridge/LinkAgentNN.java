@@ -1,5 +1,7 @@
 package code.Bridge;
 
+import java.util.Arrays;
+
 public class LinkAgentNN {
 
     private static boolean collision;
@@ -31,7 +33,7 @@ public class LinkAgentNN {
         this.yPosition = arr[6];
 
         // Sensor Calculation
-        this.sensors = 
+        this.sensors = Arrays.copyOfRange(arr, 7, arr.length);
     }
 
     public float getxPosition() {
