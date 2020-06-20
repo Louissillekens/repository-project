@@ -29,6 +29,8 @@ public class BotScreen implements Screen {
 
     // Instances for the different game modes buttons
     private TextButton agentButton;
+    private TextButton nnButton;
+    private TextButton aStarButton;
 
     // Instance variable for the chosen solver
     private static String botName;
@@ -60,6 +62,16 @@ public class BotScreen implements Screen {
         agentButton.setSize(200, 60);
         stage.addActor(agentButton);
 
+        nnButton = new TextButton("NN bot", skin);
+        nnButton.setPosition(400, 300);
+        nnButton.setSize(200, 60);
+        stage.addActor(nnButton);
+
+        aStarButton = new TextButton("A* bot", skin);
+        aStarButton.setPosition(100, 200);
+        aStarButton.setSize(200, 60);
+        stage.addActor(aStarButton);
+
         class agentListener extends ChangeListener {
 
             private Game game;
@@ -80,6 +92,48 @@ public class BotScreen implements Screen {
             }
         }
         agentButton.addListener(new agentListener(game, this));
+
+        class nnListener extends ChangeListener {
+
+            private Game game;
+            private Screen screen;
+
+            private nnListener(final Game game, Screen screen) {
+
+                this.game = game;
+                this.screen = screen;
+            }
+
+            @Override
+            public void changed(ChangeEvent event, Actor actor) {
+
+                // TODO set the right screen instance
+                this.screen.dispose();
+                botName = "NN";
+            }
+        }
+        nnButton.addListener(new nnListener(game, this));
+
+        class aStarListener extends ChangeListener {
+
+            private Game game;
+            private Screen screen;
+
+            private aStarListener(final Game game, Screen screen) {
+
+                this.game = game;
+                this.screen = screen;
+            }
+
+            @Override
+            public void changed(ChangeEvent event, Actor actor) {
+
+                this.game.setScreen(new PuttingGameScreen(myGame, new GameMode(gameMode.gameName)));
+                this.screen.dispose();
+                botName = "aStar";
+            }
+        }
+        aStarButton.addListener(new aStarListener(game, this));
     }
 
     public static String getBotName() {

@@ -4,6 +4,7 @@ import code.Bot.AgentBot;
 import code.Bot.PuttingBotDeployement;
 import code.Physics.Rungekuttasolver;
 import code.Physics.VerletSolver;
+import code.astar.AStar;
 import code.util.Util;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
@@ -115,7 +116,8 @@ public class PuttingGameScreen implements Screen {
     private BitmapFont font = new BitmapFont();
     private float fontX, fontY;
     private GlyphLayout layout = new GlyphLayout();
-    private int period = 5000;
+    private float timer = 0;
+    private int period = 2;
 
     private drawObject drawObject = new drawObject();
 
@@ -206,6 +208,7 @@ public class PuttingGameScreen implements Screen {
     private boolean isBotReady = false;
     private boolean findFlag = false;
     private boolean check = false;
+    private boolean checkCollisionMessage = false;
 
     private float botTimer1 = 0;
     private float botTimer2 = 0;
@@ -777,7 +780,7 @@ public class PuttingGameScreen implements Screen {
 
     public boolean checkCollision(int index) {
 
-        if (euclideanDistObstacles(ballPositionX, ballPositionZ, index) < 0.3f) {
+        if (euclideanDistObstacles(ballPositionX, ballPositionZ, index) < 0.4f) {
             return true;
         }
         else {
@@ -1097,9 +1100,6 @@ public class PuttingGameScreen implements Screen {
 
         camera.update();
 
-        // Reset of the timer variable used to freeze the ball
-        float timer = 0;
-
         modelBatch.begin(camera);
 
         // Render the instance of the field with the given environment
@@ -1112,35 +1112,6 @@ public class PuttingGameScreen implements Screen {
         modelBatch.render(instances, environment);
 
         //ballObject.setWorldTransform(ball.transform);
-
-        // Loop that checks the collision between each obstacle and the ball
-        for (int i = 0; i < numberOfTree; i++) {
-            if (checkCollision(i)) {
-                if (SolverScreen.getSolverName().equals("RK4")) {
-
-                    Rungekuttasolver RK4 = new Rungekuttasolver();
-
-                    float vx = (float) RK4.getVx();
-                    float vy = (float) RK4.getVy();
-
-                    int scalar = 600;
-
-                    RK4.setValues(ballPositionX, ballPositionZ, vx*scalar, vy*scalar);
-                    RK4.RK4();
-                    newBallPositionX = (float) RK4.getX();
-                    newBallPositionZ = (float) RK4.getY();
-                }
-                else if (SolverScreen.getSolverName().equals("Verlet")) {
-
-                    VerletSolver Verlet = new VerletSolver();
-
-                    float vx = (float) Verlet.getVx();
-                    float vy = (float) Verlet.getVy();
-                }
-
-                System.out.println("--> Obstacle");
-            }
-        }
 
         ball = new ModelInstance(ballModel, ballPositionX, (defineFunction(ballPositionX, ballPositionZ))+(ballSize/2), ballPositionZ);
 
@@ -1515,42 +1486,80 @@ public class PuttingGameScreen implements Screen {
 
         shapeRenderer.end();
 
-        ballMovement();
+        if (!checkCollisionMessage) {
+            ballMovement();
+        }
 
         // Condition used when the ball is out of the field
         if (outOfField(ballPositionX, ballPositionZ)) {
 
-            displayMessage("Ball went out of the field");
-
-            camera.translate(-(sumX), (float) (-0.001/3), -(sumZ));
-            canTranslateCam = false;
-            canReset = false;
-            resetBallShot();
-            camera.lookAt(ballPositionX, defineFunction(ballPositionX, ballPositionZ), ballPositionZ);
+            if (timer < period) {
+                displayMessage("Ball went out of the field");
+                checkCollisionMessage = true;
+                timer += Gdx.graphics.getDeltaTime();
+            }
+            else {
+                checkCollisionMessage = false;
+                timer = 0;
+                camera.translate(-(sumX), (float) (-0.001 / 3), -(sumZ));
+                canTranslateCam = false;
+                canReset = false;
+                resetBallShot();
+                camera.lookAt(ballPositionX, defineFunction(ballPositionX, ballPositionZ), ballPositionZ);
+            }
         }
 
         // Condition used to reset the ball position when the ball falls into water
         if (isInWater(ballPositionX, ballPositionZ)) {
 
-            while (timer < period) {
+            if (timer < period) {
                 displayMessage("Ball fell in water");
+                checkCollisionMessage = true;
                 timer += Gdx.graphics.getDeltaTime();
             }
-            camera.translate(-(sumX), (float) (-0.001 / 3), -(sumZ));
-            canTranslateCam = false;
-            canReset = false;
-            // Call of the method that reset the ball to the previous place
-            resetBallShot();
-            camera.lookAt(ballPositionX, defineFunction(ballPositionX, ballPositionZ), ballPositionZ);
+            else {
+                checkCollisionMessage = false;
+                timer = 0;
+                camera.translate(-(sumX), (float) (-0.001 / 3), -(sumZ));
+                canTranslateCam = false;
+                canReset = false;
+                // Call of the method that reset the ball to the previous place
+                resetBallShot();
+                camera.lookAt(ballPositionX, defineFunction(ballPositionX, ballPositionZ), ballPositionZ);
+            }
         }
         // Condition used to check if the ball is closed enough to the flag
         if (isWin(ballPositionX, ballPositionZ) && ballStop) {
 
-            while (timer < period) {
+            if (timer < period) {
                 displayMessage("Win");
+                checkCollisionMessage = true;
                 timer+=Gdx.graphics.getDeltaTime();
             }
-            Gdx.app.exit();
+            else {
+                Gdx.app.exit();
+            }
+        }
+
+        // Loop that checks the collision between each obstacle and the ball
+        for (int i = 0; i < numberOfTree; i++) {
+            if (checkCollision(i)) {
+                if (timer < period) {
+                    displayMessage("Ball collide with a tree");
+                    checkCollisionMessage = true;
+                    timer += Gdx.graphics.getDeltaTime();
+                }
+                else {
+                    checkCollisionMessage = false;
+                    timer = 0;
+                    camera.translate(-(sumX), (float) (-0.001 / 3), -(sumZ));
+                    canTranslateCam = false;
+                    canReset = false;
+                    // Call of the method that reset the ball to the previous place
+                    resetBallShot();
+                    camera.lookAt(ballPositionX, defineFunction(ballPositionX, ballPositionZ), ballPositionZ);
+                }
+            }
         }
 
         // Condition that only let the user controls when the Single Player mode is selected
@@ -1577,7 +1586,9 @@ public class PuttingGameScreen implements Screen {
         }
         else {
             if (BotScreen.getBotName().equals("agent")) {
-                handler.checkForAgentBot();
+                if (!checkCollisionMessage) {
+                    handler.checkForAgentBot();
+                }
                 /*
                 if (ballStop) {
                     if (countIterationBot < 1) {
@@ -1594,9 +1605,9 @@ public class PuttingGameScreen implements Screen {
                 }
                 */
             }
-            else {
-                // Bot mode only needs to have space input to work
-                handler.checkForSpaceInput();
+            if (BotScreen.getBotName().equals("aStar")) {
+                AStar bot = new AStar(this);
+                bot.findRoute();
             }
         }
     }
@@ -2350,7 +2361,6 @@ public class PuttingGameScreen implements Screen {
                         //sensorsData.add(stepData);
                     }
                 }
-                // TODO CLEMENT LinkAgentNN bridge = new LinkAgentNN(sensorsOutput, sensorsData);
                 //isBotReady = true;
 
 

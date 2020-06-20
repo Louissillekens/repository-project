@@ -51,11 +51,16 @@ public class Rungekuttasolver{
     public double[] startRK4(double xPos,double yPos, double xV, double yV){
 
         Rungekuttasolver solver = new Rungekuttasolver();
-        solver.setValues(xPos,yPos,xV,yV);
+        solver.setValues(xPos,yPos,xV*500,yV*500);
 
+        /*
         while(!hasBallStopped()){
             solver.RK4();
+            System.out.println("stuck");
         }
+        */
+
+        solver.RK4();
 
         return new double[] {solver.getX(), solver.getY()};
     }
@@ -64,8 +69,8 @@ public class Rungekuttasolver{
 
         hasStopped =false;
 
-        System.out.println("abs val of vx is: " + Math.abs(vx));
-        System.out.println("abs val of vy is: " + Math.abs(vy));
+        //System.out.println("abs val of vx is: " + Math.abs(vx));
+        //System.out.println("abs val of vy is: " + Math.abs(vy));
 
         if((Math.abs(vx) < E) && (Math.abs(vy) < E) && (!isAcceleration())){
             hasStopped = true;
@@ -79,8 +84,8 @@ public class Rungekuttasolver{
         double x_accel = this.getFHeightX(this.getX(),this.getY());
         double y_accel = this.getFHeightY(this.getX(),this.getY());
 
-        System.out.println("abs val of x_accel is: " + Math.abs(x_accel));
-        System.out.println("abs val of y_accel is: " + Math.abs(y_accel));
+        //System.out.println("abs val of x_accel is: " + Math.abs(x_accel));
+        //System.out.println("abs val of y_accel is: " + Math.abs(y_accel));
 
         if((Math.abs(x_accel) < E) && (Math.abs(y_accel) < E)) return false;
         return true;
