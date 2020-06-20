@@ -15,6 +15,7 @@ public class Rungekuttasolver{
     private double y;
     private final double onesixth =(double)1/6;
     private static boolean hasStopped;
+    private final double E = 0.00000001;
 
     public static void main(String args[]){
 
@@ -52,8 +53,7 @@ public class Rungekuttasolver{
         Rungekuttasolver solver = new Rungekuttasolver();
         solver.setValues(xPos,yPos,xV,yV);
 
-        //Run the solver
-        for (int i=0; i<6000; i++) {
+        while(!hasBallStopped()){
             solver.RK4();
         }
 
@@ -63,10 +63,21 @@ public class Rungekuttasolver{
     public boolean hasBallStopped(){
 
         hasStopped =false;
-        if(vx==0 && vy==0 /*&& ax==0 && ay == 0*/){
+
+        if((Math.abs(vx) < E) && (Math.abs(vy) < E) && (!isAcceleration())){
             hasStopped = true;
         }
+
         return hasStopped;
+    }
+
+    public boolean isAcceleration(){
+
+        double x_accel = this.getFHeightX(this.getX(),this.getY());
+        double y_accel = this.getFHeightY(this.getX(),this.getY());
+
+        if((Math.abs(x_accel) < E) && (Math.abs(y_accel) < E)) return false;
+        return true;
     }
 
     public double getHeight(double x, double y){
@@ -139,6 +150,10 @@ public class Rungekuttasolver{
 
     public double getVy(){
         return vy;
+    }
+
+    public double getE(){
+        return E;
     }
 
 }
