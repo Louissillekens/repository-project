@@ -27,7 +27,6 @@ public class LinkAgentNN {
 // Simple float[] that contains data you need for that specific action
         constructorCalc(sensorsOutput.get(action));
 
-
     }
 
     private void constructorCalc(float[] arr){

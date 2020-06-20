@@ -13,8 +13,8 @@ public class GameManager {
     private final float xFlag;
     private final float yFlag;
 
-    private float xPos;
-    private float yPos;
+    private static float xPos;
+    private static float yPos;
 
     private boolean done; // Tracks if we reached the flag = ended the episode
     private boolean current_screen; // Tracks if the game just started, meaning no prev actions //TODO utille pour non CNN?
@@ -170,4 +170,11 @@ public class GameManager {
         return done;
     }
 
+    public static float getxPos() {
+        return xPos;
+    }
+
+    public static float getyPos() {
+        return yPos;
+    }
 }
