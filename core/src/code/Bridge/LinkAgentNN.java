@@ -34,20 +34,24 @@ public class LinkAgentNN {
         this.sensors = 
     }
 
-    public static float getxPosition() {
+    public float getxPosition() {
         return xPosition;
     }
 
-    public static float getyPosition() {
+    public float getyPosition() {
         return yPosition;
     }
 
-    public static boolean getCollision() {
+    public boolean getCollision() {
         return collision;
     }
 
-    public static boolean getWinPosition() {
+    public boolean getWinPosition() {
         return win_position;
+    }
+
+    public static float[] getSensors(){
+        return sensors;
     }
 
     /*    public LinkAgentNN(ArrayList<boolean[]> booleansOutput, ArrayList<float[]> dataOutput) {
