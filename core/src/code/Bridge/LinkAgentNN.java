@@ -1,6 +1,9 @@
 package code.Bridge;
 
 import code.Bot.Agent;
+import code.Lets_Go_Champ.GameManager;
+import code.Screens.PuttingGameScreen;
+import com.game.game.Game;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -18,13 +21,15 @@ public class LinkAgentNN {
 
     public LinkAgentNN(int action){
 
+        PuttingGameScreen bot = new PuttingGameScreen(GameManager.getxPos(), GameManager.getyPos());
+
         // Object agent that (for now) can just return the output data from PuttingGameScreen
         Agent agent = new Agent();
 
         // ArrayList of float[] that corresponds to the 0-109 different actions
         sensorsOutput = agent.getOutputData();
         System.out.println(sensorsOutput.getClass().getSimpleName());
-// Simple float[] that contains data you need for that specific action
+        // Simple float[] that contains data you need for that specific action
         constructorCalc(sensorsOutput.get(action));
 
     }

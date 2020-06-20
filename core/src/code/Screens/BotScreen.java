@@ -107,9 +107,9 @@ public class BotScreen implements Screen {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
 
-                // TODO set the right screen instance
+                //this.game.setScreen(new PuttingGameScreen(4,2));
                 this.screen.dispose();
-                botName = "NN";
+                //botName = "NN";
             }
         }
         nnButton.addListener(new nnListener(game, this));
@@ -138,6 +138,10 @@ public class BotScreen implements Screen {
 
     public static String getBotName() {
         return botName;
+    }
+
+    public static void setBotName(String botName) {
+        BotScreen.botName = botName;
     }
 
     @Override

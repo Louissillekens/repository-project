@@ -248,6 +248,10 @@ public class PuttingGameScreen implements Screen {
 
     private int countForSensor0Ready = 0;
 
+    public static boolean finishAgent;
+
+    private String name;
+
     /**
      * Constructor that creates a new instance of the putting game screen
      * @param game current instance of the game
@@ -257,6 +261,17 @@ public class PuttingGameScreen implements Screen {
 
         this.game = game;
         this.gameMode = new GameMode(gameMode.gameName);
+        this.createField();
+    }
+
+    public PuttingGameScreen(float startingPositionX, float startingPositionZ) {
+
+        this.ballPositionX = startingPositionX;
+        this.ballPositionZ = startingPositionZ;
+        this.name = "NN";
+        finishAgent = false;
+        this.gameMode = new GameMode("Bot");
+        BotScreen.setBotName("agent");
         this.createField();
     }
 
@@ -1610,6 +1625,12 @@ public class PuttingGameScreen implements Screen {
                 bot.findRoute();
             }
         }
+
+        if (name.equals("NN")) {
+            if (finishAgent) {
+                Gdx.app.exit();
+            }
+        }
     }
 
     @Override
@@ -2442,8 +2463,9 @@ public class PuttingGameScreen implements Screen {
                 isSensorOnSand = new boolean[11];
                 checkForSensorsStep = new boolean[11];
 
+                finishAgent = true;
             }
-            // TODO CLEMENT LinkAgentNN bridge = new LinkAgentNN(sensorsOutput, sensorsData);
+
 
             /*
             for (int i = 0; i < sensorsData.size(); i++) {
