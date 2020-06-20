@@ -2,6 +2,7 @@ package code.Screens;
 
 import code.Bot.AgentBot;
 import code.Bot.PuttingBotDeployement;
+import code.Bridge.LinkAgentNN;
 import code.Physics.Rungekuttasolver;
 import code.Physics.VerletSolver;
 import code.util.Util;
@@ -169,7 +170,9 @@ public class PuttingGameScreen implements Screen {
     private float[] sensorsSize = new float[11];
     private static float[] maxPositionX = new float[11];
     private static float[] maxPositionZ = new float[11];
-    private float[] minEucldieanDist = new float[11];
+    private static float[] maxPositionAgentX = new float[11];
+    private static float[] maxPositionAgentZ = new float[11];
+    private float[] minEuclideanDist = new float[11];
     private float[] sensorsAngleX = new float[11];
     private float[] sensorsAngleY = new float[11];
     private float[] sensorsAngleZ = new float[11];
@@ -179,6 +182,7 @@ public class PuttingGameScreen implements Screen {
     private float[] sensorPositionX = new float[11];
     private float[] sensorPositionY = new float[11];
     private float[] sensorPositionZ = new float[11];
+    private boolean[] checkForSensorsStep = new boolean[11];
 
     private Array<ModelInstance> sensors = new Array<>();
 
@@ -209,12 +213,15 @@ public class PuttingGameScreen implements Screen {
     private int countForBot = 0;
     private int bestSensor = 0;
     private int count = 0;
+    private int counter = 0;
     private int countForSensors = 0;
+    private int countForSensorsReady = 0;
 
     private float[] stepPositionX = new float[sensorsSize.length*10];
     private float[] stepPositionZ = new float[sensorsSize.length*10];
 
-    private ArrayList<float[]> sensorsData = new ArrayList<>();
+    private static ArrayList<float[]> sensorsData = new ArrayList<>();
+    private static ArrayList<boolean[]> sensorsOutput = new ArrayList<>();
 
     private static int sandPitSize = 5;
     private static int amountOfSandPit = 10;
@@ -226,6 +233,15 @@ public class PuttingGameScreen implements Screen {
     private boolean checkSolver = false;
 
     private float agentPower;
+
+    private float stepForMaxX;
+    private float stepForMaxZ;
+    private float[] saveStepX = new float[numberOfLinesSensors];
+    private float[] saveStepZ = new float[numberOfLinesSensors];
+
+    private Array<ModelInstance> instancesTest = new Array<>();
+
+    private boolean checkCamera = false;
 
     /**
      * Constructor that creates a new instance of the putting game screen
@@ -508,6 +524,11 @@ public class PuttingGameScreen implements Screen {
         return (float) Math.sqrt(Math.pow((x1-maxPositionX[index]), 2) + Math.pow((z1-maxPositionZ[index]), 2));
     }
 
+    public static float euclideanDist(float x1, float z1, float x2, float z2) {
+
+        return (float) Math.sqrt(Math.pow((x1-x2), 2) + Math.pow((z1-z2), 2));
+    }
+
     /**
      * Method that checks if the ball is close enough to the flag
      * @param positionX the first coordinate on the field
@@ -516,7 +537,9 @@ public class PuttingGameScreen implements Screen {
      */
     public boolean isWin(float positionX, float positionZ) {
 
-        if(euclideanDistFlag(positionX, positionZ) < winRadius) return true;
+        if(euclideanDistFlag(positionX, positionZ) < winRadius) {
+            return true;
+        }
         return false;
     }
 
@@ -812,101 +835,101 @@ public class PuttingGameScreen implements Screen {
         if (num == 0) {
             if (collision) {
                 isDetectorCollision1 = true;
-                maxPositionX[num] = ballPositionX+rotationX1;
-                maxPositionZ[num] = ballPositionZ+rotationZ1;
+                maxPositionAgentX[num] = ballPositionX+rotationX1;
+                maxPositionAgentZ[num] = ballPositionZ+rotationZ1;
             } else {
-                maxPositionX[num] = ballPositionX+rotationX1;
-                maxPositionZ[num] = ballPositionZ+rotationZ1;
+                maxPositionAgentX[num] = ballPositionX+rotationX1;
+                maxPositionAgentZ[num] = ballPositionZ+rotationZ1;
             }
         }
         if (num == 1) {
             if (collision) {
                 isDetectorCollision2 = true;
-                maxPositionX[num] = ballPositionX+rotationX1;
-                maxPositionZ[num] = ballPositionZ+rotationZ1;
+                maxPositionAgentX[num] = ballPositionX+rotationX1;
+                maxPositionAgentZ[num] = ballPositionZ+rotationZ1;
             } else {
-                maxPositionX[num] = ballPositionX+rotationX1;
-                maxPositionZ[num] = ballPositionZ+rotationZ1;
+                maxPositionAgentX[num] = ballPositionX+rotationX1;
+                maxPositionAgentZ[num] = ballPositionZ+rotationZ1;
             }
         }
         if (num == 2) {
             if (collision) {
                 isDetectorCollision3 = true;
-                maxPositionX[num] = ballPositionX+rotationX1;
-                maxPositionZ[num] = ballPositionZ+rotationZ1;
+                maxPositionAgentX[num] = ballPositionX+rotationX1;
+                maxPositionAgentZ[num] = ballPositionZ+rotationZ1;
             } else {
-                maxPositionX[num] = ballPositionX+rotationX1;
-                maxPositionZ[num] = ballPositionZ+rotationZ1;
+                maxPositionAgentX[num] = ballPositionX+rotationX1;
+                maxPositionAgentZ[num] = ballPositionZ+rotationZ1;
             }
         }
         if (num == 3) {
             if (collision) {
                 isDetectorCollision4 = true;
-                maxPositionX[num] = ballPositionX+rotationX1;
-                maxPositionZ[num] = ballPositionZ+rotationZ1;
+                maxPositionAgentX[num] = ballPositionX+rotationX1;
+                maxPositionAgentZ[num] = ballPositionZ+rotationZ1;
             } else {
-                maxPositionX[num] = ballPositionX+rotationX1;
-                maxPositionZ[num] = ballPositionZ+rotationZ1;
+                maxPositionAgentX[num] = ballPositionX+rotationX1;
+                maxPositionAgentZ[num] = ballPositionZ+rotationZ1;
             }
         }
         if (num == 4) {
             if (collision) {
                 isDetectorCollision5 = true;
-                maxPositionX[num] = ballPositionX+rotationX1;
-                maxPositionZ[num] = ballPositionZ+rotationZ1;
+                maxPositionAgentX[num] = ballPositionX+rotationX1;
+                maxPositionAgentZ[num] = ballPositionZ+rotationZ1;
             } else {
-                maxPositionX[num] = ballPositionX+rotationX1;
-                maxPositionZ[num] = ballPositionZ+rotationZ1;
+                maxPositionAgentX[num] = ballPositionX+rotationX1;
+                maxPositionAgentZ[num] = ballPositionZ+rotationZ1;
             }
         }
         if (num == 6) {
             if (collision) {
                 isDetectorCollision7 = true;
-                maxPositionX[num] = ballPositionX+rotationX1;
-                maxPositionZ[num] = ballPositionZ+rotationZ1;
+                maxPositionAgentX[num] = ballPositionX+rotationX1;
+                maxPositionAgentZ[num] = ballPositionZ+rotationZ1;
             } else {
-                maxPositionX[num] = ballPositionX+rotationX1;
-                maxPositionZ[num] = ballPositionZ+rotationZ1;
+                maxPositionAgentX[num] = ballPositionX+rotationX1;
+                maxPositionAgentZ[num] = ballPositionZ+rotationZ1;
             }
         }
         if (num == 7) {
             if (collision) {
                 isDetectorCollision8 = true;
-                maxPositionX[num] = ballPositionX+rotationX1;
-                maxPositionZ[num] = ballPositionZ+rotationZ1;
+                maxPositionAgentX[num] = ballPositionX+rotationX1;
+                maxPositionAgentZ[num] = ballPositionZ+rotationZ1;
             } else {
-                maxPositionX[num] = ballPositionX+rotationX1;
-                maxPositionZ[num] = ballPositionZ+rotationZ1;
+                maxPositionAgentX[num] = ballPositionX+rotationX1;
+                maxPositionAgentZ[num] = ballPositionZ+rotationZ1;
             }
         }
         if (num == 8) {
             if (collision) {
                 isDetectorCollision9 = true;
-                maxPositionX[num] = ballPositionX+rotationX1;
-                maxPositionZ[num] = ballPositionZ+rotationZ1;
+                maxPositionAgentX[num] = ballPositionX+rotationX1;
+                maxPositionAgentZ[num] = ballPositionZ+rotationZ1;
             } else {
-                maxPositionX[num] = ballPositionX+rotationX1;
-                maxPositionZ[num] = ballPositionZ+rotationZ1;
+                maxPositionAgentX[num] = ballPositionX+rotationX1;
+                maxPositionAgentZ[num] = ballPositionZ+rotationZ1;
             }
         }
         if (num == 9) {
             if (collision) {
                 isDetectorCollision10 = true;
-                maxPositionX[num] = ballPositionX+rotationX1;
-                maxPositionZ[num] = ballPositionZ+rotationZ1;
+                maxPositionAgentX[num] = ballPositionX+rotationX1;
+                maxPositionAgentZ[num] = ballPositionZ+rotationZ1;
             } else {
-                maxPositionX[num] = ballPositionX+rotationX1;
-                maxPositionZ[num] = ballPositionZ+rotationZ1;
+                maxPositionAgentX[num] = ballPositionX+rotationX1;
+                maxPositionAgentZ[num] = ballPositionZ+rotationZ1;
             }
         }
         if (num == 10) {
             if (collision) {
                 isDetectorCollision11 = true;
-                maxPositionX[num] = ballPositionX+rotationX1;
-                maxPositionZ[num] = ballPositionZ+rotationZ1;
+                maxPositionAgentX[num] = ballPositionX+rotationX1;
+                maxPositionAgentZ[num] = ballPositionZ+rotationZ1;
             } else {
-                maxPositionX[num] = ballPositionX+rotationX1;
-                maxPositionZ[num] = ballPositionZ+rotationZ1;
+                maxPositionAgentX[num] = ballPositionX+rotationX1;
+                maxPositionAgentZ[num] = ballPositionZ+rotationZ1;
             }
         }
 
@@ -914,7 +937,23 @@ public class PuttingGameScreen implements Screen {
             sensors.add(lineInstance);
         }
 
+        /*
+        if (collision) {
+            modelBuilder.begin();
+            meshPartBuilder = modelBuilder.part("line", 1, 3, new Material());
+            meshPartBuilder.setColor(Color.WHITE);
+            meshPartBuilder.line(ballPositionX + rotationX1, (defineFunction(ballPositionX + rotationX1, ballPositionZ + rotationZ1) + 0.1f), ballPositionZ + rotationZ1,
+                    ballPositionX + rotationX2, (defineFunction(ballPositionX + rotationX2, ballPositionZ + rotationZ2) + 0.1f), ballPositionZ + rotationZ2);
+            Model lineModelExtra = modelBuilder.end();
+            ModelInstance lineInstanceExtra = new ModelInstance(lineModelExtra);
+
+            sensors.add(lineInstanceExtra);
+        }
+        */
+
         sensorsSize[num] = (index + 1)/(numberOfLinesSensors/10f);
+
+
     }
 
     public static float evaluatePowerRK4(float x, float z, float x1, float z1, float vx, float vz) {
@@ -923,7 +962,7 @@ public class PuttingGameScreen implements Screen {
 
         boolean check = false;
         float allowableRange = 0.3f;
-        float increment = 0.1f;
+        float increment = 2f;
         float i = increment/2;
         float power = 1;
         float newX = 0;
@@ -938,6 +977,15 @@ public class PuttingGameScreen implements Screen {
 
             newX = (float) RK4.getX();
             newZ = (float) RK4.getY();
+
+/*
+            System.out.println("x1 = " + x1);
+            System.out.println("z1 = " + z1);
+            System.out.println("newX = " + newX);
+            System.out.println("newZ = " + newZ);
+            System.out.println("type = " + type);
+            System.out.println();
+*/
 
             if (count < 1) {
                 if (x1 > newX && z1 > newZ) {
@@ -987,6 +1035,8 @@ public class PuttingGameScreen implements Screen {
                 }
             }
             i+=increment;
+
+            //System.out.println("stuck");
         }
 
         if (outOfField(newX, newZ) || isInWater(newX, newZ)) {
@@ -1097,6 +1147,9 @@ public class PuttingGameScreen implements Screen {
                 float stepX1 = maxVx / numberOfLinesSensors;
                 float stepZ1 = maxVz / numberOfLinesSensors;
 
+                stepForMaxX = 0;
+                stepForMaxZ = 0;
+
                 int i = 0;
                 while (i < numberOfLinesSensors) {
                     if (!isDetectorCollision6) {
@@ -1140,10 +1193,25 @@ public class PuttingGameScreen implements Screen {
                         if (!isDetectorCollision6) {
                             sensors.add(lineInstance);
                         }
+                        /*
+                        if (isDetectorCollision6) {
+
+                            modelBuilder.begin();
+                            meshPartBuilder = modelBuilder.part("line", 1, 3, new Material());
+                            meshPartBuilder.setColor(Color.RED);
+                            meshPartBuilder.line((ballPositionX + (stepX)), defineFunction((ballPositionX + (stepX)), (ballPositionZ + (stepZ))) + 0.1f, (ballPositionZ + (stepZ)),
+                                    ballPositionX + stepX + stepX1, defineFunction(ballPositionX + stepX + (stepX1), ballPositionZ + stepZ + (stepZ1)) + 0.1f, ballPositionZ + stepZ + (stepZ1));
+                            Model lineModelExtra = modelBuilder.end();
+                            ModelInstance lineInstanceExtra = new ModelInstance(lineModelExtra);
+
+                            sensors.add(lineInstanceExtra);
+                        }
+                        */
+
                         sensorsSize[5] = (i + 1) / (numberOfLinesSensors / 10f);
 
-                        maxPositionX[5] = ballPositionX + stepX;
-                        maxPositionZ[5] = ballPositionZ + stepZ;
+                        maxPositionAgentX[5] = ballPositionX + stepX;
+                        maxPositionAgentZ[5] = ballPositionZ + stepZ;
                     }
 
                     if (!isDetectorCollision1) {
@@ -1180,21 +1248,160 @@ public class PuttingGameScreen implements Screen {
                     // Print the resulting size of each sensors
                     // System.out.println("sensorsSize = " + Arrays.toString(sensorsSize));
 
-                    stepX += maxVx / numberOfLinesSensors;
-                    stepZ += maxVz / numberOfLinesSensors;
+
+                    saveStepX[i] = stepX+stepX1;
+                    saveStepZ[i] = stepZ+stepZ1;
+
+                    stepX += stepX1;
+                    stepZ += stepZ1;
 
                     i++;
                 }
 
-                for (int j = 0; j < 11; j++) {
-                    float stepSensorX = (maxPositionX[j] - ballPositionX)/10;
-                    float stepSensorZ = (maxPositionZ[j] - ballPositionZ)/10;
+
+                //System.out.println("maxPositionX = " + maxPositionX[5]);
+
+                /*
+                for (int j = 0; j < sensorsSize.length; j++) {
+
+                    float angle = 0;
+
+                    if (j==0) {
+                        angle = -135;
+                    }
+                    if (j==1) {
+                        angle = -90;
+                    }
+                    if (j==2) {
+                        angle = -67.5f;
+                    }
+                    if (j==3) {
+                        angle = -45;
+                    }
+                    if (j==4) {
+                        angle = -22.5f;
+                    }
+                    if (j==5) {
+                        angle = 0;
+                    }
+                    if (j==6) {
+                        angle = 22.5f;
+                    }
+                    if (j==7) {
+                        angle = 45;
+                    }
+                    if (j==8) {
+                        angle = 67.5f;
+                    }
+                    if (j==9) {
+                        angle = 90;
+                    }
+                    if (j==10) {
+                        angle = 135;
+                    }
+
+                    float radian = (float) Math.toRadians(angle);
+
+                    float x = (float) ((maxPositionX[5]) * Math.cos(radian) - (maxPositionZ[5]) * Math.sin(radian));
+                    float z = (float) ((maxPositionZ[5]) * Math.cos(radian) + (maxPositionX[5]) * Math.sin(radian));
+
+                    maxPositionX[j] = ballPositionX+x;
+                    maxPositionZ[j] = ballPositionZ+z;
+                }
+                */
+
+                //System.out.println("maxPositionX = " + Arrays.toString(maxPositionX));
+
+
+                //stepForMaxX = stepX + stepX1;
+                //stepForMaxZ = stepZ + stepZ1;
+
+                //for (int j = 0; j < 11; j++) {
+
+                /*
+                int step = 10;
+                float stepSensorX = (stepForMaxX - ballPositionX)/step;
+                float stepSensorZ = (stepForMaxZ - ballPositionZ)/step;
+                for (int k = 0; k < step; k++) {
+                   //int stepIndex = ((j+1)*10)-(k+1);
+                    int stepIndex = 50+k;
+                    //int stepIndex = 59-k;
+                    //stepPositionX[stepIndex] = (stepForMaxX) - ((k)*stepSensorX);
+                    //stepPositionZ[stepIndex] = (stepForMaxZ) - ((k)*stepSensorZ);
+                    stepPositionX[stepIndex] = ballPositionX + ((k+1)*stepSensorX);
+                    stepPositionZ[stepIndex] = ballPositionZ + ((k+1)*stepSensorZ);
+                }
+                */
+
+                /*
+                System.out.println("stepPositionX = " + Arrays.toString(stepPositionX));
+                System.out.println("stepPositionZ = " + Arrays.toString(stepPositionZ));
+                System.out.println();
+                */
+
+                for (int j = 0; j < sensorsSize.length; j++) {
                     for (int k = 0; k < 10; k++) {
-                        int stepIndex = ((j+1)*10)-(k+1);
-                        stepPositionX[stepIndex] = maxPositionX[j] - ((k)*stepSensorX);
-                        stepPositionZ[stepIndex] = maxPositionZ[j] - ((k)*stepSensorZ);
+
+                        int stepIndex1 = ((j*10)+(k));
+                        int stepIndex2 = ((k+1)*5)-1;
+
+                        float angle = 0;
+
+                        if (j==0) {
+                            angle = -135;
+                        }
+                        if (j==1) {
+                            angle = -90;
+                        }
+                        if (j==2) {
+                            angle = -67.5f;
+                        }
+                        if (j==3) {
+                            angle = -45;
+                        }
+                        if (j==4) {
+                            angle = -22.5f;
+                        }
+                        if (j==5) {
+                            angle = 0;
+                        }
+                        if (j==6) {
+                            angle = 22.5f;
+                        }
+                        if (j==7) {
+                            angle = 45;
+                        }
+                        if (j==8) {
+                            angle = 67.5f;
+                        }
+                        if (j==9) {
+                            angle = 90;
+                        }
+                        if (j==10) {
+                            angle = 135;
+                        }
+
+                        float radian = (float) Math.toRadians(angle);
+
+                        float x = (float) ((saveStepX[stepIndex2]) * Math.cos(radian) - (saveStepZ[stepIndex2]) * Math.sin(radian));
+                        float z = (float) ((saveStepZ[stepIndex2]) * Math.cos(radian) + (saveStepX[stepIndex2]) * Math.sin(radian));
+
+                        stepPositionX[stepIndex1] = ballPositionX+x;
+                        stepPositionZ[stepIndex1] = ballPositionZ+z;
                     }
                 }
+
+                for (int j = 0; j < sensorsSize.length; j++) {
+
+                    int stepIndex = (((j+1)*10)-1);
+
+                    maxPositionX[j] = stepPositionX[stepIndex];
+                    maxPositionZ[j] = stepPositionZ[stepIndex];
+                }
+
+
+
+                //}
                 //System.out.println("stepPositionX = " + Arrays.toString(stepPositionX));
                 //System.out.println("stepPositionZ = " + Arrays.toString(stepPositionZ));
 
@@ -1213,7 +1420,7 @@ public class PuttingGameScreen implements Screen {
                 isDetectorCollision11 = false;
 
                 for (int j = 0; j < sensorsSize.length; j++) {
-                    minEucldieanDist[j] = euclideanDistSensors(0, 0, j);
+                    minEuclideanDist[j] = euclideanDistSensors(0, 0, j);
                 }
 
                 botTimer1 = 0;
@@ -1232,6 +1439,52 @@ public class PuttingGameScreen implements Screen {
                 checkSolver = false;
             }
         }
+
+
+
+
+/*
+        for (int i = 0; i < maxPositionZ.length; i++) {
+            Model testII = modelBuilder.createBox(0.2f, 3, 0.2f,
+                    new Material(ColorAttribute.createDiffuse(Color.YELLOW)),
+                    VertexAttributes.Usage.Position | VertexAttributes.Usage.Normal
+            );
+            ModelInstance testIII = new ModelInstance(testII, maxPositionX[i], defineFunction(maxPositionX[i], maxPositionZ[i]), maxPositionZ[i]);
+
+            instancesTest.add(testIII);
+        }
+
+        if (ballStop) {
+            modelBatch.render(instancesTest, environment);
+        }
+        else {
+            instancesTest.clear();
+        }
+
+
+
+        Array<ModelInstance> testArray = new Array<>();
+
+        for (int i = 0; i < stepPositionX.length; i++) {
+            Model test = modelBuilder.createBox(0.05f, 1f, 0.05f,
+                    new Material(ColorAttribute.createDiffuse(Color.RED)),
+                    VertexAttributes.Usage.Position | VertexAttributes.Usage.Normal
+            );
+            ModelInstance testI = new ModelInstance(test, stepPositionX[i], defineFunction(stepPositionX[i],  stepPositionZ[i]), stepPositionZ[i]);
+
+            testArray.add(testI);
+        }
+
+        if (ballStop) {
+            modelBatch.render(testArray, environment);
+        }
+        else {
+            testArray.clear();
+        }
+        */
+
+
+
 
         modelBatch.render(flag1Instance, environment);
         modelBatch.render(flag2Instance, environment);
@@ -1456,6 +1709,14 @@ public class PuttingGameScreen implements Screen {
         return modelBuilder;
     }
 
+    public static ArrayList<boolean[]> getSensorsOutput() {
+        return sensorsOutput;
+    }
+
+    public static ArrayList<float[]> getSensorsData() {
+        return sensorsData;
+    }
+
     public class InputHandler {
 
         public void checkForAgentBot() {
@@ -1543,6 +1804,7 @@ public class PuttingGameScreen implements Screen {
 
                 if (countForBot < 1) {
 
+                    /*
                     camera.direction.x = camDirectionFlagX;
                     camera.direction.y = camDirectionFlagY;
                     camera.direction.z = camDirectionFlagZ;
@@ -1554,12 +1816,126 @@ public class PuttingGameScreen implements Screen {
                     camera.position.x = camPositionFlagX;
                     camera.position.y = camPositionFlagY;
                     camera.position.z = camPositionFlagZ;
+                    */
 
                     checkForSensors = true;
                     countForBot++;
                 }
                 else {
                     checkForSensors = false;
+                }
+            }
+
+            if (sensorsReady) {
+
+                if (countForSensors < 1) {
+                    for (int j = 0; j < sensorsSize.length; j++) {
+                        minEuclideanDist[j] = 100;
+                    }
+                }
+
+                countForSensors++;
+
+                modelBatch.render(sensors, environment);
+
+                float timePeriod1 = 2f;
+                float camVelocity = 7f;
+                float error = 0.1f;
+
+                if (botTimer1 < timePeriod1) {
+
+                    for (int i = 0; i < sensorsSize.length; i++) {
+                        if (euclideanDistSensors(finalPositionArrowX, finalPositionArrowZ, i) < minEuclideanDist[i]) {
+
+                            minEuclideanDist[i] = euclideanDistSensors(finalPositionArrowX, finalPositionArrowZ, i)+error;
+                        }
+                    }
+
+                    camera.rotateAround(vector1 = new Vector3(ballPositionX, defineFunction(ballPositionX, ballPositionZ), ballPositionZ),
+                            vector2 = new Vector3(0f, 1f, 0f), camVelocity);
+                    camera.lookAt(ballPositionX, defineFunction(ballPositionX, ballPositionZ), ballPositionZ);
+
+                    botTimer1+=Gdx.graphics.getDeltaTime();
+                }
+
+
+                float camVelocity1 = 3f;
+                float camVelocity2 = 0.5f;
+                if (botTimer1 > timePeriod1 && !botReady) {
+
+                    if (counter < 1) {
+
+                        camera.direction.x = camDirectionFlagX;
+                        camera.direction.y = camDirectionFlagY;
+                        camera.direction.z = camDirectionFlagZ;
+
+                        camera.up.x = camUpFlagX;
+                        camera.up.y = camUpFlagY;
+                        camera.up.z = camUpFlagZ;
+
+                        camera.position.x = camPositionFlagX;
+                        camera.position.y = camPositionFlagY;
+                        camera.position.z = camPositionFlagZ;
+
+                        checkCamera = true;
+                    }
+                    if (checkCamera) {
+                        counter++;
+                    }
+
+                    //for (int i = 0; i < sensorsSize.length; i++) {
+
+                    if (checkCamera) {
+                        if (euclideanDistSensors(finalPositionArrowX, finalPositionArrowZ, countForSensorsReady) < minEuclideanDist[countForSensorsReady]) {
+
+                            minEuclideanDist[countForSensorsReady] = euclideanDistSensors(finalPositionArrowX, finalPositionArrowZ, countForSensorsReady);
+
+                            if (countForSensorsReady == 0) {
+                                camera.rotateAround(vector1 = new Vector3(ballPositionX, defineFunction(ballPositionX, ballPositionZ), ballPositionZ),
+                                        vector2 = new Vector3(0f, 1f, 0f), camVelocity2);
+                                camera.lookAt(ballPositionX, defineFunction(ballPositionX, ballPositionZ), ballPositionZ);
+                            } else {
+                                camera.rotateAround(vector1 = new Vector3(ballPositionX, defineFunction(ballPositionX, ballPositionZ), ballPositionZ),
+                                        vector2 = new Vector3(0f, 1f, 0f), -camVelocity2);
+                                camera.lookAt(ballPositionX, defineFunction(ballPositionX, ballPositionZ), ballPositionZ);
+                            }
+
+                            sensorsAngleX[countForSensorsReady] = camera.direction.x;
+                            sensorsAngleY[countForSensorsReady] = camera.direction.y;
+                            sensorsAngleZ[countForSensorsReady] = camera.direction.z;
+
+                            sensorUpX[countForSensorsReady] = camera.up.x;
+                            sensorUpY[countForSensorsReady] = camera.up.y;
+                            sensorUpZ[countForSensorsReady] = camera.up.z;
+
+                            sensorPositionX[countForSensorsReady] = camera.position.x;
+                            sensorPositionY[countForSensorsReady] = camera.position.y;
+                            sensorPositionZ[countForSensorsReady] = camera.position.z;
+
+                            checkForSensorsStep[countForSensorsReady] = true;
+                        } else {
+                            if (checkForSensorsStep[countForSensorsReady]) {
+                                countForSensorsReady++;
+                            }
+                            if (countForSensorsReady == 0) {
+                                camera.rotateAround(vector1 = new Vector3(ballPositionX, defineFunction(ballPositionX, ballPositionZ), ballPositionZ),
+                                        vector2 = new Vector3(0f, 1f, 0f), camVelocity1);
+                                camera.lookAt(ballPositionX, defineFunction(ballPositionX, ballPositionZ), ballPositionZ);
+                            } else {
+                                camera.rotateAround(vector1 = new Vector3(ballPositionX, defineFunction(ballPositionX, ballPositionZ), ballPositionZ),
+                                        vector2 = new Vector3(0f, 1f, 0f), -camVelocity1);
+                                camera.lookAt(ballPositionX, defineFunction(ballPositionX, ballPositionZ), ballPositionZ);
+                            }
+                        }
+                        if (countForSensorsReady == 11) {
+                            botReady = true;
+                        }
+                    }
+
+                    //System.out.println("countForSensorsReady = " + countForSensorsReady);
+
+                    //}
+
                 }
             }
 
@@ -1677,6 +2053,8 @@ public class PuttingGameScreen implements Screen {
             }
             */
 
+            /*
+
             float timePeriod = 2f;
             float camVelocity = 7f;
 
@@ -1684,7 +2062,7 @@ public class PuttingGameScreen implements Screen {
 
                 if (countForSensors < 1) {
                     for (int j = 0; j < sensorsSize.length; j++) {
-                        minEucldieanDist[j] = 100;
+                        minEuclideanDist[j] = 100;
                     }
                 }
 
@@ -1696,24 +2074,24 @@ public class PuttingGameScreen implements Screen {
 
                     for (int i = 0; i < sensorsSize.length; i++) {
 
-                        /*
+
                         if (i==0 || i==10) {
                         System.out.println("i = " + i);
                         System.out.println("real dist = " + euclideanDistSensors(finalPositionArrowX, finalPositionArrowZ, i));
-                        System.out.println("theoric dist  = " + minEucldieanDist[i]);
+                        System.out.println("theoric dist  = " + minEuclideanDist[i]);
                         System.out.println();
                         }
-                        */
 
-                        if (euclideanDistSensors(finalPositionArrowX, finalPositionArrowZ, i) < minEucldieanDist[i]) {
 
-                            /*
+                        if (euclideanDistSensors(finalPositionArrowX, finalPositionArrowZ, i) < minEuclideanDist[i]) {
+
+
                             if (i==0 || i==10) {
                                 System.out.println("Is ok");
                             }
-                            */
 
-                            minEucldieanDist[i] = euclideanDistSensors(finalPositionArrowX, finalPositionArrowZ, i);
+
+                            minEuclideanDist[i] = euclideanDistSensors(finalPositionArrowX, finalPositionArrowZ, i);
 
                             sensorsAngleX[i] = camera.direction.x;
                             sensorsAngleY[i] = camera.direction.y;
@@ -1740,9 +2118,9 @@ public class PuttingGameScreen implements Screen {
 
                     for (int i = 0; i < sensorsSize.length; i++) {
 
-                        if (euclideanDistSensors(finalPositionArrowX, finalPositionArrowZ, i) < minEucldieanDist[i]) {
+                        if (euclideanDistSensors(finalPositionArrowX, finalPositionArrowZ, i) < minEuclideanDist[i]) {
 
-                            minEucldieanDist[i] = euclideanDistSensors(finalPositionArrowX, finalPositionArrowZ, i);
+                            minEuclideanDist[i] = euclideanDistSensors(finalPositionArrowX, finalPositionArrowZ, i);
 
                             sensorsAngleX[i] = camera.direction.x;
                             sensorsAngleY[i] = camera.direction.y;
@@ -1767,7 +2145,7 @@ public class PuttingGameScreen implements Screen {
 
                 if (botTimer1 > timePeriod && botTimer2 > timePeriod+0.5f) {
 
-                    /*
+                    // To comment
                     camera.direction.x = camDirectionFlagX;
                     camera.direction.y = camDirectionFlagY;
                     camera.direction.z = camDirectionFlagZ;
@@ -1779,20 +2157,26 @@ public class PuttingGameScreen implements Screen {
                     camera.position.x = camPositionFlagX;
                     camera.position.y = camPositionFlagY;
                     camera.position.z = camPositionFlagZ;
-                    */
+
 
                     botReady = true;
                     sensorsReady = false;
                 }
             }
 
+            */
+
             if (botReady) {
 
                 for (int i = 0; i < sensorsSize.length; i++) {
                     for (int j = 0; j < 10; j++) {
                         int stepIndex = (i*10)+j;
-                        float[] stepData = new float[3];
-                        for (int k = 0; k < 3; k++) {
+                        float posX = 0;
+                        float posZ = 0;
+                        float[] stepData = new float[5];
+                        boolean[] stepOutput = new boolean[2];
+                        boolean[] stepCollision = new boolean[10];
+                        for (int k = 0; k < stepData.length+stepOutput.length; k++) {
                             if (k==0) {
                                 stepData[k] = sensorsAngleX[i];
                             }
@@ -1810,28 +2194,123 @@ public class PuttingGameScreen implements Screen {
                                 System.out.println("stepPositionZ = " + stepPositionZ[stepIndex]);
                                 */
 
+
+                                /*
+                                System.out.println("stepPositionX = " + stepPositionX[stepIndex]);
+                                System.out.println("stepPositionZ = " + stepPositionZ[stepIndex]);
+                                System.out.println("sensorsAngleX = " + sensorsAngleX[i]);
+                                System.out.println("sensorsAngleZ = " + sensorsAngleZ[i]);
+                                */
+
+                                //System.out.println("stuck");
+
+                                /*
+                                System.out.println("ballPositionX = " + ballPositionX);
+                                System.out.println("ballPositionZ = " + ballPositionZ);
+                                */
+
+                                /*
+                                System.out.println("stepPositionX = " + Arrays.toString(stepPositionX));
+                                System.out.println("stepPositionZ = " + Arrays.toString(stepPositionZ));
+                                System.out.println("stepPositionX current = " + stepPositionX[stepIndex]);
+                                System.out.println("stepPositionZ current = " + stepPositionZ[stepIndex]);
+                                System.out.println("sensorsAngleX = " + Arrays.toString(sensorsAngleX));
+                                System.out.println("sensorsAngleZ = " + Arrays.toString(sensorsAngleZ));
+                                System.out.println("sensorsAngleX current = " + sensorsAngleX[i]);
+                                System.out.println("sensorsAngleZ current = " + sensorsAngleZ[i]);
+                                System.out.println();
+                                */
+
+
                                 float velocity = evaluatePowerRK4(ballPositionX,ballPositionZ,stepPositionX[stepIndex],stepPositionZ[stepIndex],sensorsAngleX[i],sensorsAngleZ[i]);
                                 stepData[k] = velocity;
+
                                 //System.out.println("ok");
                             }
+                            if (k==3) {
+                                Rungekuttasolver RK4 = new Rungekuttasolver();
+
+                                RK4.setValues(ballPositionX, ballPositionZ, sensorsAngleX[i]*stepData[2], sensorPositionZ[i]*stepData[2]);
+
+                                RK4.RK4();
+
+                                posX = (float) RK4.getX();
+                                posZ = (float) RK4.getY();
+
+                                for (int l = 0; l < numberOfTree; l++) {
+                                    if (euclideanDistObstacles(posX, posZ, l) < 0.5f) {
+                                        stepOutput[0] = true;
+                                        stepCollision[j] = true;
+                                    }
+                                    else {
+                                        stepOutput[0] = false;
+                                        stepCollision[j] = false;
+                                    }
+                                }
+
+                                if (defineFunction(posX, posZ) < 0.05f) {
+                                    stepOutput[0] = true;
+                                    stepCollision[j] = true;
+                                }
+                                else {
+                                    stepOutput[0] = false;
+                                    stepCollision[j] = false;
+                                }
+
+                                if (outOfField(posX, posZ)) {
+                                    stepOutput[0] = true;
+                                    stepCollision[j] = true;
+                                }
+                                else {
+                                    stepOutput[0] = false;
+                                    stepCollision[j] = false;
+                                }
+                            }
+                            if (k==4) {
+                                if (stepCollision[j]) {
+                                    stepOutput[1] = false;
+                                }
+                                else {
+                                    if (isWin(posX, posZ)) {
+                                        stepOutput[1] = true;
+                                    }
+                                }
+                            }
+                            if (k==5) {
+                                stepData[k-2] = posX;
+                            }
+                            if (k==6) {
+                                stepData[k-2] = posZ;
+                            }
                         }
+                        //System.out.println("stepData = " + Arrays.toString(stepData));
+                        //System.out.println("stepOutput = " + Arrays.toString(stepOutput));
+
+                        sensorsOutput.add(stepOutput);
                         sensorsData.add(stepData);
                     }
                 }
+                LinkAgentNN bridge = new LinkAgentNN(sensorsOutput, sensorsData);
 
+                /*
                 for (int i = 0; i < sensorsData.size(); i++) {
                     System.out.println("sensorsData = " + Arrays.toString(sensorsData.get(i)));
                 }
+                for (int i = 0; i < sensorsOutput.size(); i++) {
+                    System.out.println("sensorsOutput = " + Arrays.toString(sensorsOutput.get(i)));
+                }
+                */
+
 
                 countIndex++;
                 ballStop = false;
 
-                AgentBot bot = new AgentBot(sensorsSize, sensorsAngleX, sensorsAngleZ, maxPositionX, maxPositionZ, canHitFlag, isSensorOnSand, ballPositionX, ballPositionZ);
+                AgentBot bot = new AgentBot(sensorsSize, sensorsAngleX, sensorsAngleZ, maxPositionAgentX, maxPositionAgentZ, canHitFlag, isSensorOnSand, ballPositionX, ballPositionZ);
 
                 float[] newPositions = bot.startBot();
 
                 agentPower = bot.getPowerScalar();
-                System.out.println("agentPower = " + agentPower);
+                //System.out.println("agentPower = " + agentPower);
 
                 bestSensor = bot.getBestSensor();
 
@@ -1846,6 +2325,9 @@ public class PuttingGameScreen implements Screen {
                 camera.position.x = sensorPositionX[bestSensor];
                 camera.position.y = sensorPositionY[bestSensor];
                 camera.position.z = sensorPositionZ[bestSensor];
+
+                //sensorsAngleX = new float[sensorsSize.length];
+                //sensorsAngleZ = new float[sensorsSize.length];
 
                 newBallPositionX = newPositions[0];
                 newBallPositionZ = newPositions[1];
@@ -1865,17 +2347,21 @@ public class PuttingGameScreen implements Screen {
                 sumX = 0;
                 sumZ = 0;
                 count = 0;
+                counter = 0;
                 botTimer1 = 0;
                 botTimer2 = 0;
                 countForSensors = 0;
+                countForSensorsReady = 0;
 
                 check = false;
                 botReady = false;
                 findFlag = false;
+                checkCamera = false;
 
                 countForFlag = 0;
 
                 isSensorOnSand = new boolean[11];
+                checkForSensorsStep = new boolean[11];
             }
         }
 

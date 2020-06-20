@@ -34,17 +34,17 @@ public class AgentBot {
         this.ballZ = ballZ;
 
         this.sensorsWeight = new float[sensorsSize.length];
-        this.sensorsWeight[0] = 10;
-        this.sensorsWeight[1] = 7;
-        this.sensorsWeight[2] = 5;
+        this.sensorsWeight[0] = 12;
+        this.sensorsWeight[1] = 8;
+        this.sensorsWeight[2] = 6;
         this.sensorsWeight[3] = 3;
         this.sensorsWeight[4] = 2;
         this.sensorsWeight[5] = 1;
         this.sensorsWeight[6] = 2;
         this.sensorsWeight[7] = 3;
-        this.sensorsWeight[8] = 5;
-        this.sensorsWeight[9] = 7;
-        this.sensorsWeight[10] = 10;
+        this.sensorsWeight[8] = 6;
+        this.sensorsWeight[9] = 8;
+        this.sensorsWeight[10] = 12;
 
         System.out.println("sensorsSize = " + Arrays.toString(sensorsSize));
         System.out.println("sensorsAngleX = " + Arrays.toString(sensorsAngleX));
@@ -59,6 +59,12 @@ public class AgentBot {
         for (int i = 0; i < sensorsWeight.length; i++) {
             if (isSensorOnSand[i]) {
                 sensorsWeight[i] = sensorsWeight[i]*3;
+            }
+        }
+
+        for (int i = 0; i < sensorSize.length; i++) {
+            if (sensorSize[i] < 0.5) {
+                sensorsWeight[i] = sensorsWeight[i]*10;
             }
         }
 
