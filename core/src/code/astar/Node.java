@@ -56,19 +56,19 @@ public class Node {
      * @param max max shot power
      */
     public void generateShot(double min, double max){
-        generateAngle();
-        generatePower(min, max);
+        angle = generateAngle();
+        power = generatePower(min, max);
     }
 
     /**
      * generate a random angle for the shot to be taken
      */
-    public void generateAngle(){
+    public double generateAngle(){
         Random r = new Random();
         int min = 0;
         int max = 360;
         angle = min + (max - min) * r.nextDouble();
-
+        return angle;
     }
 
     /**
@@ -76,10 +76,11 @@ public class Node {
      * @param min the minimum power
      * @param max the maximum power
      */
-    public void generatePower(double min, double max){
+    public double generatePower(double min, double max){
 
         Random r = new Random();
         power = min + (max - min) * r.nextDouble();
+        return power;
     }
 
     /**
@@ -112,11 +113,18 @@ public class Node {
     public double[] executeShot(){
 
         //Convert degrees to radians, radians is the argument for Math.sin or Math.cos
-        double angle = (getAngle()*Math.PI)/180;
+        double newAngle = (angle*Math.PI)/180;
 
         //Split the velocity vector into x,y components
-        double vxi = (getPower())*Math.cos(angle);
-        double vyi = (getPower())*Math.sin(angle);
+
+        System.out.println("power = " + power);
+        System.out.println("newAngle = " + newAngle);
+
+        double vxi = (getPower())*Math.cos(newAngle);
+        double vyi = (getPower())*Math.sin(newAngle);
+
+        System.out.println("vxi = " + vxi);
+        System.out.println("vyi = " + vyi);
 
         Rungekuttasolver rk = new Rungekuttasolver();
         System.out.println("starts calculations for location now");

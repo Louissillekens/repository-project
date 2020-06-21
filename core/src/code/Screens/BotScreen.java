@@ -1,5 +1,7 @@
 package code.Screens;
 
+import code.Lets_Go_Champ.Alex_Clem;
+import code.Lets_Go_Champ.ExceptionHandeling;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.Screen;
@@ -15,7 +17,7 @@ import com.game.game.Game;
 
 public class BotScreen implements Screen {
 
-    private Game myGame;
+    private static Game myGame;
     private Stage stage;
 
     // Instances for the background and title images + textures
@@ -29,6 +31,9 @@ public class BotScreen implements Screen {
 
     // Instances for the different game modes buttons
     private TextButton agentButton;
+    private TextButton qAgentButton;
+    private TextButton aStarButton;
+    private TextButton trainButton;
 
     // Instance variable for the chosen solver
     private static String botName;
@@ -60,6 +65,21 @@ public class BotScreen implements Screen {
         agentButton.setSize(200, 60);
         stage.addActor(agentButton);
 
+        qAgentButton = new TextButton("Q Agent", skin);
+        qAgentButton.setPosition(400, 300);
+        qAgentButton.setSize(200, 60);
+        stage.addActor(qAgentButton);
+
+        aStarButton = new TextButton("A* bot", skin);
+        aStarButton.setPosition(100, 200);
+        aStarButton.setSize(200, 60);
+        stage.addActor(aStarButton);
+
+        trainButton = new TextButton("Train Data", skin);
+        trainButton.setPosition(400, 200);
+        trainButton.setSize(200, 60);
+        stage.addActor(trainButton);
+
         class agentListener extends ChangeListener {
 
             private Game game;
@@ -80,10 +100,107 @@ public class BotScreen implements Screen {
             }
         }
         agentButton.addListener(new agentListener(game, this));
+
+        class qAgentListener extends ChangeListener {
+
+            private Game game;
+            private Screen screen;
+
+            private qAgentListener(final Game game, Screen screen) {
+
+                this.game = game;
+                this.screen = screen;
+            }
+
+            @Override
+            public void changed(ChangeEvent event, Actor actor) {
+
+                this.game.setScreen(new PuttingGameScreen(myGame, new GameMode(gameMode.gameName)));
+
+                try {
+                    new Alex_Clem(PuttingGameScreen.getStartingPositionX(), PuttingGameScreen.getStartingPositionZ(), PuttingGameScreen.getFlagPositionX(), PuttingGameScreen.getFlagPositionZ());
+                } catch (ExceptionHandeling exceptionHandeling) {
+                    exceptionHandeling.printStackTrace();
+                }
+
+                this.screen.dispose();
+                botName = "Q_agent";
+            }
+        }
+        qAgentButton.addListener(new qAgentListener(game, this));
+
+        class aStarListener extends ChangeListener {
+
+            private Game game;
+            private Screen screen;
+
+            private aStarListener(final Game game, Screen screen) {
+
+                this.game = game;
+                this.screen = screen;
+            }
+
+            @Override
+            public void changed(ChangeEvent event, Actor actor) {
+
+                //AStar aStar = new AStar();
+                botName = "aStar";
+            }
+        }
+        aStarButton.addListener(new aStarListener(game, this));
+
+        class trainListener extends ChangeListener {
+
+            private Game game;
+            private Screen screen;
+
+            private trainListener(final Game game, Screen screen) {
+
+                this.game = game;
+                this.screen = screen;
+            }
+
+            @Override
+            public void changed(ChangeEvent event, Actor actor) {
+
+
+            }
+        }
+        trainButton.addListener(new trainListener(game, this));
     }
+
+    /*
+    public static void startTraining() {
+
+
+        myGame.setScreen(new PuttingGameScreen(2,4));
+
+        if (PuttingGameScreen.finishAgent)
+        try {
+            new Alex_Clem(PuttingGameScreen.getStartingPositionX(), PuttingGameScreen.getStartingPositionZ(), PuttingGameScreen.getFlagPositionX(), PuttingGameScreen.getFlagPositionZ());
+        } catch (ExceptionHandeling exceptionHandeling) {
+            exceptionHandeling.printStackTrace();
+        }
+    }
+    */
+
+/*
+    public static boolean displayGUI(float x, float y) {
+
+        PuttingGameScreen gameScreen = new PuttingGameScreen(x,y);
+
+        myGame.setScreen(gameScreen);
+
+        return gameScreen.getFinishAgent();
+    }
+*/
 
     public static String getBotName() {
         return botName;
+    }
+
+    public static void setBotName(String botName) {
+        BotScreen.botName = botName;
     }
 
     @Override

@@ -9,7 +9,7 @@ public class Agent {
     private EpsilonGreedyStrat strategy;
 
     private int nActions;
-    private int current_step; // Agent current step number in the environment
+    private int current_step; // AgentTest current step number in the environment
 
     /**
      * @param strategy EpsilonGreedyStrat for the epsilon and will use this to
@@ -45,5 +45,9 @@ public class Agent {
             float [] results = policy_nn.forward(state); //Exploit, find the best action
             return MathWork.getMaxIndex(results); //  Return the position of that best action
         }
+    }
+
+    public int getCurrent_step() {
+        return current_step;
     }
 }
