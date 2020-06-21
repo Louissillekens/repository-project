@@ -2,6 +2,9 @@ package code.Screens;
 
 import code.Bot.AgentBot;
 import code.Bot.PuttingBotDeployement;
+import code.Bridge.LinkAgentNN;
+import code.Lets_Go_Champ.Alex_Clem;
+import code.Lets_Go_Champ.ExceptionHandeling;
 import code.Physics.Rungekuttasolver;
 import code.Physics.VerletSolver;
 import code.astar.AStar;
@@ -112,8 +115,8 @@ public class PuttingGameScreen implements Screen {
     private static boolean canTranslateCam = false;
     private static boolean canReset = false;
 
-    private SpriteBatch batch = new SpriteBatch();
-    private BitmapFont font = new BitmapFont();
+    private SpriteBatch batch;
+    private BitmapFont font;
     private float fontX, fontY;
     private GlyphLayout layout = new GlyphLayout();
     private float timer = 0;
@@ -125,24 +128,6 @@ public class PuttingGameScreen implements Screen {
     private Model ballModel;
 
     private ModelInstance ball;
-
-    /*
-    private btCollisionConfiguration collisionConfig;
-    private btDispatcher dispatcher;
-
-    private btCollisionShape ballShape;
-    private btCollisionShape trunkShape;
-    private btCollisionShape branchesShape;
-
-    private btCollisionObject ballObject;
-    private btCollisionObject trunkObject;
-    private btCollisionObject branchesObject;
-
-    private btCollisionShape lineShape;
-    private btCollisionObject lineObject;
-
-    private Array<btCollisionObject> obstacleObjects = new Array<>();
-    */
 
     private boolean ballStop = true;
 
@@ -209,6 +194,7 @@ public class PuttingGameScreen implements Screen {
     private boolean findFlag = false;
     private boolean check = false;
     private boolean checkCollisionMessage = false;
+    private boolean readyToTrain = false;
 
     private float botTimer1 = 0;
     private float botTimer2 = 0;
@@ -248,9 +234,16 @@ public class PuttingGameScreen implements Screen {
 
     private int countForSensor0Ready = 0;
 
-    public static boolean finishAgent;
+    public static boolean finishAgent = false;
+    public static boolean isReadyToTrain = false;
 
     private String name = "";
+
+    public static int action;
+
+    private float[] stepData;
+
+    private boolean ballMoved = false;
 
     /**
      * Constructor that creates a new instance of the putting game screen
@@ -268,10 +261,10 @@ public class PuttingGameScreen implements Screen {
 
         this.ballPositionX = startingPositionX;
         this.ballPositionZ = startingPositionZ;
-        this.name = "NN";
+        this.name = "Q_agent";
         finishAgent = false;
         this.gameMode = new GameMode("Bot");
-        BotScreen.setBotName("agent");
+        //BotScreen.setBotName("agent");
         this.createField();
     }
 
@@ -279,8 +272,6 @@ public class PuttingGameScreen implements Screen {
      * Method used to create the 3D field
      */
     public void createField() {
-
-        //Bullet.init();
 
         // Creation of the 3D perspective camera
         camera = new PerspectiveCamera(75, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
@@ -357,7 +348,7 @@ public class PuttingGameScreen implements Screen {
             float randomX = 5 + rand.nextFloat() * (45 - 5);
             float randomZ = 5 + rand.nextFloat() * (45 - 5);
 
-            while (((Math.abs(randomX-flagPositionX) < 5) && (Math.abs(randomZ-flagPositionZ) < 5)) || (defineFunction(randomX, randomZ) < 0)) {
+            while (((Math.abs(randomX - flagPositionX) < 5) && (Math.abs(randomZ - flagPositionZ) < 5)) || (defineFunction(randomX, randomZ) < 0)) {
                 randomX = 5 + rand.nextFloat() * (45 - 5);
                 randomZ = 5 + rand.nextFloat() * (45 - 5);
             }
@@ -365,37 +356,10 @@ public class PuttingGameScreen implements Screen {
             treePositionX[i] = randomX;
             treePositionZ[i] = randomZ;
 
-            ModelInstance[] treeInstances = drawObject.drawTree(randomX,randomZ);
+            ModelInstance[] treeInstances = drawObject.drawTree(randomX, randomZ);
 
             instances.add(treeInstances[0], treeInstances[1]);
-
-            /*
-            trunkShape = new btCylinderShape(new Vector3(0.25f,3,0.25f));
-
-            trunkObject = new btCollisionObject();
-            trunkObject.setCollisionShape(trunkShape);
-            trunkObject.setWorldTransform(treeInstances[0].transform);
-            obstacleObjects.add(trunkObject);
-
-            branchesShape = new btConeShape(2,3);
-
-            branchesObject = new btCollisionObject();
-            branchesObject.setCollisionShape(branchesShape);
-            branchesObject.setWorldTransform(treeInstances[1].transform);
-            obstacleObjects.add(branchesObject);*/
-
         }
-
-        /*
-        ballShape = new btSphereShape(ballSize);
-
-        ballObject = new btCollisionObject();
-        ballObject.setCollisionShape(ballShape);
-        ballObject.setWorldTransform(ball.transform);
-
-        collisionConfig = new btDefaultCollisionConfiguration();
-        dispatcher = new btCollisionDispatcher(collisionConfig);
-        */
 
         // Adding an environment which is used for the luminosity
         environment = new Environment();
@@ -460,21 +424,6 @@ public class PuttingGameScreen implements Screen {
             sandPitZ2[count] = sandPitPosition[3];
             count++;
         }
-
-        /*
-        System.out.println("sandPitX1 = " + Arrays.toString(sandPitX1));
-        System.out.println("sandPitX1 = " + Arrays.toString(sandPitX2));
-        System.out.println("sandPitX1 = " + Arrays.toString(sandPitZ1));
-        System.out.println("sandPitX1 = " + Arrays.toString(sandPitZ2));
-        */
-
-
-        /*
-        System.out.println("sandPitX1 = " + Arrays.toString(sandPitX1));
-        System.out.println("sandPitX2 = " + Arrays.toString(sandPitX2));
-        System.out.println("sandPitZ1 = " + Arrays.toString(sandPitZ1));
-        System.out.println("sandPitZ2 = " + Arrays.toString(sandPitZ2));
-        */
 
         float step = 1f;
         for(float i = 0; i < ((step*(1/step))*gridDepth); i+=step) {
@@ -679,30 +628,6 @@ public class PuttingGameScreen implements Screen {
             }
             camera.lookAt(ballPositionX, defineFunction(ballPositionX, ballPositionZ), ballPositionZ);
 
-            /*
-            if (gameMode.gameName.equals("Single_Player")) {
-
-                camera.translate((newBallPositionX - ballPositionX) / scaleFactor, 0.001f / scaleFactor, (newBallPositionZ - ballPositionZ) / scaleFactor);
-                sumX += (newBallPositionX - ballPositionX) / (scaleFactor);
-                sumZ += (newBallPositionZ - ballPositionZ) / (scaleFactor);
-            }*/
-
-            /*
-            else if (BotScreen.getBotName().equals("agent")) {
-
-                float scaleFactor;
-                if (agentPower >= 2000) {
-                    scaleFactor = 53;
-                }
-                else {
-                    scaleFactor = 50;
-                }
-                camera.translate((newBallPositionX - ballPositionX) / scaleFactor, 0.001f / scaleFactor, (newBallPositionZ - ballPositionZ) / scaleFactor);
-                sumX += (newBallPositionX - ballPositionX) / (scaleFactor);
-                sumZ += (newBallPositionZ - ballPositionZ) / (scaleFactor);
-            }
-            */
-
             positionArrayX[countIndex] = newBallPositionX;
             positionArrayZ[countIndex] = newBallPositionZ;
 
@@ -718,12 +643,6 @@ public class PuttingGameScreen implements Screen {
             if (countIndex > 0) {
                 ballPositionX = positionArrayX[countIndex];
                 ballPositionZ = positionArrayZ[countIndex];
-                /*
-                System.out.println("ballPositionX = " + ballPositionX);
-                System.out.println("ballPositionZ = " + ballPositionZ);
-                System.out.println("newBallPositionX = " + newBallPositionX);
-                System.out.println("newBallPositionZ = " + newBallPositionZ);
-                */
             }
         }
     }
@@ -733,6 +652,9 @@ public class PuttingGameScreen implements Screen {
      * @param message to draw on the screen
      */
     public void displayMessage(String message){
+
+        batch = new SpriteBatch();
+        font = new BitmapFont();
 
         font.getData().setScale(3);
         font.getRegion().getTexture().setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear);
@@ -774,24 +696,6 @@ public class PuttingGameScreen implements Screen {
         System.out.println("flag x: " + randomX);
         System.out.println("flag z: " + randomZ);
     }
-
-    /*
-    public boolean checkCollision(btCollisionObject ballObject, btCollisionObject obstacleObject) {
-
-        CollisionObjectWrapper co0 = new CollisionObjectWrapper(ballObject);
-        CollisionObjectWrapper co1 = new CollisionObjectWrapper(obstacleObject);
-
-        btCollisionAlgorithmConstructionInfo ci = new btCollisionAlgorithmConstructionInfo();
-        ci.setDispatcher1(dispatcher);
-        btCollisionAlgorithm algorithm = new btSphereBoxCollisionAlgorithm(null, ci, co0.wrapper, co1.wrapper, false);
-
-        btDispatcherInfo info = new btDispatcherInfo();
-        btManifoldResult result = new btManifoldResult(co0.wrapper, co1.wrapper);
-
-        algorithm.processCollision(co0.wrapper, co1.wrapper, info, result);
-
-        return result.getPersistentManifold().getNumContacts() > 0;
-    }*/
 
     public boolean checkCollision(int index) {
 
@@ -956,24 +860,7 @@ public class PuttingGameScreen implements Screen {
         if (!collision) {
             sensors.add(lineInstance);
         }
-
-        /*
-        if (collision) {
-            modelBuilder.begin();
-            meshPartBuilder = modelBuilder.part("line", 1, 3, new Material());
-            meshPartBuilder.setColor(Color.WHITE);
-            meshPartBuilder.line(ballPositionX + rotationX1, (defineFunction(ballPositionX + rotationX1, ballPositionZ + rotationZ1) + 0.1f), ballPositionZ + rotationZ1,
-                    ballPositionX + rotationX2, (defineFunction(ballPositionX + rotationX2, ballPositionZ + rotationZ2) + 0.1f), ballPositionZ + rotationZ2);
-            Model lineModelExtra = modelBuilder.end();
-            ModelInstance lineInstanceExtra = new ModelInstance(lineModelExtra);
-
-            sensors.add(lineInstanceExtra);
-        }
-        */
-
         sensorsSize[num] = (index + 1)/(numberOfLinesSensors/10f);
-
-
     }
 
     public static float evaluatePowerRK4(float x, float z, float x1, float z1, float vx, float vz) {
@@ -1007,7 +894,6 @@ public class PuttingGameScreen implements Screen {
             System.out.println("type = " + type);
             System.out.println();
             */
-
 
 
             if (count < 1) {
@@ -1189,20 +1075,6 @@ public class PuttingGameScreen implements Screen {
                         if (!isDetectorCollision6) {
                             sensors.add(lineInstance);
                         }
-                        /*
-                        if (isDetectorCollision6) {
-
-                            modelBuilder.begin();
-                            meshPartBuilder = modelBuilder.part("line", 1, 3, new Material());
-                            meshPartBuilder.setColor(Color.RED);
-                            meshPartBuilder.line((ballPositionX + (stepX)), defineFunction((ballPositionX + (stepX)), (ballPositionZ + (stepZ))) + 0.1f, (ballPositionZ + (stepZ)),
-                                    ballPositionX + stepX + stepX1, defineFunction(ballPositionX + stepX + (stepX1), ballPositionZ + stepZ + (stepZ1)) + 0.1f, ballPositionZ + stepZ + (stepZ1));
-                            Model lineModelExtra = modelBuilder.end();
-                            ModelInstance lineInstanceExtra = new ModelInstance(lineModelExtra);
-
-                            sensors.add(lineInstanceExtra);
-                        }
-                        */
 
                         sensorsSize[5] = (i + 1) / (numberOfLinesSensors / 10f);
 
@@ -1253,87 +1125,6 @@ public class PuttingGameScreen implements Screen {
 
                     i++;
                 }
-
-
-                //System.out.println("maxPositionX = " + maxPositionX[5]);
-
-                /*
-                for (int j = 0; j < sensorsSize.length; j++) {
-
-                    float angle = 0;
-
-                    if (j==0) {
-                        angle = -135;
-                    }
-                    if (j==1) {
-                        angle = -90;
-                    }
-                    if (j==2) {
-                        angle = -67.5f;
-                    }
-                    if (j==3) {
-                        angle = -45;
-                    }
-                    if (j==4) {
-                        angle = -22.5f;
-                    }
-                    if (j==5) {
-                        angle = 0;
-                    }
-                    if (j==6) {
-                        angle = 22.5f;
-                    }
-                    if (j==7) {
-                        angle = 45;
-                    }
-                    if (j==8) {
-                        angle = 67.5f;
-                    }
-                    if (j==9) {
-                        angle = 90;
-                    }
-                    if (j==10) {
-                        angle = 135;
-                    }
-
-                    float radian = (float) Math.toRadians(angle);
-
-                    float x = (float) ((maxPositionX[5]) * Math.cos(radian) - (maxPositionZ[5]) * Math.sin(radian));
-                    float z = (float) ((maxPositionZ[5]) * Math.cos(radian) + (maxPositionX[5]) * Math.sin(radian));
-
-                    maxPositionX[j] = ballPositionX+x;
-                    maxPositionZ[j] = ballPositionZ+z;
-                }
-                */
-
-                //System.out.println("maxPositionX = " + Arrays.toString(maxPositionX));
-
-
-                //stepForMaxX = stepX + stepX1;
-                //stepForMaxZ = stepZ + stepZ1;
-
-                //for (int j = 0; j < 11; j++) {
-
-                /*
-                int step = 10;
-                float stepSensorX = (stepForMaxX - ballPositionX)/step;
-                float stepSensorZ = (stepForMaxZ - ballPositionZ)/step;
-                for (int k = 0; k < step; k++) {
-                   //int stepIndex = ((j+1)*10)-(k+1);
-                    int stepIndex = 50+k;
-                    //int stepIndex = 59-k;
-                    //stepPositionX[stepIndex] = (stepForMaxX) - ((k)*stepSensorX);
-                    //stepPositionZ[stepIndex] = (stepForMaxZ) - ((k)*stepSensorZ);
-                    stepPositionX[stepIndex] = ballPositionX + ((k+1)*stepSensorX);
-                    stepPositionZ[stepIndex] = ballPositionZ + ((k+1)*stepSensorZ);
-                }
-                */
-
-                /*
-                System.out.println("stepPositionX = " + Arrays.toString(stepPositionX));
-                System.out.println("stepPositionZ = " + Arrays.toString(stepPositionZ));
-                System.out.println();
-                */
 
                 for (int j = 0; j < sensorsSize.length; j++) {
                     for (int k = 0; k < 10; k++) {
@@ -1395,14 +1186,6 @@ public class PuttingGameScreen implements Screen {
                     maxPositionZ[j] = stepPositionZ[stepIndex];
                 }
 
-
-
-                //}
-                //System.out.println("stepPositionX = " + Arrays.toString(stepPositionX));
-                //System.out.println("stepPositionZ = " + Arrays.toString(stepPositionZ));
-
-                //System.out.println("isSensorOnSand = " + Arrays.toString(isSensorOnSand));
-
                 isDetectorCollision1 = false;
                 isDetectorCollision2 = false;
                 isDetectorCollision3 = false;
@@ -1437,51 +1220,6 @@ public class PuttingGameScreen implements Screen {
         }
 
 
-
-
-/*
-        for (int i = 0; i < maxPositionZ.length; i++) {
-            Model testII = modelBuilder.createBox(0.2f, 3, 0.2f,
-                    new Material(ColorAttribute.createDiffuse(Color.YELLOW)),
-                    VertexAttributes.Usage.Position | VertexAttributes.Usage.Normal
-            );
-            ModelInstance testIII = new ModelInstance(testII, maxPositionX[i], defineFunction(maxPositionX[i], maxPositionZ[i]), maxPositionZ[i]);
-
-            instancesTest.add(testIII);
-        }
-
-        if (ballStop) {
-            modelBatch.render(instancesTest, environment);
-        }
-        else {
-            instancesTest.clear();
-        }
-
-
-
-        Array<ModelInstance> testArray = new Array<>();
-
-        for (int i = 0; i < stepPositionX.length; i++) {
-            Model test = modelBuilder.createBox(0.05f, 1f, 0.05f,
-                    new Material(ColorAttribute.createDiffuse(Color.RED)),
-                    VertexAttributes.Usage.Position | VertexAttributes.Usage.Normal
-            );
-            ModelInstance testI = new ModelInstance(test, stepPositionX[i], defineFunction(stepPositionX[i],  stepPositionZ[i]), stepPositionZ[i]);
-
-            testArray.add(testI);
-        }
-
-        if (ballStop) {
-            modelBatch.render(testArray, environment);
-        }
-        else {
-            testArray.clear();
-        }
-        */
-
-
-
-
         modelBatch.render(flag1Instance, environment);
         modelBatch.render(flag2Instance, environment);
 
@@ -1501,7 +1239,7 @@ public class PuttingGameScreen implements Screen {
 
         shapeRenderer.end();
 
-        if (!checkCollisionMessage) {
+        if (!checkCollisionMessage && !readyToTrain) {
             ballMovement();
         }
 
@@ -1604,21 +1342,6 @@ public class PuttingGameScreen implements Screen {
                 if (!checkCollisionMessage) {
                     handler.checkForAgentBot();
                 }
-                /*
-                if (ballStop) {
-                    if (countIterationBot < 1) {
-                        agent = new AgentTest();
-                    }
-                    countIterationBot++;
-                    //System.out.println("agent = " + agent);
-                    agent.startAgent();
-                    if (AgentTest.isBotReady) {
-                        agent.startBot();
-                    }
-                } else {
-                    agent.resetValues();
-                }
-                */
             }
             if (BotScreen.getBotName().equals("aStar")) {
                 AStar bot = new AStar(this);
@@ -1626,11 +1349,57 @@ public class PuttingGameScreen implements Screen {
             }
         }
 
-        if (name.equals("NN")) {
-            if (finishAgent) {
-                Gdx.app.exit();
+        if (name.equals("Q_agent")) {
+
+            if (LinkAgentNN.newAgent) {
+                if (ballMoved) {
+                    finishAgent = false;
+                }
+                if (!finishAgent) {
+                    handler.checkForAgentBot();
+                }
+                else {
+
+                    int sensorNum = (int) Math.ceil(action/10f);
+
+                    stepData = sensorsOutput.get(action);
+
+                    if (stepData[0]==1) {
+                        ballMoved = false;
+                    }
+                    else {
+                        float power = evaluatePowerRK4(ballPositionX, ballPositionZ, stepData[3], stepData[4], sensorsAngleX[sensorNum], sensorsAngleZ[sensorNum]);
+
+                        Rungekuttasolver RK4 = new Rungekuttasolver();
+
+                        RK4.setValues(ballPositionX, ballPositionZ, sensorsAngleX[sensorNum]*power, sensorsAngleZ[sensorNum]*power);
+                        RK4.RK4();
+
+                        newBallPositionX = (float) RK4.getX();
+                        newBallPositionZ = (float) RK4.getY();
+
+                        canTranslateCam = true;
+
+                        positionArrayX[countIndex] = newBallPositionX;
+                        positionArrayZ[countIndex] = newBallPositionZ;
+
+                        ballPositionX = positionArrayX[countIndex - 1];
+                        ballPositionZ = positionArrayZ[countIndex - 1];
+
+                        int ballStep = 100;
+                        ballStepXmean = (positionArrayX[countIndex] - positionArrayX[countIndex - 1]) / ballStep;
+                        ballStepZmean = (positionArrayZ[countIndex] - positionArrayZ[countIndex - 1]) / ballStep;
+
+                        ballMoved = true;
+                        ballStop = false;
+                    }
+                }
+                if (finishAgent && ballStop) {
+                    isReadyToTrain = true;
+                }
             }
         }
+        //System.out.println("stuck");
     }
 
     @Override
@@ -1660,20 +1429,6 @@ public class PuttingGameScreen implements Screen {
 
     @Override
     public void dispose() {
-
-        /*
-        trunkObject.dispose();
-        trunkShape.dispose();
-
-        branchesObject.dispose();
-        branchesShape.dispose();
-
-        ballObject.dispose();
-        ballShape.dispose();
-
-        dispatcher.dispose();
-        collisionConfig.dispose();
-        */
 
         modelBatch.dispose();
     }
@@ -1874,20 +1629,6 @@ public class PuttingGameScreen implements Screen {
 
                 if (countForBot < 1) {
 
-                    /*
-                    camera.direction.x = camDirectionFlagX;
-                    camera.direction.y = camDirectionFlagY;
-                    camera.direction.z = camDirectionFlagZ;
-
-                    camera.up.x = camUpFlagX;
-                    camera.up.y = camUpFlagY;
-                    camera.up.z = camUpFlagZ;
-
-                    camera.position.x = camPositionFlagX;
-                    camera.position.y = camPositionFlagY;
-                    camera.position.z = camPositionFlagZ;
-                    */
-
                     checkForSensors = true;
                     countForBot++;
                 }
@@ -1955,10 +1696,6 @@ public class PuttingGameScreen implements Screen {
                         counter++;
                     }
 
-                    //for (int i = 0; i < sensorsSize.length; i++) {
-
-                    //System.out.println("checkCamera = " + checkCamera);
-
                     if (checkCamera) {
 
                         if (euclideanDistSensors(finalPositionArrowX, finalPositionArrowZ, countForSensorsReady) < minEuclideanDist[countForSensorsReady]) {
@@ -2011,240 +1748,8 @@ public class PuttingGameScreen implements Screen {
                             botReady = true;
                         }
                     }
-
-                    //System.out.println("countForSensorsReady = " + countForSensorsReady);
-
-                    //}
-
                 }
             }
-
-            /*
-            if (!findFlag && ballStop) {
-
-                canTranslateCam = false;
-
-                if (bestSensor == 5) {
-                    findFlag = true;
-                }
-
-                if (countForFlag < 1) {
-                    minDistanceArrowFlag = euclideanDistFlag(ballPositionX, ballPositionZ);
-                }
-
-                countForFlag++;
-
-                float timePeriod = 2f;
-                float camVelocity = 5f;
-
-                if (botTimer1 < timePeriod) {
-
-                    if (euclideanDistFlag(finalPositionArrowX, finalPositionArrowZ) < minDistanceArrowFlag) {
-
-                        minDistanceArrowFlag = euclideanDistFlag(finalPositionArrowX, finalPositionArrowZ);
-
-                        camDirectionFlagX = camera.direction.x;
-                        camDirectionFlagY = camera.direction.y;
-                        camDirectionFlagZ = camera.direction.z;
-
-                        camUpFlagX = camera.up.x;
-                        camUpFlagY = camera.up.y;
-                        camUpFlagZ = camera.up.z;
-
-                        camPositionFlagX = camera.position.x;
-                        camPositionFlagY = camera.position.y;
-                        camPositionFlagZ = camera.position.z;
-
-                        sensorsAngleX[5] = camDirectionFlagX;
-                        sensorsAngleY[5] = camDirectionFlagY;
-                        sensorsAngleZ[5] = camDirectionFlagZ;
-
-                        sensorUpX[5] = camUpFlagX;
-                        sensorUpY[5] = camUpFlagY;
-                        sensorUpZ[5] = camUpFlagZ;
-
-                        sensorPositionX[5] = camDirectionFlagX;
-                        sensorPositionY[5] = camDirectionFlagY;
-                        sensorPositionZ[5] = camDirectionFlagZ;
-                    }
-
-                    camera.rotateAround(vector1 = new Vector3(ballPositionX, defineFunction(ballPositionX, ballPositionZ), ballPositionZ),
-                            vector2 = new Vector3(0f, 1f, 0f), camVelocity);
-                    camera.lookAt(ballPositionX, defineFunction(ballPositionX, ballPositionZ), ballPositionZ);
-
-                    botTimer1 += Gdx.graphics.getDeltaTime();
-                }
-
-                if (botTimer1 > timePeriod && botTimer2 < timePeriod) {
-
-                    if (euclideanDistFlag(finalPositionArrowX, finalPositionArrowZ) < minDistanceArrowFlag) {
-
-                        minDistanceArrowFlag = euclideanDistFlag(finalPositionArrowX, finalPositionArrowZ);
-
-                        camDirectionFlagX = camera.direction.x;
-                        camDirectionFlagY = camera.direction.y;
-                        camDirectionFlagZ = camera.direction.z;
-
-                        camUpFlagX = camera.up.x;
-                        camUpFlagY = camera.up.y;
-                        camUpFlagZ = camera.up.z;
-
-                        camPositionFlagX = camera.position.x;
-                        camPositionFlagY = camera.position.y;
-                        camPositionFlagZ = camera.position.z;
-
-                        sensorsAngleX[5] = camDirectionFlagX;
-                        sensorsAngleY[5] = camDirectionFlagY;
-                        sensorsAngleZ[5] = camDirectionFlagZ;
-
-                        sensorUpX[5] = camUpFlagX;
-                        sensorUpY[5] = camUpFlagY;
-                        sensorUpZ[5] = camUpFlagZ;
-
-                        sensorPositionX[5] = camDirectionFlagX;
-                        sensorPositionY[5] = camDirectionFlagY;
-                        sensorPositionZ[5] = camDirectionFlagZ;
-                    }
-
-                    camera.rotateAround(vector1 = new Vector3(ballPositionX, defineFunction(ballPositionX, ballPositionZ), ballPositionZ),
-                            vector2 = new Vector3(0f, 1f, 0f), -camVelocity);
-                    camera.lookAt(ballPositionX, defineFunction(ballPositionX, ballPositionZ), ballPositionZ);
-
-                    botTimer2 += Gdx.graphics.getDeltaTime();
-                }
-
-                if (botTimer1 > timePeriod && botTimer2 > timePeriod) {
-
-                    camera.direction.x = camDirectionFlagX;
-                    camera.direction.y = camDirectionFlagY;
-                    camera.direction.z = camDirectionFlagZ;
-
-                    camera.up.x = camUpFlagX;
-                    camera.up.y = camUpFlagY;
-                    camera.up.z = camUpFlagZ;
-
-                    camera.position.x = camPositionFlagX;
-                    camera.position.y = camPositionFlagY;
-                    camera.position.z = camPositionFlagZ;
-
-                    checkForSensors = true;
-                    findFlag = true;
-                }
-            }
-            */
-
-            /*
-
-            float timePeriod = 2f;
-            float camVelocity = 7f;
-
-            if (sensorsReady) {
-
-                if (countForSensors < 1) {
-                    for (int j = 0; j < sensorsSize.length; j++) {
-                        minEuclideanDist[j] = 100;
-                    }
-                }
-
-                countForSensors++;
-
-                modelBatch.render(sensors, environment);
-
-                if (botTimer1 < timePeriod) {
-
-                    for (int i = 0; i < sensorsSize.length; i++) {
-
-
-                        if (i==0 || i==10) {
-                        System.out.println("i = " + i);
-                        System.out.println("real dist = " + euclideanDistSensors(finalPositionArrowX, finalPositionArrowZ, i));
-                        System.out.println("theoric dist  = " + minEuclideanDist[i]);
-                        System.out.println();
-                        }
-
-
-                        if (euclideanDistSensors(finalPositionArrowX, finalPositionArrowZ, i) < minEuclideanDist[i]) {
-
-
-                            if (i==0 || i==10) {
-                                System.out.println("Is ok");
-                            }
-
-
-                            minEuclideanDist[i] = euclideanDistSensors(finalPositionArrowX, finalPositionArrowZ, i);
-
-                            sensorsAngleX[i] = camera.direction.x;
-                            sensorsAngleY[i] = camera.direction.y;
-                            sensorsAngleZ[i] = camera.direction.z;
-
-                            sensorUpX[i] = camera.up.x;
-                            sensorUpY[i] = camera.up.y;
-                            sensorUpZ[i] = camera.up.z;
-
-                            sensorPositionX[i] = camera.position.x;
-                            sensorPositionY[i] = camera.position.y;
-                            sensorPositionZ[i] = camera.position.z;
-                        }
-                    }
-
-                    camera.rotateAround(vector1 = new Vector3(ballPositionX, defineFunction(ballPositionX, ballPositionZ), ballPositionZ),
-                            vector2 = new Vector3(0f, 1f, 0f), camVelocity);
-                    camera.lookAt(ballPositionX, defineFunction(ballPositionX, ballPositionZ), ballPositionZ);
-
-                    botTimer1 += Gdx.graphics.getDeltaTime();
-                }
-
-                if (botTimer1 > timePeriod && botTimer2 < timePeriod+0.5f) {
-
-                    for (int i = 0; i < sensorsSize.length; i++) {
-
-                        if (euclideanDistSensors(finalPositionArrowX, finalPositionArrowZ, i) < minEuclideanDist[i]) {
-
-                            minEuclideanDist[i] = euclideanDistSensors(finalPositionArrowX, finalPositionArrowZ, i);
-
-                            sensorsAngleX[i] = camera.direction.x;
-                            sensorsAngleY[i] = camera.direction.y;
-                            sensorsAngleZ[i] = camera.direction.z;
-
-                            sensorUpX[i] = camera.up.x;
-                            sensorUpY[i] = camera.up.y;
-                            sensorUpZ[i] = camera.up.z;
-
-                            sensorPositionX[i] = camera.position.x;
-                            sensorPositionY[i] = camera.position.y;
-                            sensorPositionZ[i] = camera.position.z;
-                        }
-                    }
-
-                    camera.rotateAround(vector1 = new Vector3(ballPositionX, defineFunction(ballPositionX, ballPositionZ), ballPositionZ),
-                            vector2 = new Vector3(0f, 1f, 0f), -camVelocity);
-                    camera.lookAt(ballPositionX, defineFunction(ballPositionX, ballPositionZ), ballPositionZ);
-
-                    botTimer2 += Gdx.graphics.getDeltaTime();
-                }
-
-                if (botTimer1 > timePeriod && botTimer2 > timePeriod+0.5f) {
-
-                    // To comment
-                    camera.direction.x = camDirectionFlagX;
-                    camera.direction.y = camDirectionFlagY;
-                    camera.direction.z = camDirectionFlagZ;
-
-                    camera.up.x = camUpFlagX;
-                    camera.up.y = camUpFlagY;
-                    camera.up.z = camUpFlagZ;
-
-                    camera.position.x = camPositionFlagX;
-                    camera.position.y = camPositionFlagY;
-                    camera.position.z = camPositionFlagZ;
-
-
-                    botReady = true;
-                    sensorsReady = false;
-                }
-            }
-
-            */
 
             if (botReady) {
 
@@ -2254,9 +1759,10 @@ public class PuttingGameScreen implements Screen {
                         int stepIndexBis = 0;
                         float posX = 0;
                         float posZ = 0;
-                        float[] stepOutput = new float[18];
+                        float[] stepOutput = new float[15];
                         boolean[] stepCollision = new boolean[10];
                         for (int k = 0; k < stepOutput.length; k++) {
+                            /*
                             if (k==0) {
                                 stepOutput[k] = sensorsAngleX[i];
                             }
@@ -2264,77 +1770,16 @@ public class PuttingGameScreen implements Screen {
                                 stepOutput[k] = sensorsAngleZ[i];
                             }
                             if (k==2) {
-                                /*
-                                System.out.println("not ok");
-                                System.out.println("sensorsAngleX = " + Arrays.toString(sensorsAngleX));
-                                System.out.println("sensorsAngleZ = " + Arrays.toString(sensorsAngleZ));
-                                System.out.println("sensorsAngleX[i] = " + sensorsAngleX[i]);
-                                System.out.println("sensorsAngleZ[i] = " + sensorsAngleZ[i]);
-                                System.out.println("stepPositionX = " + stepPositionX[stepIndex]);
-                                System.out.println("stepPositionZ = " + stepPositionZ[stepIndex]);
-                                */
-
-
-                                /*
-                                System.out.println("stepPositionX = " + stepPositionX[stepIndex]);
-                                System.out.println("stepPositionZ = " + stepPositionZ[stepIndex]);
-                                System.out.println("sensorsAngleX = " + sensorsAngleX[i]);
-                                System.out.println("sensorsAngleZ = " + sensorsAngleZ[i]);
-                                */
-
-                                //System.out.println("stuck");
-
-                                /*
-                                System.out.println("ballPositionX = " + ballPositionX);
-                                System.out.println("ballPositionZ = " + ballPositionZ);
-                                */
-
-                                /*
-                                System.out.println("stepPositionX = " + Arrays.toString(stepPositionX));
-                                System.out.println("stepPositionZ = " + Arrays.toString(stepPositionZ));
-                                System.out.println("stepPositionX current = " + stepPositionX[stepIndex]);
-                                System.out.println("stepPositionZ current = " + stepPositionZ[stepIndex]);
-                                System.out.println("sensorsAngleX = " + Arrays.toString(sensorsAngleX));
-                                System.out.println("sensorsAngleZ = " + Arrays.toString(sensorsAngleZ));
-                                System.out.println("sensorsAngleX current = " + sensorsAngleX[i]);
-                                System.out.println("sensorsAngleZ current = " + sensorsAngleZ[i]);
-                                System.out.println();
-                                */
-
-                                /*
-                                System.out.println("step x = " + stepPositionX[stepIndex]);
-                                System.out.println("step z = " + stepPositionZ[stepIndex]);
-
-                                System.out.println("stuck");
-
-                                float velocity = evaluatePowerRK4(ballPositionX,ballPositionZ,stepPositionX[stepIndex],stepPositionZ[stepIndex],sensorsAngleX[i],sensorsAngleZ[i]);
-                                stepOutput[k] = velocity;
-
-                                System.out.println("ok");
-                                */
+                                // TODO fix the evaluateRK4Power here
                             }
-                            if (k==3) {
-
-                                /*
-                                Rungekuttasolver RK4 = new Rungekuttasolver();
-
-                                RK4.setValues(ballPositionX, ballPositionZ, sensorsAngleX[i]*stepOutput[k-1], sensorPositionZ[i]*stepOutput[k-1]);
-
-                                RK4.RK4();
-
-                                posX = (float) RK4.getX();
-                                posZ = (float) RK4.getY();
-
-                                System.out.println("posX = " + posX);
-                                System.out.println("posZ = " + posZ);
-                                System.out.println();
-                                */
+                            */
+                            if (k==0) {
 
                                 posX = stepPositionX[stepIndex];
                                 posZ = stepPositionZ[stepIndex];
 
                                 for (int l = 0; l < numberOfTree; l++) {
-                                    if (euclideanDistObstacles(posX, posZ, l) < 0.5f) {
+                                    if (euclideanDistObstacles(posX, posZ, l) < 0.5f || stepCollision[j]) {
                                         stepOutput[k] = 1;
                                         stepCollision[j] = true;
                                     }
@@ -2344,7 +1789,7 @@ public class PuttingGameScreen implements Screen {
                                     }
                                 }
 
-                                if (defineFunction(posX, posZ) < 0.05f) {
+                                if (defineFunction(posX, posZ) < 0.05f || stepCollision[j]) {
                                     stepOutput[k] = 1;
                                     stepCollision[j] = true;
                                 }
@@ -2353,7 +1798,7 @@ public class PuttingGameScreen implements Screen {
                                     stepCollision[j] = false;
                                 }
 
-                                if (outOfField(posX, posZ)) {
+                                if (outOfField(posX, posZ) || stepCollision[j]) {
                                     stepOutput[k] = 1;
                                     stepCollision[j] = true;
                                 }
@@ -2362,7 +1807,7 @@ public class PuttingGameScreen implements Screen {
                                     stepCollision[j] = false;
                                 }
                             }
-                            if (k==4) {
+                            if (k==1) {
                                 if (stepCollision[j]) {
                                     stepOutput[k] = 0;
                                 }
@@ -2372,13 +1817,13 @@ public class PuttingGameScreen implements Screen {
                                     }
                                 }
                             }
-                            if (k==5) {
+                            if (k==2) {
                                 stepOutput[k] = posX;
                             }
-                            if (k==6) {
+                            if (k==3) {
                                 stepOutput[k] = posZ;
                             }
-                            if (k > 6) {
+                            if (k > 4) {
                                 stepOutput[k] = sensorsSize[stepIndexBis]/10f;
                                 stepIndexBis++;
                             }
@@ -2387,70 +1832,70 @@ public class PuttingGameScreen implements Screen {
                         //System.out.println("stepOutput = " + Arrays.toString(stepOutput));
 
                         sensorsOutput.add(stepOutput);
-                        //sensorsData.add(stepData);
                     }
                 }
-                //isBotReady = true;
 
                 for (int i = 0; i < sensorsOutput.size(); i++) {
                     System.out.println("sensorsOutput = " + Arrays.toString(sensorsOutput.get(i)));
                 }
 
+                finishAgent = true;
 
-                countIndex++;
-                ballStop = false;
+                if (BotScreen.getBotName().equals("agent")) {
 
-                AgentBot bot = new AgentBot(sensorsSize, sensorsAngleX, sensorsAngleZ, maxPositionAgentX, maxPositionAgentZ, canHitFlag, isSensorOnSand, ballPositionX, ballPositionZ);
+                    countIndex++;
+                    ballStop = false;
 
-                float[] newPositions = bot.startBot();
+                    AgentBot bot = new AgentBot(sensorsSize, sensorsAngleX, sensorsAngleZ, maxPositionAgentX, maxPositionAgentZ, canHitFlag, isSensorOnSand, ballPositionX, ballPositionZ);
 
-                agentPower = bot.getPowerScalar();
-                //System.out.println("agentPower = " + agentPower);
+                    float[] newPositions = bot.startBot();
 
-                bestSensor = bot.getBestSensor();
+                    agentPower = bot.getPowerScalar();
 
-                camera.direction.x = sensorsAngleX[bestSensor];
-                camera.direction.y = sensorsAngleY[bestSensor];
-                camera.direction.z = sensorsAngleZ[bestSensor];
+                    bestSensor = bot.getBestSensor();
 
-                camera.up.x = sensorUpX[bestSensor];
-                camera.up.y = sensorUpY[bestSensor];
-                camera.up.z = sensorUpZ[bestSensor];
+                    camera.direction.x = sensorsAngleX[bestSensor];
+                    camera.direction.y = sensorsAngleY[bestSensor];
+                    camera.direction.z = sensorsAngleZ[bestSensor];
 
-                camera.position.x = sensorPositionX[bestSensor];
-                camera.position.y = sensorPositionY[bestSensor];
-                camera.position.z = sensorPositionZ[bestSensor];
+                    camera.up.x = sensorUpX[bestSensor];
+                    camera.up.y = sensorUpY[bestSensor];
+                    camera.up.z = sensorUpZ[bestSensor];
 
-                sensorsAngleX = new float[sensorsSize.length];
-                sensorsAngleY = new float[sensorsSize.length];
-                sensorsAngleZ = new float[sensorsSize.length];
+                    camera.position.x = sensorPositionX[bestSensor];
+                    camera.position.y = sensorPositionY[bestSensor];
+                    camera.position.z = sensorPositionZ[bestSensor];
 
-                sensorUpX = new float[sensorsSize.length];
-                sensorUpY = new float[sensorsSize.length];
-                sensorUpZ = new float[sensorsSize.length];
+                    sensorsAngleX = new float[sensorsSize.length];
+                    sensorsAngleY = new float[sensorsSize.length];
+                    sensorsAngleZ = new float[sensorsSize.length];
 
-                sensorPositionX = new float[sensorsSize.length];
-                sensorPositionY = new float[sensorsSize.length];
-                sensorPositionZ = new float[sensorsSize.length];
+                    sensorUpX = new float[sensorsSize.length];
+                    sensorUpY = new float[sensorsSize.length];
+                    sensorUpZ = new float[sensorsSize.length];
 
-                newBallPositionX = newPositions[0];
-                newBallPositionZ = newPositions[1];
+                    sensorPositionX = new float[sensorsSize.length];
+                    sensorPositionY = new float[sensorsSize.length];
+                    sensorPositionZ = new float[sensorsSize.length];
 
-                canTranslateCam = true;
+                    newBallPositionX = newPositions[0];
+                    newBallPositionZ = newPositions[1];
 
-                positionArrayX[countIndex] = newBallPositionX;
-                positionArrayZ[countIndex] = newBallPositionZ;
+                    canTranslateCam = true;
 
-                ballPositionX = positionArrayX[countIndex - 1];
-                ballPositionZ = positionArrayZ[countIndex - 1];
+                    positionArrayX[countIndex] = newBallPositionX;
+                    positionArrayZ[countIndex] = newBallPositionZ;
 
-                int ballStep = 100;
-                ballStepXmean = (positionArrayX[countIndex] - positionArrayX[countIndex - 1]) / ballStep;
-                ballStepZmean = (positionArrayZ[countIndex] - positionArrayZ[countIndex - 1]) / ballStep;
+                    ballPositionX = positionArrayX[countIndex - 1];
+                    ballPositionZ = positionArrayZ[countIndex - 1];
+
+                    int ballStep = 100;
+                    ballStepXmean = (positionArrayX[countIndex] - positionArrayX[countIndex - 1]) / ballStep;
+                    ballStepZmean = (positionArrayZ[countIndex] - positionArrayZ[countIndex - 1]) / ballStep;
+                }
 
                 sumX = 0;
                 sumZ = 0;
-                //countIterationBot = 0;
 
                 count = 0;
                 counter = 0;
@@ -2463,25 +1908,19 @@ public class PuttingGameScreen implements Screen {
 
                 check = false;
                 botReady = false;
-                //isBotReady = false;
                 findFlag = false;
                 checkCamera = false;
 
                 isSensorOnSand = new boolean[11];
                 checkForSensorsStep = new boolean[11];
 
-                finishAgent = true;
-            }
+                /*
+                if (BotScreen.getBotName().equals("Q_agent")) {
 
 
-            /*
-            for (int i = 0; i < sensorsData.size(); i++) {
-                System.out.println("sensorsData = " + Arrays.toString(sensorsData.get(i)));
+                }
+                */
             }
-            for (int i = 0; i < sensorsOutput.size(); i++) {
-                System.out.println("sensorsOutput = " + Arrays.toString(sensorsOutput.get(i)));
-            }
-            */
         }
 
 
@@ -2516,26 +1955,6 @@ public class PuttingGameScreen implements Screen {
 
                         newBallPositionX = (float) RK4.getX();
                         newBallPositionZ = (float) RK4.getY();
-
-                        /*
-                        while (!checkSolver) {
-                            if (vx > allowableRange || vy > allowableRange) {
-
-                                RK4.RK4();
-                                
-                                newBallPositionX = (float) RK4.getX();
-                                newBallPositionZ = (float) RK4.getY();
-
-                                vx = (float) RK4.getVx();
-                                vy = (float) RK4.getVy();
-                                System.out.println("ok");
-                            }
-                            else {
-                                System.out.println("ok1");
-                                checkSolver = true;
-                            }
-                        }
-                        */
                     }
 
                     // Instance of the Verlet solver
@@ -2579,11 +1998,6 @@ public class PuttingGameScreen implements Screen {
 
                 positionArrayX[countIndex] = newBallPositionX;
                 positionArrayZ[countIndex] = newBallPositionZ;
-
-                //System.out.println("distance x = " + (positionArrayX[countIndex] - positionArrayX[countIndex-1]));
-                //System.out.println("distance z = " + (positionArrayZ[countIndex] - positionArrayZ[countIndex-1]));
-
-                //System.out.println("euclidean distance = " + Math.sqrt(Math.pow((positionArrayX[countIndex] - positionArrayX[countIndex-1]),2) + Math.pow((positionArrayZ[countIndex] - positionArrayZ[countIndex-1]),2)));
 
                 ballPositionX = positionArrayX[countIndex -1];
                 ballPositionZ = positionArrayZ[countIndex -1];

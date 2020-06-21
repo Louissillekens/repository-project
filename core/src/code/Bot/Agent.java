@@ -7,7 +7,7 @@ import java.util.Arrays;
 
 public class Agent {
 
-    private static ArrayList<float[]> outputData;
+    private ArrayList<float[]> outputData;
 
     public Agent() {
 
@@ -15,7 +15,7 @@ public class Agent {
         System.out.println(Arrays.deepToString(new ArrayList[]{outputData}));
     }
 
-    public static ArrayList<float[]> getOutputData() {
+    public ArrayList<float[]> getOutputData() {
         return outputData;
     }
 }

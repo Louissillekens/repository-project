@@ -1,11 +1,14 @@
 package code.Bridge;
 
 import code.Bot.Agent;
+import code.Lets_Go_Champ.Alex_Clem;
 import code.Lets_Go_Champ.GameManager;
 import code.Screens.BotScreen;
 import code.Screens.PuttingGameScreen;
+import code.Screens.RenderGUI;
 import com.game.game.Game;
 
+import java.lang.reflect.GenericArrayType;
 import java.util.ArrayList;
 import java.util.Arrays;
 
@@ -18,9 +21,18 @@ public class LinkAgentNN {
     private static float[] sensors;
     private ArrayList<float[]> sensorsOutput;
     private float[] actionSensorOutput;
+    public static boolean newAgent = false;
 
 
     public LinkAgentNN(int action) {
+
+        PuttingGameScreen.action = action;
+
+        while (!PuttingGameScreen.isReadyToTrain) {
+            newAgent = true;
+        }
+
+        newAgent = false;
 
         // Object agent that (for now) can just return the output data from PuttingGameScreen
         Agent agent = new Agent();
@@ -30,7 +42,6 @@ public class LinkAgentNN {
         System.out.println(sensorsOutput.getClass().getSimpleName());
         // Simple float[] that contains data you need for that specific action
         constructorCalc(sensorsOutput.get(action));
-
     }
 
     private void constructorCalc(float[] arr){
