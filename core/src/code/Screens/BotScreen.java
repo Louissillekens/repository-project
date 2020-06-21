@@ -1,7 +1,6 @@
 package code.Screens;
 
 import code.Lets_Go_Champ.Alex_Clem;
-import code.Lets_Go_Champ.ExceptionHandeling;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.Screen;
@@ -116,16 +115,13 @@ public class BotScreen implements Screen {
             public void changed(ChangeEvent event, Actor actor) {
 
                 this.game.setScreen(new PuttingGameScreen(myGame, new GameMode(gameMode.gameName)));
-
-                try {
-                    new Alex_Clem(PuttingGameScreen.getStartingPositionX(), PuttingGameScreen.getStartingPositionZ(), PuttingGameScreen.getFlagPositionX(), PuttingGameScreen.getFlagPositionZ());
-                } catch (ExceptionHandeling exceptionHandeling) {
-                    exceptionHandeling.printStackTrace();
-                }
-
+                new Alex_Clem(PuttingGameScreen.getStartingPositionX(), PuttingGameScreen.getStartingPositionZ(), PuttingGameScreen.getFlagPositionX(), PuttingGameScreen.getFlagPositionZ());
                 this.screen.dispose();
                 botName = "Q_agent";
+
             }
+
+
         }
         qAgentButton.addListener(new qAgentListener(game, this));
 
@@ -167,6 +163,7 @@ public class BotScreen implements Screen {
             }
         }
         trainButton.addListener(new trainListener(game, this));
+
     }
 
     /*

@@ -24,6 +24,7 @@ public class LinkAgentNN {
 
         while (!PuttingGameScreen.isReadyToTrain) {
             newAgent = true;
+
         }
 
         newAgent = false;
