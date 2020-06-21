@@ -46,4 +46,8 @@ public class Agent {
             return MathWork.getMaxIndex(results); //  Return the position of that best action
         }
     }
+
+    public int getCurrent_step() {
+        return current_step;
+    }
 }
