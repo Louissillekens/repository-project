@@ -1,14 +1,8 @@
 package code.Bridge;
 
 import code.Bot.Agent;
-import code.Lets_Go_Champ.Alex_Clem;
-import code.Lets_Go_Champ.GameManager;
-import code.Screens.BotScreen;
 import code.Screens.PuttingGameScreen;
-import code.Screens.RenderGUI;
-import com.game.game.Game;
 
-import java.lang.reflect.GenericArrayType;
 import java.util.ArrayList;
 import java.util.Arrays;
 
@@ -46,23 +40,23 @@ public class LinkAgentNN {
 
     private void constructorCalc(float[] arr){
         // Collision
-        if (arr[3] == 1)
+        if (arr[0] == 1)
             this.collision = true;
         else
             this.collision = false;
 
         // Win position
-        if (arr[4] == 1)
+        if (arr[1] == 1)
             this.win_position = true;
         else
             this.win_position = false;
 
         // Update the position
-        this.xPosition = arr[5];
-        this.yPosition = arr[6];
+        this.xPosition = arr[2];
+        this.yPosition = arr[3];
 
         // Sensor Calculation
-        this.sensors = Arrays.copyOfRange(arr, 7, arr.length);
+        this.sensors = Arrays.copyOfRange(arr, 4, arr.length);
     }
 
     public float getxPosition() {

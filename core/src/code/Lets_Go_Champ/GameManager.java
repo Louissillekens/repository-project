@@ -48,7 +48,7 @@ public class GameManager {
      */
     int takeAction(int action){
         int reward = 0;
-
+        System.out.println("res");
         LinkAgentNN bridge = new LinkAgentNN(action);
 
         boolean final_destination = bridge.getWinPosition();

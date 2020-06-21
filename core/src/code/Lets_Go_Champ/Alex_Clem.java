@@ -67,8 +67,10 @@ public class Alex_Clem {
             float[] state= gm.getState(); // Get the starting state
 
             while (!gm.isDone()){ //Not in an ending state //TODO should put a limit of number of moves possible
+
                 int action = agent.selectAction(state, policy_net); // Decide an action [0;109] from Q(s,a) = policy net (The agent didnt move yet)
                 int reward = gm.takeAction(action); //Get the reward from that action
+                System.out.println(reward);
                 float[] next_state = gm.getState(); // Get the new state (has been updated in takeAction)
 
                 memory.push(new Experience(state, action, next_state, reward)); // Add a new experience of this step
@@ -87,6 +89,7 @@ public class Alex_Clem {
 
                     policy_net.backprop(loss, Qvalues.getActionCache()); // Backprop the loss to update the weights and bias
                 }
+                System.out.println("ntn");
             }
 
             total_rewards_episodes[e] = gm.getTotalRewards(); // Store the total rewards of an episode
