@@ -51,7 +51,7 @@ public class PuttingGameScreen implements Screen {
     private float directionZ;
 
     // Instances variables for the ball in the game
-    //private Model ball;
+    // private Model ball;
     private ModelInstance ballInstance;
     private static float startingPositionX = 2;
     private static float startingPositionZ = 2;

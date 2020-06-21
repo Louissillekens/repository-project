@@ -28,4 +28,6 @@ public class EpsilonGreedyStrat {
     float getExplorationRate(int current_step){
         return (float) (end + (start - end)*(Math.exp(-1*decay*current_step))); // Formula
     }
+
+
 }
