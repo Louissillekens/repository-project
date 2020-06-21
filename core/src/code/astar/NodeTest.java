@@ -12,10 +12,10 @@ public class NodeTest {
     public static void main(String[] args) {
 
         //made a few nodes to test with
-        Node parent = new Node(null, 1,1);
-        Node node = new Node(parent, 2,2);
-        Node child1 = new Node(node,1,2);
-        Node child2 = new Node(node,1.5,3);
+        Node parent = new Node(null, 0,0);
+        Node node = new Node(parent, 0,0);
+        Node child1 = new Node(node,0,0);
+        Node child2 = new Node(node,0,0);
 
         child1.generateShot(0.25,3);
         System.out.println(child1.getPower() + " ------ " + child1.getAngle());
