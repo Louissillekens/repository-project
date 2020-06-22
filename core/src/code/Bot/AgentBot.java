@@ -36,13 +36,13 @@ public class AgentBot {
         this.sensorsWeight = new float[sensorsSize.length];
         this.sensorsWeight[0] = 12;
         this.sensorsWeight[1] = 8;
-        this.sensorsWeight[2] = 6;
+        this.sensorsWeight[2] = 5;
         this.sensorsWeight[3] = 3;
         this.sensorsWeight[4] = 2;
         this.sensorsWeight[5] = 1;
         this.sensorsWeight[6] = 2;
         this.sensorsWeight[7] = 3;
-        this.sensorsWeight[8] = 6;
+        this.sensorsWeight[8] = 5;
         this.sensorsWeight[9] = 8;
         this.sensorsWeight[10] = 12;
 
@@ -63,7 +63,7 @@ public class AgentBot {
         }
 
         for (int i = 0; i < sensorSize.length; i++) {
-            if (sensorSize[i] < 0.5) {
+            if (sensorSize[i] < 1.5f) {
                 sensorsWeight[i] = sensorsWeight[i]*10;
             }
         }
@@ -104,13 +104,7 @@ public class AgentBot {
         float newBallX = (float) RK4.getX();
         float newBallZ = (float) RK4.getY();
 
-        /*
-        System.out.println("ballX = " + ballX);
-        System.out.println("ballZ = " + ballZ);
-        System.out.println("newBallX = " + newBallX);
-        System.out.println("newBallZ = " + newBallZ);
-        System.out.println();
-        */
+        PuttingGameScreen.countTries++;
 
         return new float[]{newBallX, newBallZ};
     }

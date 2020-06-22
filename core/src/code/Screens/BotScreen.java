@@ -33,7 +33,6 @@ public class BotScreen implements Screen {
     private TextButton agentButton;
     private TextButton qAgentButton;
     private TextButton aStarButton;
-    private TextButton trainButton;
 
     // Instance variable for the chosen solver
     private static String botName;
@@ -75,11 +74,6 @@ public class BotScreen implements Screen {
         aStarButton.setSize(200, 60);
         stage.addActor(aStarButton);
 
-        trainButton = new TextButton("Train Data", skin);
-        trainButton.setPosition(400, 200);
-        trainButton.setSize(200, 60);
-        stage.addActor(trainButton);
-
         class agentListener extends ChangeListener {
 
             private Game game;
@@ -115,16 +109,11 @@ public class BotScreen implements Screen {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
 
-                this.game.setScreen(new PuttingGameScreen(myGame, new GameMode(gameMode.gameName)));
-
-                try {
-                    new Alex_Clem(PuttingGameScreen.getStartingPositionX(), PuttingGameScreen.getStartingPositionZ(), PuttingGameScreen.getFlagPositionX(), PuttingGameScreen.getFlagPositionZ());
-                } catch (ExceptionHandeling exceptionHandeling) {
-                    exceptionHandeling.printStackTrace();
-                }
-
-                this.screen.dispose();
+                this.game.setScreen(new PuttingGameScreen(2, 2));
                 botName = "Q_agent";
+                this.screen.dispose();
+
+                System.out.println("ok");
             }
         }
         qAgentButton.addListener(new qAgentListener(game, this));
@@ -148,25 +137,6 @@ public class BotScreen implements Screen {
             }
         }
         aStarButton.addListener(new aStarListener(game, this));
-
-        class trainListener extends ChangeListener {
-
-            private Game game;
-            private Screen screen;
-
-            private trainListener(final Game game, Screen screen) {
-
-                this.game = game;
-                this.screen = screen;
-            }
-
-            @Override
-            public void changed(ChangeEvent event, Actor actor) {
-
-
-            }
-        }
-        trainButton.addListener(new trainListener(game, this));
     }
 
     /*
