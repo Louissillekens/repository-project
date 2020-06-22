@@ -23,8 +23,6 @@ public class InputHandler {
 
             double power = game.getShot_Power();
 
-            PuttingGameScreen.countIndex++;
-
             PuttingGameScreen.ballStop = false;
 
             // Condition that checks the game mode chosen by the user before taking the shot
@@ -34,8 +32,13 @@ public class InputHandler {
                 // Used to compute the next position of the ball based on the current position, the camera direction and the power
                 if (SolverScreen.getSolverName().equals("RK4")) {
 
-                    game.takeRK4shot((float) power, 500);
-                    PuttingGameScreen.countTries++;
+                    if (Math.abs(game.getCamera().direction.x) > 0.001 && Math.abs(game.getCamera().direction.z) > 0.001) {
+
+                        PuttingGameScreen.countIndex++;
+
+                        game.takeRK4shot((float) power, 500);
+                        PuttingGameScreen.countTries++;
+                    }
                 }
 
                 // Instance of the Verlet solver
@@ -55,6 +58,8 @@ public class InputHandler {
                     PuttingGameScreen.newBallPositionZ = (float) Verlet.getY();
 
                     PuttingGameScreen.countTries++;
+
+                    PuttingGameScreen.countIndex++;
                 }
             }
         }
@@ -70,9 +75,16 @@ public class InputHandler {
             // Some key pressed input to rotate the camera and also zoom in zoom out
             if(Gdx.input.isKeyPressed(Input.Keys.RIGHT)) {
                 game.cameraRotation(-1);
+                System.out.println("dir x = " + game.getCamera().direction.x);
+                System.out.println("dir z = " + game.getCamera().direction.z);
+                System.out.println();
             }
             if(Gdx.input.isKeyPressed(Input.Keys.LEFT)) {
                 game.cameraRotation(1);
+
+                System.out.println("dir x = " + game.getCamera().direction.x);
+                System.out.println("dir z = " + game.getCamera().direction.z);
+                System.out.println();
             }
             if(Gdx.input.isKeyPressed(Input.Keys.UP)) {
                 //round the shot power to two decimal places to avoid errors where the power would get above max power
