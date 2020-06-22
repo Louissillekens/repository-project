@@ -4,6 +4,7 @@ import code.Bot.AgentBot;
 import code.Bridge.LinkAgentNN;
 import code.Physics.Rungekuttasolver;
 import code.astar.AStar;
+import code.astar.Node;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.*;
@@ -21,6 +22,7 @@ import com.badlogic.gdx.utils.Array;
 import com.game.game.Game;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Random;
 
 import static com.badlogic.gdx.graphics.GL20.GL_TRIANGLES;
@@ -1516,7 +1518,7 @@ public class PuttingGameScreen implements Screen {
             }
             if (BotScreen.getBotName().equals("aStar")) {
                 AStar bot = new AStar(this);
-                bot.findRoute();
+                List<Node> nodes = bot.findRoute();
             }
         }
 
