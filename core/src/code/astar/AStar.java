@@ -91,7 +91,7 @@ public class AStar {
 
         ArrayList<Node> list = new ArrayList<Node>();
         //we don't add the last node as it contains the location and is not an actual shot to be taken
-        //list.add(node);
+        list.add(node);
 
         while(node.hasParent()){
             //adds the node's parent to the start of the list and shifts existing nodes to the right

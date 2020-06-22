@@ -1520,7 +1520,7 @@ public class PuttingGameScreen implements Screen {
                 AStar bot = new AStar(this);
                 List<Node> nodes = bot.findRoute();
 
-                
+
 
                 for(int i = 0 ; i < nodes.size() ; i++){
 
