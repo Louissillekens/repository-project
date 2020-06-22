@@ -1563,7 +1563,11 @@ public class PuttingGameScreen implements Screen {
                     }
 
                     bot = new AStar(this);
+                    long start = System.currentTimeMillis();
                     nodes = bot.findRoute();
+                    long end = System.currentTimeMillis();
+                    long duration = start - end;
+                    System.out.println("time till solution found by A* : " + duration);
 
                     System.out.println("nodes = " + nodes.size());
 
