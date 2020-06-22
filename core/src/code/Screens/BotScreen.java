@@ -135,7 +135,8 @@ public class BotScreen implements Screen {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
 
-                //AStar aStar = new AStar();
+                this.game.setScreen(new PuttingGameScreen(myGame, new GameMode(gameMode.gameName)));
+                this.screen.dispose();
                 botName = "aStar";
             }
         }
