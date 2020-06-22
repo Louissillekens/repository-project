@@ -117,17 +117,17 @@ public class Node {
 
         //Split the velocity vector into x,y components
 
-        System.out.println("power = " + power);
-        System.out.println("newAngle = " + newAngle);
+        //System.out.println("power = " + power);
+        //System.out.println("newAngle = " + newAngle);
 
         double vxi = (getPower())*Math.cos(newAngle);
         double vyi = (getPower())*Math.sin(newAngle);
 
-        System.out.println("vxi = " + vxi);
-        System.out.println("vyi = " + vyi);
+        //System.out.println("vxi = " + vxi);
+        //System.out.println("vyi = " + vyi);
 
         Rungekuttasolver rk = new Rungekuttasolver();
-        System.out.println("starts calculations for location now");
+        //System.out.println("starts calculations for location now");
         return  rk.startRK4(getX(), getZ(), vxi, vyi);
     }
 

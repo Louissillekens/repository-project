@@ -22,6 +22,7 @@ import com.badlogic.gdx.utils.Array;
 import com.game.game.Game;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
 
@@ -114,7 +115,7 @@ public class PuttingGameScreen implements Screen {
     private boolean[] detectorCollision = new boolean[11];
     private int numberOfLinesSensors = 50;
 
-    private int numberOfTree = 50;
+    private int numberOfTree = 30;
     private static float[] treePositionX;
     private static float[] treePositionZ;
 
@@ -165,6 +166,8 @@ public class PuttingGameScreen implements Screen {
     public static boolean finishAgent = false;
     public static boolean isReadyToTrain = false;
     private boolean checkCamera = false;
+    private boolean checkAStar = false;
+    private boolean aStarReady = true;
 
     private float agentPower;
     private float botTimer1 = 0;
@@ -176,6 +179,7 @@ public class PuttingGameScreen implements Screen {
     private int countForSensors = 0;
     private int countForSensorsReady = 0;
     private int countForSensor0Ready = 0;
+    private int nodeIndex = 0;
     public static int countTries = 0;
 
     private float[] stepPositionX = new float[sensorsSize.length*10];
@@ -196,6 +200,11 @@ public class PuttingGameScreen implements Screen {
     private float[] saveStepZ = new float[numberOfLinesSensors];
 
     private String name = "";
+
+    private AStar bot;
+    private List<Node> nodes;
+    private float[] newPosX;
+    private float[] newPosZ;
 
     /**
      * Constructor that creates a new instance of the putting game screen
@@ -335,7 +344,7 @@ public class PuttingGameScreen implements Screen {
         float field4 = (float) (((Math.sin(x) + Math.sin(y))/4)+(Math.sin(2*x)/4)+0.3);
         float ripple1 = (float) ((0.4)+Math.sin((0.4)*(Math.pow(x,2)+Math.pow(y,2))/10)+1);
 
-        return field1;
+        return field0;
     }
 
     /**
@@ -611,10 +620,11 @@ public class PuttingGameScreen implements Screen {
 
             ballStop = false;
             sensorsReady = false;
-
+            checkAStar = false;
         }
         else {
             ballStop = true;
+            checkAStar = true;
             if (countIndex > 0) {
                 ballPositionX = positionArrayX[countIndex];
                 ballPositionZ = positionArrayZ[countIndex];
@@ -1354,18 +1364,6 @@ public class PuttingGameScreen implements Screen {
     @Override
     public void render(float delta) {
 
-        /*
-        if (countIterations < 1) {
-            try {
-                new Alex_Clem(PuttingGameScreen.getStartingPositionX(), PuttingGameScreen.getStartingPositionZ(), PuttingGameScreen.getFlagPositionX(), PuttingGameScreen.getFlagPositionZ());
-            } catch (ExceptionHandeling exceptionHandeling) {
-                exceptionHandeling.printStackTrace();
-            }
-        }
-        countIterations++;
-        */
-
-
         Gdx.gl.glViewport(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
         Gdx.gl.glClearColor(0, 0, 0, 1);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT);
@@ -1421,8 +1419,19 @@ public class PuttingGameScreen implements Screen {
         shapeRenderer.end();
 
         if (!checkCollisionMessage && !readyToTrain) {
+
             ballMovement();
+
+            //System.out.println("ballPositionX = " + ballPositionX);
+            //System.out.println("ballPositionZ = " + ballPositionZ);
+            //System.out.println("newBallPositionX = " + newBallPositionX);
+            //System.out.println("newBallPositionZ = " + newBallPositionZ);
+            //System.out.println();
         }
+
+        //if (!checkAStar) {
+            //ballMovement();
+        //}
 
         // Condition used when the ball is out of the field
         if (outOfField(ballPositionX, ballPositionZ)) {
@@ -1441,6 +1450,7 @@ public class PuttingGameScreen implements Screen {
                 resetBallShot();
                 camera.lookAt(ballPositionX, defineFunction(ballPositionX, ballPositionZ), ballPositionZ);
             }
+            aStarReady = true;
         }
 
         // Condition used to reset the ball position when the ball falls into water
@@ -1461,6 +1471,7 @@ public class PuttingGameScreen implements Screen {
                 resetBallShot();
                 camera.lookAt(ballPositionX, defineFunction(ballPositionX, ballPositionZ), ballPositionZ);
             }
+            aStarReady = true;
         }
         // Condition used to check if the ball is closed enough to the flag
         if (isWin(ballPositionX, ballPositionZ) && ballStop) {
@@ -1493,6 +1504,7 @@ public class PuttingGameScreen implements Screen {
                     resetBallShot();
                     camera.lookAt(ballPositionX, defineFunction(ballPositionX, ballPositionZ), ballPositionZ);
                 }
+                aStarReady = true;
             }
         }
 
@@ -1517,15 +1529,85 @@ public class PuttingGameScreen implements Screen {
                 }
             }
             if (BotScreen.getBotName().equals("aStar")) {
-                AStar bot = new AStar(this);
-                List<Node> nodes = bot.findRoute();
 
+                if (aStarReady) {
 
+                    //System.out.println("ok");
 
-                for(int i = 0 ; i < nodes.size() ; i++){
+                    /*
+                    ballPositionX = startingPositionX;
+                    ballPositionZ = startingPositionZ;
 
+                    positionArrayX = new float[100];
+                    positionArrayZ = new float[100];
 
+                    translateX = new float[100];
+                    translateZ = new float[100];
+
+                    sumX = 0;
+                    sumZ = 0;
+                    */
+
+                    bot = new AStar(this);
+                    nodes = bot.findRoute();
+
+                    System.out.println("nodes = " + nodes.size());
+
+                    newPosX = new float[nodes.size()];
+                    newPosZ = new float[nodes.size()];
+
+                    for (int i = 0; i < nodes.size(); i++) {
+
+                        newPosX[i] = (float) nodes.get(i).getX();
+                        newPosZ[i] = (float) nodes.get(i).getZ();
+                    }
+
+                    aStarReady = false;
+                    checkAStar = true;
                 }
+
+                if (checkAStar && nodeIndex < nodes.size()) {
+
+                    countIndex++;
+
+                    if (nodeIndex==0) {
+                        newBallPositionX = newPosX[nodeIndex]+startingPositionX;
+                        newBallPositionZ = newPosZ[nodeIndex]+startingPositionZ;
+                    }
+                    else {
+                        newBallPositionX = newPosX[nodeIndex];
+                        newBallPositionZ = newPosZ[nodeIndex];
+                    }
+
+                    if (!isWin(newBallPositionX, newBallPositionZ)) {
+                        countTries++;
+                    }
+
+                    System.out.println("newPosX = " + newBallPositionX);
+                    System.out.println("newPosZ = " + newBallPositionZ);
+                    System.out.println();
+
+                    positionArrayX[countIndex] = newBallPositionX;
+                    positionArrayZ[countIndex] = newBallPositionZ;
+
+                    ballPositionX = positionArrayX[countIndex-1];
+                    ballPositionZ = positionArrayZ[countIndex-1];
+
+                    int ballStep = 100;
+                    ballStepXmean = (positionArrayX[countIndex]-positionArrayX[countIndex -1])/ ballStep;
+                    ballStepZmean = (positionArrayZ[countIndex]-positionArrayZ[countIndex -1])/ ballStep;
+
+                    sumX = 0;
+                    sumZ = 0;
+
+                    trackShot = true;
+                    canTranslateCam = true;
+                    canReset = true;
+
+                    checkAStar = false;
+                    nodeIndex++;
+                }
+                //System.out.println("checkAStar = " + checkAStar);
             }
         }
 

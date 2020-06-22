@@ -55,7 +55,7 @@ public class AStar {
                 nodes.add(cloneNode);
                 //each iteration create a random shot and make a node of where the ball arrives
                 cloneNode.generateShot( 0.25, game.getMAX_SPEED()); //min is set to 0.5 as values lower than this will not make the ball move all that much
-                double[] locData = node.executeShot();
+                double[] locData = cloneNode.executeShot();
                 Node nextNode = new Node(cloneNode, locData[0], locData[1]);
                 this.computeScore(nextNode);
                 this.addNode(nextNode);
@@ -76,9 +76,9 @@ public class AStar {
 
         double score = 100;
         score -= distanceHeuristic*(node.CalculateDistTo(game.getFlagPositionX(), game.getFlagPositionZ()));
-        System.out.println(score);
+        //System.out.println(score);
         score -= stepHeuristic*amOfSteps(node);
-        System.out.println(score);
+        //System.out.println(score);
         node.setScore(score);
     }
 
