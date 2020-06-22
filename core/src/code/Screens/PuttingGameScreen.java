@@ -180,6 +180,7 @@ public class PuttingGameScreen implements Screen {
     private int countForSensorsReady = 0;
     private int countForSensor0Ready = 0;
     private int nodeIndex = 0;
+    private int countAStarIterations = 0;
     public static int countTries = 0;
 
     private float[] stepPositionX = new float[sensorsSize.length*10];
@@ -1449,8 +1450,8 @@ public class PuttingGameScreen implements Screen {
                 canReset = false;
                 resetBallShot();
                 camera.lookAt(ballPositionX, defineFunction(ballPositionX, ballPositionZ), ballPositionZ);
+                aStarReady = true;
             }
-            aStarReady = true;
         }
 
         // Condition used to reset the ball position when the ball falls into water
@@ -1470,8 +1471,8 @@ public class PuttingGameScreen implements Screen {
                 // Call of the method that reset the ball to the previous place
                 resetBallShot();
                 camera.lookAt(ballPositionX, defineFunction(ballPositionX, ballPositionZ), ballPositionZ);
+                aStarReady = true;
             }
-            aStarReady = true;
         }
         // Condition used to check if the ball is closed enough to the flag
         if (isWin(ballPositionX, ballPositionZ) && ballStop) {
@@ -1503,8 +1504,8 @@ public class PuttingGameScreen implements Screen {
                     // Call of the method that reset the ball to the previous place
                     resetBallShot();
                     camera.lookAt(ballPositionX, defineFunction(ballPositionX, ballPositionZ), ballPositionZ);
+                    aStarReady = true;
                 }
-                aStarReady = true;
             }
         }
 
@@ -1530,23 +1531,36 @@ public class PuttingGameScreen implements Screen {
             }
             if (BotScreen.getBotName().equals("aStar")) {
 
+                //System.out.println("aStarReady = " + aStarReady);
+
                 if (aStarReady) {
 
                     //System.out.println("ok");
 
-                    /*
-                    ballPositionX = startingPositionX;
-                    ballPositionZ = startingPositionZ;
+                    if (countAStarIterations > 0) {
 
-                    positionArrayX = new float[100];
-                    positionArrayZ = new float[100];
+                        ballPositionX = startingPositionX;
+                        ballPositionZ = startingPositionZ;
 
-                    translateX = new float[100];
-                    translateZ = new float[100];
+                        camera = new PerspectiveCamera(75, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+                        camera.position.set(-3.5f + startingPositionX, 3f, -3.5f + startingPositionZ);
+                        camera.lookAt(ballPositionX, defineFunction(ballPositionX, ballPositionZ), ballPositionZ);
+                        camera.near = 0.1f;
+                        camera.far = 400f;
 
-                    sumX = 0;
-                    sumZ = 0;
-                    */
+                        positionArrayX = new float[100];
+                        positionArrayZ = new float[100];
+
+                        translateX = new float[100];
+                        translateZ = new float[100];
+
+                        sumX = 0;
+                        sumZ = 0;
+
+                        countIndex = 0;
+                        nodeIndex = 0;
+                        countTries = 0;
+                    }
 
                     bot = new AStar(this);
                     nodes = bot.findRoute();
@@ -1562,9 +1576,15 @@ public class PuttingGameScreen implements Screen {
                         newPosZ[i] = (float) nodes.get(i).getZ();
                     }
 
+                    countAStarIterations++;
+
                     aStarReady = false;
                     checkAStar = true;
                 }
+
+                //System.out.println("checkAStar = " + checkAStar);
+                //System.out.println("nodeIndex = " + nodeIndex);
+                //System.out.println("countIndex = " + countIndex);
 
                 if (checkAStar && nodeIndex < nodes.size()) {
 
@@ -1590,8 +1610,11 @@ public class PuttingGameScreen implements Screen {
                     positionArrayX[countIndex] = newBallPositionX;
                     positionArrayZ[countIndex] = newBallPositionZ;
 
-                    ballPositionX = positionArrayX[countIndex-1];
-                    ballPositionZ = positionArrayZ[countIndex-1];
+                    //ballPositionX = positionArrayX[countIndex-1];
+                    //ballPositionZ = positionArrayZ[countIndex-1];
+
+                    //System.out.println("positionArrayX = " + Arrays.toString(positionArrayX));
+                    //System.out.println("positionArrayZ = " + Arrays.toString(positionArrayZ));
 
                     int ballStep = 100;
                     ballStepXmean = (positionArrayX[countIndex]-positionArrayX[countIndex -1])/ ballStep;
