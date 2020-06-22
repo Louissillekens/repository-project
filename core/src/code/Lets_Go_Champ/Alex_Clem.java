@@ -11,28 +11,30 @@ public class Alex_Clem {
     private static float xFlag;
     private static float yFlag;
 
-    int memory_size = 100000; // Size of the number of experieces we can store
-    int batch_size = 256; // Number of experiences we take from the memory
+    static int memory_size = 100000; // Size of the number of experieces we can store
+    static int batch_size = 256; // Number of experiences we take from the memory
 
-    float gamma = 0.9f; // Importance to future rewards
+    static float gamma = 0.9f; // Importance to future rewards
 
-    float eps_start = 1f;
-    float eps_end = 0.01f;
-    float eps_decay = 0.001f;
+    static float eps_start = 1f;
+    static float eps_end = 0.01f;
+    static float eps_decay = 0.001f;
 
-    int target_network_update = 10; // updating the target network every 10 episodes
-    float lr = 0.01f; // Policy nn learning rate
+    static int target_network_update = 10; // updating the target network every 10 episodes
+    static float lr = 0.01f; // Policy nn learning rate
 
-    int num_episodes = 1000; // Max number of episodes
+    static int num_episodes = 1000; // Max number of episodes
 
 
-    public Alex_Clem(float xStart, float yStart, float xFlag, float yFlag) throws ExceptionHandeling {
-        this.xStart= xStart;
+    public Alex_Clem(float xStart, float yStart, float xFlag, float yFlag) {
+        this.xStart = xStart;
         this.yStart = yStart;
         this.xFlag = xFlag;
         this.yFlag = yFlag;
 
+    }
 
+    public static void executeBG(){
         GameManager gm = new GameManager(xStart,yStart,xFlag,yFlag); // Create the game manager
         EpsilonGreedyStrat strategy = new EpsilonGreedyStrat(eps_start, eps_end, eps_decay); // Create the strat
         Agent agent = new Agent(strategy,gm.numActionsAvailable()); // Create the agent
@@ -50,8 +52,12 @@ public class Alex_Clem {
         target_net.setTrainingMode(false); // Only for evaluation
 
         // Set the activation function for the networks
-        policy_net.setActivationFunction("relu"); // set activation function, relu by default
-        target_net.setActivationFunction("relu"); // set activation function, relu by default
+        try {
+            policy_net.setActivationFunction("relu"); // set activation function, relu by default
+            target_net.setActivationFunction("relu"); // set activation function, relu by default
+        } catch (ExceptionHandeling exceptionHandeling) {
+            exceptionHandeling.printStackTrace();
+        }
 
         // Set the learning rate of our policy_net
         policy_net.setLR(lr);

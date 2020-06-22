@@ -25,6 +25,7 @@ public class LinkAgentNN {
         while (!PuttingGameScreen.isReadyToTrain) {
             //System.out.println("action = " + PuttingGameScreen.action);
             newAgent = true;
+
         }
 
         newAgent = false;

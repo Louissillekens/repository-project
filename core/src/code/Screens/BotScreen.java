@@ -1,7 +1,6 @@
 package code.Screens;
 
 import code.Lets_Go_Champ.Alex_Clem;
-import code.Lets_Go_Champ.ExceptionHandeling;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.Screen;
@@ -114,7 +113,11 @@ public class BotScreen implements Screen {
                 this.screen.dispose();
 
                 System.out.println("ok");
+                botName = "Q_agent";
+
             }
+
+
         }
         qAgentButton.addListener(new qAgentListener(game, this));
 
