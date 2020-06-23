@@ -1576,7 +1576,14 @@ public class PuttingGameScreen implements Screen {
                     }
 
                     bot = new AStar(this);
-                    nodes = bot.findRoute(); //TODO find the time it took for A* to run 
+                    int samplesize = 1;
+                    int nano = 1000000;
+                    long startTime = System.nanoTime();
+                    for (int i=0;i<samplesize;i++){
+                        nodes = bot.findRoute(); //TODO find the time it took for A* to run 
+                    }
+                    long endTime = System.nanoTime();
+                    System.out.println("average time per shot was " + (((endTime-startTime)/nano)/samplesize)+ " ms");
 
                     System.out.println("nodes = " + nodes.size());
 
