@@ -57,9 +57,9 @@ public class GameManager {
         float new_xPos = bridge.getxPosition();
         float new_yPos = bridge.getyPosition();
 
-        System.out.println("new_yPos = " + new_xPos);
+        System.out.println("new_xPos = " + new_xPos);
         System.out.println("new_yPos = " + new_yPos);
-        System.exit(0);
+        //System.exit(0);
 
         // The ball is at the final destination
         if (final_destination ==  true){

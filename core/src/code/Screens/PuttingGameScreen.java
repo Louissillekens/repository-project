@@ -173,6 +173,7 @@ public class PuttingGameScreen implements Screen {
     private static boolean checkCamera = false;
     private boolean checkAStar = false;
     private boolean aStarReady = true;
+    public static boolean checkBridge = false;
 
     private static float agentPower;
     private static float botTimer1 = 0;
@@ -1694,6 +1695,34 @@ public class PuttingGameScreen implements Screen {
                     isReadyToTrain = true;
                 }
             }*/
+
+            if (checkBridge) {
+
+                countIndex++;
+
+                newBallPositionX = sensorsOutput.get(action)[2];
+                newBallPositionZ = sensorsOutput.get(action)[3];
+
+                if (!isWin(newBallPositionX, newBallPositionZ)) {
+                    countTries++;
+                }
+
+                positionArrayX[countIndex] = newBallPositionX;
+                positionArrayZ[countIndex] = newBallPositionZ;
+
+                int ballStep = 100;
+                ballStepXmean = (positionArrayX[countIndex]-positionArrayX[countIndex -1])/ ballStep;
+                ballStepZmean = (positionArrayZ[countIndex]-positionArrayZ[countIndex -1])/ ballStep;
+
+                sumX = 0;
+                sumZ = 0;
+
+                trackShot = true;
+                canTranslateCam = true;
+                canReset = true;
+
+                checkBridge = false;
+            }
         }
     }
 
