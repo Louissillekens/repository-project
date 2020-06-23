@@ -1576,7 +1576,7 @@ public class PuttingGameScreen implements Screen {
                     }
 
                     bot = new AStar(this);
-                    nodes = bot.findRoute();
+                    nodes = bot.findRoute(); //TODO find the time it took for A* to run 
 
                     System.out.println("nodes = " + nodes.size());
 
