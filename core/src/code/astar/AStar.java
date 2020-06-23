@@ -1,5 +1,6 @@
 package code.astar;
 
+import code.Physics.Rungekuttasolver;
 import code.Screens.PuttingGameScreen;
 
 import java.util.ArrayList;
@@ -78,6 +79,11 @@ public class AStar {
         score -= distanceHeuristic*(node.CalculateDistTo(game.getFlagPositionX(), game.getFlagPositionZ()));
         //System.out.println(score);
         score -= stepHeuristic*amOfSteps(node);
+
+        if(node.getX() < 0 || node.getZ() < 0 || node.getX() > game.getGridWidth() || node.getZ() > game.getGridDepth()){
+            score = 0;
+        }
+        if(Rungekuttasolver.getHeight(node.getX(), node.getZ()) < 0) score = 0;
         //System.out.println(score);
         node.setScore(score);
     }

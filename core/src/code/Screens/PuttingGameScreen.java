@@ -1839,4 +1839,13 @@ public class PuttingGameScreen implements Screen {
     public GameMode getGameMode() {
         return gameMode;
     }
+
+    public float getGridWidth() {
+        return gridWidth;
+    }
+
+    public float getGridDepth() {
+        return gridDepth;
+    }
+
 }

@@ -91,7 +91,7 @@ public class Rungekuttasolver{
         return true;
     }
 
-    public double getHeight(double x, double y){
+    public static double getHeight(double x, double y){
 
         return PuttingGameScreen.defineFunction(x,y);
     }
