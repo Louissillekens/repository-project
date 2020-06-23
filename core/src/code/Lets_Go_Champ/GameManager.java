@@ -2,6 +2,7 @@ package code.Lets_Go_Champ;
 
 import code.Bridge.LinkAgentNN;
 import code.NN.MathWork;
+import code.Screens.PuttingGameScreen;
 
 /**
  * @author: Alexandre Martens
@@ -133,9 +134,14 @@ public class GameManager {
      * Reset the position of the agent to a starting state
      */
     public void reset(){
-        this.xPos = xStart;
-        this.yPos = yStart;
+        if (isDone() == true){
+            this.xPos = PuttingGameScreen.getStartingPositionX();
+            this.yPos = PuttingGameScreen.getFlagPositionZ();
+        }else {
 
+            this.xPos = xStart;
+            this.yPos = yStart;
+        }
         this.done = false;
         this.rewards_total = 0;
     }

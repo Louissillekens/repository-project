@@ -1,6 +1,7 @@
 package code.Screens;
 
 import code.Bot.AgentBot;
+import code.Bridge.LinkAgentNN;
 import code.Lets_Go_Champ.Alex_Clem;
 import code.Lets_Go_Champ.Experience;
 import code.Lets_Go_Champ.Qvalues;
@@ -1598,23 +1599,24 @@ public class PuttingGameScreen implements Screen {
                     //We start from the starting position
                     if (lgbabe.gm.isDone()) {
                         lgbabe.gm.reset();
-                        lgbabe.setDestination(false); //TODO IF ARRIVED AT DESTINATION
-                        //Agent agent = new Agent();
+                        lgbabe.setDestination(false);
+                        //Si jarrive a calc ici dabord un sensor check if underneed always sensot
+                        LinkAgentNN straight = new LinkAgentNN(70);
                         // TAKE ACTION GET SENSORS INPUT TO GETSTATE
-                        //lgbabe.gm.getState();
-                        //System.out.println("lgbabe = " + Arrays.toString(lgbabe.state));
-                        //System.exit(0);
+                        lgbabe.setState(straight.getSensors());
+                        System.out.println("lgbabe = " + Arrays.toString(lgbabe.state));
+                        System.exit(0);
                     }
 
                     int action = lgbabe.agent.selectAction(lgbabe.state, lgbabe.policy_net); // Decide an action [0;109] from Q(s,a) = policy net (The agent didnt move yet)
                     int reward = lgbabe.gm.takeAction(action); //Get the reward from that action
                     lgbabe.setState(lgbabe.gm.getState());
                     float[] next_state = lgbabe.gm.getState(); // Get the new state (has been updated in takeAction)
-                     System.out.println("experiences = " + e + " state " + Arrays.toString(lgbabe.state));
+                    //System.out.println("experiences = " + e + " state " + Arrays.toString(lgbabe.state));
 
                     lgbabe.memory.push(new Experience(lgbabe.state, action, next_state, reward)); // Add a new experience of this step
                     lgbabe.setState(next_state); //Update the new position numerically
-                    System.out.println("lgbabe.memory.push_count = " + lgbabe.memory.push_count);
+                   // System.out.println("lgbabe.memory.push_count = " + lgbabe.memory.push_count);
                     // If the number of experiences in the memory is >= batch size we need
                     if (lgbabe.memory.canProvideSample(lgbabe.batch_size)) {
                         List<Experience> experiences = lgbabe.memory.getSample(lgbabe.batch_size);

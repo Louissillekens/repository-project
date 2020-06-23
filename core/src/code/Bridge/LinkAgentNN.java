@@ -32,8 +32,9 @@ public class LinkAgentNN {
         // Simple float[] that contains data you need for that specific action
         // System.out.println("Size returned outputs" + sensorsOutput.size());
         constructorCalc(sensorsOutput.get(action));
-
+        System.out.println(Arrays.toString(sensorsOutput.get(action)));
         PuttingGameScreen.checkBridge = true;
+        System.exit(0);
     }
 
     private void constructorCalc(float[] arr){
