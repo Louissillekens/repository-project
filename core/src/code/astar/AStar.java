@@ -12,7 +12,7 @@ public class AStar {
     private PuttingGameScreen game;
 
 
-    private final int amOfNodes = 10; //the amount of nodes we generate from a node each time
+    private final int amOfNodes = 20; //the amount of nodes we generate from a node each time
 
     //temp set to 0.5, these final doubles are here to work as a factor in computing the score of a node
     private final double distanceHeuristic = 0.25;
