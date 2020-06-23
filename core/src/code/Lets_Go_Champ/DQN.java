@@ -24,7 +24,7 @@ public class DQN implements Serializable {
         return nn.forward(nn, t);
     }
 
-    void backprop(float[] loss, float[] actionCache){
+    public void backprop(float[] loss, float[] actionCache){
         if (this.trainingMode == true){
             nn.backprop(loss, actionCache);
         } else

@@ -6,7 +6,7 @@ import java.util.Random;
 
 public class ReplayMemory {
     private int capacity; // Capacity of the memory at max capacity
-    private int push_count; // Keep track of how many times we added an experience to the memory
+    public int push_count; // Keep track of how many times we added an experience to the memory
 
     private List<Experience> memory ;
 
@@ -24,7 +24,7 @@ public class ReplayMemory {
     /**
      * @param experience add an experience to the memory
      */
-    void push(Experience experience){
+    public void push(Experience experience){
         if (memory.size() < capacity){
             memory.add(experience); // Memory has room for the new exp, add it
         }
@@ -39,7 +39,7 @@ public class ReplayMemory {
      *                   1 sample is 1 experience (S,A,S',R)
      * @return list of experieces of size batch_size chosen at RANDOM
      */
-    List<Experience> getSample(int batch_size){
+    public List<Experience> getSample(int batch_size){
         Random rand = new Random();
 
         List<Experience> samples = new ArrayList<>();
@@ -51,7 +51,7 @@ public class ReplayMemory {
         return samples;
     }
 
-    boolean canProvideSample(int batch_size){
+    public boolean canProvideSample(int batch_size){
         return memory.size() >= batch_size;
     }
 

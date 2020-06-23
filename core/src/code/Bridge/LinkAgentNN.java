@@ -15,28 +15,19 @@ public class LinkAgentNN {
     private static float[] sensors;
     private ArrayList<float[]> sensorsOutput;
     private float[] actionSensorOutput;
-    public static boolean newAgent = false;
 
 
     public LinkAgentNN(int action) {
-
         PuttingGameScreen.action = action;
-
-        while (!PuttingGameScreen.isReadyToTrain) {
-            //System.out.println("action = " + PuttingGameScreen.action);
-            newAgent = true;
-
-        }
-
-        newAgent = false;
 
         // Object agent that (for now) can just return the output data from PuttingGameScreen
         Agent agent = new Agent();
 
         // ArrayList of float[] that corresponds to the 0-109 different actions
         sensorsOutput = agent.getOutputData();
-        System.out.println(sensorsOutput.getClass().getSimpleName());
+        //System.out.println(sensorsOutput.getClass().getSimpleName());
         // Simple float[] that contains data you need for that specific action
+        // System.out.println("Size returned outputs" + sensorsOutput.size());
         constructorCalc(sensorsOutput.get(action));
     }
 

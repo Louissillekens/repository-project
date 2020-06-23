@@ -37,7 +37,7 @@ public class GameManager {
         this.xPos = xStart;
         this.yPos = yStart;
 
-        this.done = false;
+        this.done = true;
         this.current_screen = true;
         this.rewards_total = 0;
     }
@@ -46,8 +46,9 @@ public class GameManager {
      * @param action action number we took [0-109]
      * @return reward of that action
      */
-    int takeAction(int action){
+    public int takeAction(int action){
         int reward = 0;
+
         LinkAgentNN bridge = new LinkAgentNN(action);
 
         boolean final_destination = bridge.getWinPosition();
@@ -55,6 +56,10 @@ public class GameManager {
 
         float new_xPos = bridge.getxPosition();
         float new_yPos = bridge.getyPosition();
+
+        System.out.println("new_yPos = " + new_xPos);
+        System.out.println("new_yPos = " + new_yPos);
+        System.exit(0);
 
         // The ball is at the final destination
         if (final_destination ==  true){
@@ -115,7 +120,7 @@ public class GameManager {
     /**
      * @return sensor state values
      */
-    float[] getState(){
+    public float[] getState(){
         return LinkAgentNN.getSensors();
     }
 
@@ -127,7 +132,7 @@ public class GameManager {
     /**
      * Reset the position of the agent to a starting state
      */
-    void reset(){
+    public void reset(){
         this.xPos = xStart;
         this.yPos = yStart;
 
@@ -160,6 +165,7 @@ public class GameManager {
     int numActionsAvailable(){
         return 110;
     }
+
 
 
     /**

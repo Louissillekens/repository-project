@@ -29,7 +29,7 @@ public class Agent {
      * @param policy_nn policy network to get the max Q val if needed
      * @return
      */
-    int selectAction(float[] state, DQN policy_nn){
+    public int selectAction(float[] state, DQN policy_nn){
         Random random = new Random();
 
         float rate = strategy.getExplorationRate(current_step);

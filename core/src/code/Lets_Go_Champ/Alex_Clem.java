@@ -12,18 +12,30 @@ public class Alex_Clem {
     private static float yFlag;
 
     static int memory_size = 100000; // Size of the number of experieces we can store
-    static int batch_size = 256; // Number of experiences we take from the memory
+    public static int batch_size = 256; // Number of experiences we take from the memory
 
-    static float gamma = 0.9f; // Importance to future rewards
+    public static float gamma = 0.9f; // Importance to future rewards
 
     static float eps_start = 1f;
     static float eps_end = 0.01f;
     static float eps_decay = 0.001f;
 
-    static int target_network_update = 10; // updating the target network every 10 episodes
+    public static int target_network_update = 10; // updating the target network every 10 episodes
     static float lr = 0.01f; // Policy nn learning rate
 
-    static int num_episodes = 1000; // Max number of episodes
+    private static int num_episodes = 1000; // Max number of episodes
+    public float [] total_rewards_episodes;
+    public GameManager gm;
+    public Agent agent;
+    private EpsilonGreedyStrat strategy;
+    public ReplayMemory memory;
+    public DQN policy_net;
+    public DQN target_net;
+
+    private int e = 0;
+    public float[] state;
+
+    private boolean destination = true; // TODO WHERE used
 
 
     public Alex_Clem(float xStart, float yStart, float xFlag, float yFlag) {
@@ -32,42 +44,40 @@ public class Alex_Clem {
         this.xFlag = xFlag;
         this.yFlag = yFlag;
 
-    }
-
-    public static void executeBG(){
-        GameManager gm = new GameManager(xStart,yStart,xFlag,yFlag); // Create the game manager
-        EpsilonGreedyStrat strategy = new EpsilonGreedyStrat(eps_start, eps_end, eps_decay); // Create the strat
-        Agent agent = new Agent(strategy,gm.numActionsAvailable()); // Create the agent
-        ReplayMemory memory = new ReplayMemory(memory_size); // Create the memory
+        this.gm = new GameManager(xStart,yStart,xFlag,yFlag); // Create the game manager
+        this.strategy = new EpsilonGreedyStrat(eps_start, eps_end, eps_decay); // Create the strat
+        this.agent = new Agent(strategy,gm.numActionsAvailable()); // Create the agent
+        this.memory = new ReplayMemory(memory_size); // Create the memory
 
         // Create the 2 networks
-        DQN policy_net = new DQN(); // Create the policy network
-        DQN target_net = new DQN(); // Create the target network
+        this.policy_net = new DQN(); // Create the policy network
+        this.target_net = new DQN(); // Create the target network
 
         // Set weights of target_net(downer one) = policy_net(upper one)
-        target_net.copyLayers(policy_net);
+        this.target_net.copyLayers(policy_net);
 
         // Set the network train ability (extra security)
-        policy_net.setTrainingMode(true); // Train and evaluate
-        target_net.setTrainingMode(false); // Only for evaluation
+        this.policy_net.setTrainingMode(true); // Train and evaluate
+        this.target_net.setTrainingMode(false); // Only for evaluation
 
         // Set the activation function for the networks
         try {
-            policy_net.setActivationFunction("relu"); // set activation function, relu by default
-            target_net.setActivationFunction("relu"); // set activation function, relu by default
+            this.policy_net.setActivationFunction("relu"); // set activation function, relu by default
+            this.target_net.setActivationFunction("relu"); // set activation function, relu by default
         } catch (ExceptionHandeling exceptionHandeling) {
             exceptionHandeling.printStackTrace();
         }
 
         // Set the learning rate of our policy_net
-        policy_net.setLR(lr);
+        this.policy_net.setLR(lr);
 
         // Save the networks
         ExportNeuralNets.exportNetworks(policy_net, target_net);
 
+        this.total_rewards_episodes = new float[num_episodes];
+    }
 
-        float[] total_rewards_episodes = new float[num_episodes];
-
+    public void executeBG(){
         for (int e = 0; e < num_episodes; e++){
             gm.reset(); //We start from the starting position
             float[] state= gm.getState(); // Get the starting state
@@ -107,4 +117,35 @@ public class Alex_Clem {
             ExportNeuralNets.exportNetworks(policy_net, target_net);
         }
     }
+
+    public int getE() {
+        return e;
+    }
+
+    public void setE(int e) {
+        this.e = e;
+    }
+
+    public static int getNum_episodes() {
+        return num_episodes;
+    }
+
+    public boolean isDestination() {
+        return destination;
+    }
+
+    public void setDestination(boolean destination) {
+        this.destination = destination;
+    }
+
+    public float[] getState() {
+        return state;
+    }
+
+    public void setState(float[] state) {
+        this.state = state;
+    }
+
+
+
 }

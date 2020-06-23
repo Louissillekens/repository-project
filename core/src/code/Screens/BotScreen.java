@@ -36,6 +36,8 @@ public class BotScreen implements Screen {
     // Instance variable for the chosen solver
     private static String botName;
 
+    public static Alex_Clem lets_Go_Baby;
+
     public BotScreen(final Game game, final GameMode gameMode) {
 
         this.myGame = game;
@@ -108,13 +110,15 @@ public class BotScreen implements Screen {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
 
-                this.game.setScreen(new PuttingGameScreen(2, 2));
+                PuttingGameScreen scrn = new PuttingGameScreen(2, 2);
+                this.game.setScreen(scrn);
                 botName = "Q_agent";
                 this.screen.dispose();
-
-                System.out.println("ok");
                 botName = "Q_agent";
 
+                lets_Go_Baby = new Alex_Clem(scrn.getBallPositionX(), scrn.getBallPositionZ(), scrn.getFlagPositionX(), scrn.getFlagPositionZ());
+
+                System.out.println("lets_Go_Baby CREATED");
             }
 
 
@@ -218,5 +222,13 @@ public class BotScreen implements Screen {
     @Override
     public void dispose() {
 
+    }
+
+    public static Alex_Clem getLets_Go_Baby() {
+        return lets_Go_Baby;
+    }
+
+    public void setLets_Go_Baby(Alex_Clem lets_Go_Baby) {
+        this.lets_Go_Baby = lets_Go_Baby;
     }
 }

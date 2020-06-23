@@ -1,7 +1,11 @@
 package code.Screens;
 
 import code.Bot.AgentBot;
-import code.Bridge.LinkAgentNN;
+import code.Lets_Go_Champ.Alex_Clem;
+import code.Lets_Go_Champ.Experience;
+import code.Lets_Go_Champ.Qvalues;
+import code.NN.ExportNeuralNets;
+import code.NN.MathWork;
 import code.Physics.Rungekuttasolver;
 import code.astar.AStar;
 import code.astar.Node;
@@ -35,28 +39,31 @@ public class PuttingGameScreen implements Screen {
 
     private InputHandler handler;
 
-    private PerspectiveCamera camera;
-    private ModelBatch modelBatch;
+    private static PerspectiveCamera camera;
+    private static ModelBatch modelBatch;
     private MeshPartBuilder meshPartBuilder;
     private static ModelBuilder modelBuilder;
-    private Environment environment;
+    private static Environment environment;
 
     private static float startingPositionX = 2;
     private static float startingPositionZ = 2;
     private static float ballSize = 0.2f;
-    private float ballPositionX = startingPositionX;
-    private float ballPositionZ = startingPositionZ;
+    private static float ballPositionX = startingPositionX;
+    private static float ballPositionZ = startingPositionZ;
     public static float newBallPositionX;
     public static float newBallPositionZ;
-    private float ballStepXmean;
-    private float ballStepZmean;
+    private static float ballStepXmean;
+    private static float ballStepZmean;
+
+    //QSHIT
+    public static boolean freeToGo = false;
 
     private Model flatField;
     private ModelInstance[] fieldInstance;
     private Model slopeModel;
     private ModelInstance[] slopeInstance;
-    private Model arrow;
-    private ModelInstance arrowInstance;
+    private static Model arrow;
+    private static ModelInstance arrowInstance;
     private static Color fieldColor;
     private static int numberOfFields = 1;
     private static float gridWidth = 50;
@@ -82,13 +89,13 @@ public class PuttingGameScreen implements Screen {
     private static float winRadius = 3;
 
     public static int countIndex = 0;
-    private float[] positionArrayX = new float[100];
-    private float[] positionArrayZ = new float[100];
+    private static float[] positionArrayX = new float[100];
+    private static float[] positionArrayZ = new float[100];
 
     public static float[] translateX = new float[100];
     public static float[] translateZ = new float[100];
-    private float sumX = 0;
-    private float sumZ = 0;
+    private static float sumX = 0;
+    private static float sumZ = 0;
     public static boolean trackShot = false;
     public static boolean canTranslateCam = false;
     public static boolean canReset = false;
@@ -112,77 +119,77 @@ public class PuttingGameScreen implements Screen {
     private boolean[] detectorCollision = new boolean[11];
     private int numberOfLinesSensors = 50;
 
-    private int numberOfTree = 50;
+    private static int numberOfTree = 50;
 
     private static float[] treePositionX;
     private static float[] treePositionZ;
 
-    private boolean[] canHitFlag = new boolean[11];
-    private boolean[] isSensorOnSand = new boolean[11];
-    private float[] sensorsSize = new float[11];
+    private static boolean[] canHitFlag = new boolean[11];
+    private static boolean[] isSensorOnSand = new boolean[11];
+    private static float[] sensorsSize = new float[11];
     private static float[] maxPositionX = new float[11];
     private static float[] maxPositionZ = new float[11];
     private static float[] maxPositionAgentX = new float[11];
     private static float[] maxPositionAgentZ = new float[11];
-    private float[] minEuclideanDist = new float[11];
-    private float[] sensorsAngleX = new float[11];
-    private float[] sensorsAngleY = new float[11];
-    private float[] sensorsAngleZ = new float[11];
-    private float[] sensorUpX = new float[11];
-    private float[] sensorUpY = new float[11];
-    private float[] sensorUpZ = new float[11];
-    private float[] sensorPositionX = new float[11];
-    private float[] sensorPositionY = new float[11];
-    private float[] sensorPositionZ = new float[11];
-    private boolean[] checkForSensorsStep = new boolean[11];
+    private static float[] minEuclideanDist = new float[11];
+    private static float[] sensorsAngleX = new float[11];
+    private static float[] sensorsAngleY = new float[11];
+    private static float[] sensorsAngleZ = new float[11];
+    private static float[] sensorUpX = new float[11];
+    private static float[] sensorUpY = new float[11];
+    private static float[] sensorUpZ = new float[11];
+    private static float[] sensorPositionX = new float[11];
+    private static float[] sensorPositionY = new float[11];
+    private static float[] sensorPositionZ = new float[11];
+    private static boolean[] checkForSensorsStep = new boolean[11];
 
-    private Array<ModelInstance> sensors = new Array<>();
+    private static Array<ModelInstance> sensors = new Array<>();
 
-    private float camDirectionFlagX;
-    private float camDirectionFlagY;
-    private float camDirectionFlagZ;
-    private float camUpFlagX;
-    private float camUpFlagY;
-    private float camUpFlagZ;
-    private float camPositionFlagX;
-    private float camPositionFlagY;
-    private float camPositionFlagZ;
+    private static float camDirectionFlagX;
+    private static float camDirectionFlagY;
+    private static float camDirectionFlagZ;
+    private static float camUpFlagX;
+    private static float camUpFlagY;
+    private static float camUpFlagZ;
+    private static float camPositionFlagX;
+    private static float camPositionFlagY;
+    private static float camPositionFlagZ;
 
-    private float finalPositionArrowX;
-    private float finalPositionArrowZ;
+    private static float finalPositionArrowX;
+    private static float finalPositionArrowZ;
 
-    private float minDistanceArrowFlag;
+    private static float minDistanceArrowFlag;
 
-    private boolean checkForSensors = false;
-    private boolean sensorsReady = false;
-    private boolean botReady = false;
-    private boolean findFlag = false;
-    private boolean check = false;
+    private static boolean checkForSensors = false;
+    private static boolean sensorsReady = false;
+    private static boolean botReady = false;
+    private static boolean findFlag = false;
+    private static boolean check = false;
     private boolean checkCollisionMessage = false;
     private boolean readyToTrain = false;
     private boolean ballMoved = false;
     public static boolean finishAgent = false;
     public static boolean isReadyToTrain = false;
-    private boolean checkCamera = false;
+    private static boolean checkCamera = false;
     private boolean checkAStar = false;
     private boolean aStarReady = true;
 
-    private float agentPower;
-    private float botTimer1 = 0;
-    private int countForFlag = 0;
-    private int countForBot = 0;
-    private int bestSensor = 0;
-    private int count = 0;
-    private int counter = 0;
-    private int countForSensors = 0;
-    private int countForSensorsReady = 0;
-    private int countForSensor0Ready = 0;
+    private static float agentPower;
+    private static float botTimer1 = 0;
+    private static int countForFlag = 0;
+    private static int countForBot = 0;
+    private static int bestSensor = 0;
+    private static int count = 0;
+    private static int counter = 0;
+    private static int countForSensors = 0;
+    private static int countForSensorsReady = 0;
+    private static int countForSensor0Ready = 0;
     private int nodeIndex = 0;
     private int countAStarIterations = 0;
     public static int countTries = 0;
 
-    private float[] stepPositionX = new float[sensorsSize.length*10];
-    private float[] stepPositionZ = new float[sensorsSize.length*10];
+    private static float[] stepPositionX = new float[sensorsSize.length*10];
+    private static float[] stepPositionZ = new float[sensorsSize.length*10];
 
     private static ArrayList<float[]> sensorsOutput = new ArrayList<>();
     private float[] stepData;
@@ -216,6 +223,7 @@ public class PuttingGameScreen implements Screen {
             System.out.println("secondPassed = " + secondPassed);
         }
     };
+    private int counterFirstIter;
 
     public void start() {
         time.schedule(timerTask, 1000, 1000);
@@ -775,14 +783,14 @@ public class PuttingGameScreen implements Screen {
         sensorsSize[num] = (index + 1)/(numberOfLinesSensors/10f);
     }
 
-    public void cameraRotation(float angle) {
+    public static void cameraRotation(float angle) {
 
         camera.rotateAround(vector1 = new Vector3(ballPositionX, defineFunction(ballPositionX, ballPositionZ), ballPositionZ),
                 vector2 = new Vector3(0f, 1f, 0f), angle);
         camera.lookAt(ballPositionX, defineFunction(ballPositionX, ballPositionZ), ballPositionZ);
     }
 
-    public void drawArrow() {
+    public static void drawArrow() {
 
         arrow = getModelBuilder().createArrow(ballPositionX, defineFunction(ballPositionX, ballPositionZ) + 1f, ballPositionZ,
                 ((camera.direction.x) * 5) + (ballPositionX), defineFunction(ballPositionX, ballPositionZ) + 2f,
@@ -894,7 +902,7 @@ public class PuttingGameScreen implements Screen {
         return new float[]{randomX1, randomZ1, randomX2, randomZ2};
     }
 
-    public void resetValues() {
+    public static void resetValues() {
 
         sumX = 0;
         sumZ = 0;
@@ -1063,7 +1071,7 @@ public class PuttingGameScreen implements Screen {
         }
     }
 
-    public void startAgent() {
+    public static void startAgent() {
 
         finalPositionArrowX = ((camera.direction.x) * 5) + (ballPositionX);
         finalPositionArrowZ = ((camera.direction.z) * 5) + (ballPositionZ);
@@ -1236,85 +1244,9 @@ public class PuttingGameScreen implements Screen {
 
         if (botReady) {
 
-            /*
-            for (int i = 0; i < sensorsSize.length; i++) {
-                for (int j = 0; j < 10; j++) {
-                    int stepIndex = (i * 10) + j;
-                    int stepIndexBis = 0;
-                    float posX = 0;
-                    float posZ = 0;
-                    float[] stepOutput = new float[15];
-                    boolean[] stepCollision = new boolean[10];
-                    for (int k = 0; k < stepOutput.length; k++) {
-
-                        if (k==0) {
-                            stepOutput[k] = sensorsAngleX[i];
-                        }
-                        if (k==1) {
-                            stepOutput[k] = sensorsAngleZ[i];
-                        }
-                        if (k==2) {
-
-                        }
-
-                        if (k == 0) {
-                            posX = stepPositionX[stepIndex];
-                            posZ = stepPositionZ[stepIndex];
-
-                            for (int l = 0; l < numberOfTree; l++) {
-                                if (euclideanDistObstacles(posX, posZ, l) < 0.5f || stepCollision[j]) {
-                                    stepOutput[k] = 1;
-                                    stepCollision[j] = true;
-                                } else {
-                                    stepOutput[k] = 0;
-                                    stepCollision[j] = false;
-                                }
-                            }
-
-                            if (defineFunction(posX, posZ) < 0.05f || stepCollision[j]) {
-                                stepOutput[k] = 1;
-                                stepCollision[j] = true;
-                            } else {
-                                stepOutput[k] = 0;
-                                stepCollision[j] = false;
-                            }
-
-                            if (outOfField(posX, posZ) || stepCollision[j]) {
-                                stepOutput[k] = 1;
-                                stepCollision[j] = true;
-                            } else {
-                                stepOutput[k] = 0;
-                                stepCollision[j] = false;
-                            }
-                        }
-                        if (k == 1) {
-                            if (stepCollision[j]) {
-                                stepOutput[k] = 0;
-                            } else {
-                                if (isWin(posX, posZ)) {
-                                    stepOutput[k] = 1;
-                                }
-                            }
-                        }
-                        if (k == 2) {
-                            stepOutput[k] = posX;
-                        }
-                        if (k == 3) {
-                            stepOutput[k] = posZ;
-                        }
-                        if (k > 4) {
-                            stepOutput[k] = sensorsSize[stepIndexBis] / 10f;
-                            stepIndexBis++;
-                        }
-                    }
-                    sensorsOutput.add(stepOutput);
-                }
-            }
-
             for (int i = 0; i < sensorsOutput.size(); i++) {
                 System.out.println("sensorsOutput = " + Arrays.toString(sensorsOutput.get(i)));
             }
-            */
 
             finishAgent = true;
 
@@ -1655,7 +1587,62 @@ public class PuttingGameScreen implements Screen {
         }
 
         if (name.equals("Q_agent")) {
-            if (LinkAgentNN.newAgent) {
+            Alex_Clem lgbabe = BotScreen.getLets_Go_Baby();
+
+            //After the first refresh
+            if (freeToGo) {
+                if (lgbabe.getE() < lgbabe.getNum_episodes()) {
+                    int e = lgbabe.getE();
+
+                    //We start from the starting position
+                    if (lgbabe.gm.isDone()) {
+                        lgbabe.gm.reset();
+                        lgbabe.setDestination(false); //TODO IF ARRIVED AT DESTINATION
+                    }
+
+                    int action = lgbabe.agent.selectAction(lgbabe.state, lgbabe.policy_net); // Decide an action [0;109] from Q(s,a) = policy net (The agent didnt move yet)
+                    int reward = lgbabe.gm.takeAction(action); //Get the reward from that action
+                    lgbabe.setState(lgbabe.gm.getState());
+                    float[] next_state = lgbabe.gm.getState(); // Get the new state (has been updated in takeAction)
+                     System.out.println("experiences = " + e + " state " + Arrays.toString(lgbabe.state));
+
+                    lgbabe.memory.push(new Experience(lgbabe.state, action, next_state, reward)); // Add a new experience of this step
+                    lgbabe.setState(next_state); //Update the new position numerically
+                    System.out.println("lgbabe.memory.push_count = " + lgbabe.memory.push_count);
+                    // If the number of experiences in the memory is >= batch size we need
+                    if (lgbabe.memory.canProvideSample(lgbabe.batch_size)) {
+                        List<Experience> experiences = lgbabe.memory.getSample(lgbabe.batch_size);
+
+                        //First get arrays of Q(s'a) and Q'(s',a)
+                        float[] current_q_values = Qvalues.getCurrent(lgbabe.policy_net, experiences); // Compute the current Q values
+                        float[] next_q_values = Qvalues.getNext(lgbabe.target_net, experiences); // Compute the next state action pair Q max value
+
+                        float[] target_q_values = Qvalues.getTarget(next_q_values, experiences, lgbabe.gamma); // Apply the formula to it
+                        float[] loss = MathWork.squaredError(current_q_values, target_q_values); // Compute the loss for every current-target pair
+
+                        lgbabe.policy_net.backprop(loss, Qvalues.getActionCache()); // Backprop the loss to update the weights and bias
+                    }
+
+                    lgbabe.total_rewards_episodes[e] = lgbabe.gm.getTotalRewards(); // Store the total rewards of an episode
+
+                    // Update the target_net check
+                    if (e % lgbabe.target_network_update == 0) {
+                        lgbabe.target_net.copyLayers(lgbabe.policy_net);
+                    }
+
+                    if (lgbabe.gm.isDone()) {
+                        ExportNeuralNets.exportNetworks(lgbabe.policy_net, lgbabe.target_net);
+                        lgbabe.setE(e++);
+                    }
+
+                }
+            }
+            if (counterFirstIter == 0)
+                freeToGo = true;
+            counterFirstIter++;
+
+
+            /*if (LinkAgentNN.newAgent) {
                 if (ballMoved) {
                     finishAgent = false;
                 }
@@ -1701,8 +1688,76 @@ public class PuttingGameScreen implements Screen {
                 if (finishAgent && ballStop) {
                     isReadyToTrain = true;
                 }
+            }*/
+        }
+    }
+
+    public static ArrayList<float[]> sensorCalc(){
+
+        for (int i = 0; i < sensorsSize.length; i++) {
+            for (int j = 0; j < 10; j++) {
+                int stepIndex = (i * 10) + j;
+                int stepIndexBis = 0;
+                float posX = 0;
+                float posZ = 0;
+                float[] stepOutput = new float[15];
+                boolean[] stepCollision = new boolean[10];
+                for (int k = 0; k < stepOutput.length; k++) {
+
+                    if (k == 0) {
+                        posX = stepPositionX[stepIndex];
+                        posZ = stepPositionZ[stepIndex];
+
+                        for (int l = 0; l < numberOfTree; l++) {
+                            if (euclideanDistObstacles(posX, posZ, l) < 0.5f || stepCollision[j]) {
+                                stepOutput[k] = 1;
+                                stepCollision[j] = true;
+                            } else {
+                                stepOutput[k] = 0;
+                                stepCollision[j] = false;
+                            }
+                        }
+
+                        if (defineFunction(posX, posZ) < 0.05f || stepCollision[j]) {
+                            stepOutput[k] = 1;
+                            stepCollision[j] = true;
+                        } else {
+                            stepOutput[k] = 0;
+                            stepCollision[j] = false;
+                        }
+
+                        if (outOfField(posX, posZ) || stepCollision[j]) {
+                            stepOutput[k] = 1;
+                            stepCollision[j] = true;
+                        } else {
+                            stepOutput[k] = 0;
+                            stepCollision[j] = false;
+                        }
+                    }
+                    if (k == 1) {
+                        if (stepCollision[j]) {
+                            stepOutput[k] = 0;
+                        } else {
+                            if (isWin(posX, posZ)) {
+                                stepOutput[k] = 1;
+                            }
+                        }
+                    }
+                    if (k == 2) {
+                        stepOutput[k] = posX;
+                    }
+                    if (k == 3) {
+                        stepOutput[k] = posZ;
+                    }
+                    if (k > 4) {
+                        stepOutput[k] = sensorsSize[stepIndexBis] / 10f;
+                        stepIndexBis++;
+                    }
+                }
+                sensorsOutput.add(stepOutput);
             }
         }
+        return sensorsOutput;
     }
 
     @Override

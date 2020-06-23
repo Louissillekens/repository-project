@@ -2,6 +2,7 @@ package code.Lets_Go_Champ;
 
 import code.NN.MathWork;
 
+import java.util.Arrays;
 import java.util.List;
 
 public class Qvalues {
@@ -15,17 +16,21 @@ public class Qvalues {
      * @param experiences the batch
      * @return array with all the q values corresponding to the action-state pair
      */
-    static float[] getCurrent(DQN policy_net, List<Experience> experiences){
+    public static float[] getCurrent(DQN policy_net, List<Experience> experiences){
         float[] q_values = new float[experiences.size()]; // Store all Qvalues of action-state pair
+        actionCache = new float[experiences.size()];
 
         //For each sample
         for (int i = 0; i < experiences.size(); i++){
+
             float[] inputs = experiences.get(i).getState(); // Get the initial state
+            System.out.println("Arrays.toString(inputs) = " + Arrays.toString(inputs));
             float[] output = policy_net.forward(inputs); // Get all the output values
 
             q_values[i] = output[experiences.get(i).getAction()]; // Get the q value of the action
             actionCache[i] = experiences.get(i).getAction(); // Will be used in backprop to map loss and action neuron
         }
+
         return q_values;
     }
 
@@ -34,7 +39,7 @@ public class Qvalues {
      * @param experiences the batch
      * @return array with the max q value corresponding to the state'
      */
-    static float[] getNext(DQN target_net, List<Experience> experiences){
+    public static float[] getNext(DQN target_net, List<Experience> experiences){
         float[] max_q_values = new float[experiences.size()]; // Store all max Qvalues of state'
 
         //For each sample
@@ -53,7 +58,7 @@ public class Qvalues {
      * @param gamma the 'importance to future rewards' parameter
      * @return array with target values
      */
-    static float[] getTarget(float[] next_q_values, List<Experience> experiences, float gamma){
+    public static float[] getTarget(float[] next_q_values, List<Experience> experiences, float gamma){
         float[] target_q_values = new float[experiences.size()]; // Store all target values
 
         //For each sample
