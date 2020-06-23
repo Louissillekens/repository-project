@@ -1611,6 +1611,11 @@ public class PuttingGameScreen implements Screen {
                     if (lgbabe.gm.isDone()) {
                         lgbabe.gm.reset();
                         lgbabe.setDestination(false); //TODO IF ARRIVED AT DESTINATION
+                        //Agent agent = new Agent();
+                        // TAKE ACTION GET SENSORS INPUT TO GETSTATE
+                        //lgbabe.gm.getState();
+                        //System.out.println("lgbabe = " + Arrays.toString(lgbabe.state));
+                        //System.exit(0);
                     }
 
                     int action = lgbabe.agent.selectAction(lgbabe.state, lgbabe.policy_net); // Decide an action [0;109] from Q(s,a) = policy net (The agent didnt move yet)
