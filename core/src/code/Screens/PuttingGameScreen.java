@@ -21,10 +21,7 @@ import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.Array;
 import com.game.game.Game;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Random;
+import java.util.*;
 
 import static com.badlogic.gdx.graphics.GL20.GL_TRIANGLES;
 
@@ -115,7 +112,8 @@ public class PuttingGameScreen implements Screen {
     private boolean[] detectorCollision = new boolean[11];
     private int numberOfLinesSensors = 50;
 
-    private int numberOfTree = 30;
+    private int numberOfTree = 50;
+
     private static float[] treePositionX;
     private static float[] treePositionZ;
 
@@ -191,7 +189,8 @@ public class PuttingGameScreen implements Screen {
     public static int action;
 
     private static int sandPitSize = 5;
-    private static int amountOfSandPit = 10;
+    private static int amountOfSandPit = 30;
+
     private static float[] sandPitX1 = new float[amountOfSandPit];
     private static float[] sandPitZ1 = new float[amountOfSandPit];
     private static float[] sandPitX2 = new float[amountOfSandPit];
@@ -207,6 +206,21 @@ public class PuttingGameScreen implements Screen {
     private float[] newPosX;
     private float[] newPosZ;
 
+    int secondPassed = 0;
+
+    Timer time = new Timer();
+    TimerTask timerTask = new TimerTask() {
+        @Override
+        public void run() {
+            secondPassed++;
+            System.out.println("secondPassed = " + secondPassed);
+        }
+    };
+
+    public void start() {
+        time.schedule(timerTask, 1000, 1000);
+    }
+
     /**
      * Constructor that creates a new instance of the putting game screen
      * @param game current instance of the game
@@ -218,6 +232,8 @@ public class PuttingGameScreen implements Screen {
         this.gameMode = new GameMode(gameMode.gameName);
         this.createField();
         handler = new InputHandler(this);
+
+        start();
     }
 
     public PuttingGameScreen(float startingPositionX, float startingPositionZ) {
@@ -345,7 +361,7 @@ public class PuttingGameScreen implements Screen {
         float field4 = (float) (((Math.sin(x) + Math.sin(y))/4)+(Math.sin(2*x)/4)+0.3);
         float ripple1 = (float) ((0.4)+Math.sin((0.4)*(Math.pow(x,2)+Math.pow(y,2))/10)+1);
 
-        return field0;
+        return field1;
     }
 
     /**
@@ -685,12 +701,7 @@ public class PuttingGameScreen implements Screen {
 
     public boolean checkCollision(int index) {
 
-        if (euclideanDistObstacles(ballPositionX, ballPositionZ, index) < 0.4f) {
-            return true;
-        }
-        else {
-            return false;
-        }
+        return euclideanDistObstacles(ballPositionX, ballPositionZ, index) < 0.4f;
     }
 
     public void drawSensors(double angle, float x1, float x2, float z1, float z2, int index, int num) {
@@ -1224,6 +1235,8 @@ public class PuttingGameScreen implements Screen {
         }
 
         if (botReady) {
+
+            /*
             for (int i = 0; i < sensorsSize.length; i++) {
                 for (int j = 0; j < 10; j++) {
                     int stepIndex = (i * 10) + j;
@@ -1233,7 +1246,7 @@ public class PuttingGameScreen implements Screen {
                     float[] stepOutput = new float[15];
                     boolean[] stepCollision = new boolean[10];
                     for (int k = 0; k < stepOutput.length; k++) {
-                        /*
+
                         if (k==0) {
                             stepOutput[k] = sensorsAngleX[i];
                         }
@@ -1241,9 +1254,9 @@ public class PuttingGameScreen implements Screen {
                             stepOutput[k] = sensorsAngleZ[i];
                         }
                         if (k==2) {
-                            // TODO fix the evaluateRK4Power here
+
                         }
-                        */
+
                         if (k == 0) {
                             posX = stepPositionX[stepIndex];
                             posZ = stepPositionZ[stepIndex];
@@ -1298,7 +1311,6 @@ public class PuttingGameScreen implements Screen {
                 }
             }
 
-            /*
             for (int i = 0; i < sensorsOutput.size(); i++) {
                 System.out.println("sensorsOutput = " + Arrays.toString(sensorsOutput.get(i)));
             }
@@ -1483,6 +1495,7 @@ public class PuttingGameScreen implements Screen {
                 timer+=Gdx.graphics.getDeltaTime();
             }
             else {
+                System.out.println("amount of tries = " + countTries);
                 Gdx.app.exit();
             }
         }
@@ -1563,11 +1576,7 @@ public class PuttingGameScreen implements Screen {
                     }
 
                     bot = new AStar(this);
-                    long start = System.currentTimeMillis();
                     nodes = bot.findRoute();
-                    long end = System.currentTimeMillis();
-                    long duration = start - end;
-                    System.out.println("time till solution found by A* : " + duration);
 
                     System.out.println("nodes = " + nodes.size());
 

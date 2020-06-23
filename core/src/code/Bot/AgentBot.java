@@ -34,17 +34,12 @@ public class AgentBot {
         this.ballZ = ballZ;
 
         this.sensorsWeight = new float[sensorsSize.length];
-        this.sensorsWeight[0] = 12;
-        this.sensorsWeight[1] = 8;
-        this.sensorsWeight[2] = 5;
-        this.sensorsWeight[3] = 3;
-        this.sensorsWeight[4] = 2;
-        this.sensorsWeight[5] = 1;
-        this.sensorsWeight[6] = 2;
-        this.sensorsWeight[7] = 3;
-        this.sensorsWeight[8] = 5;
-        this.sensorsWeight[9] = 8;
-        this.sensorsWeight[10] = 12;
+        for (int i = 0; i < sensorsWeight.length; i++) {
+            int[] config1 = new int[]{10,7,5,3,2,1,2,3,5,7,10};
+            int[] config2 = new int[]{15,10,8,4,2,1,2,4,8,10,15};
+            int[] config3 = new int[]{1,1,1,1,1,1,1,1,1,1,1};
+            sensorsWeight[i] = config2[i];
+        }
 
         System.out.println("sensorsSize = " + Arrays.toString(sensorsSize));
         System.out.println("sensorsAngleX = " + Arrays.toString(sensorsAngleX));
@@ -58,7 +53,7 @@ public class AgentBot {
 
         for (int i = 0; i < sensorsWeight.length; i++) {
             if (isSensorOnSand[i]) {
-                sensorsWeight[i] = sensorsWeight[i]*3;
+                sensorsWeight[i] = sensorsWeight[i]*2;
             }
         }
 
@@ -78,8 +73,12 @@ public class AgentBot {
         for (int i = 0; i < sensorsCost.length; i++) {
             if (sensorsCost[i] < minimumCost) {
                 minimumCost = sensorsCost[i];
-                bestSensor  = i;
+                bestSensor = i;
             }
+        }
+
+        if (Math.abs(sensorsAngleX[bestSensor]) < 0.001 || Math.abs(sensorsAngleZ[bestSensor]) < 0.001) {
+            bestSensor++;
         }
 
         System.out.println("sensorsCost = " + Arrays.toString(sensorsCost));
