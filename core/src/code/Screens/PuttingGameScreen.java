@@ -214,6 +214,9 @@ public class PuttingGameScreen implements Screen {
     private float[] newPosX;
     private float[] newPosZ;
 
+    private float[] nextPositionX = new float[2];
+    private float[] nextPositionZ= new float[2];
+
     int secondPassed = 0;
 
     Timer time = new Timer();
@@ -299,8 +302,11 @@ public class PuttingGameScreen implements Screen {
         }
 
         // Initial values of the arrays that store the position of the ball is the first position of the ball
-        positionArrayX[0] = ballPositionX;
-        positionArrayZ[0] = ballPositionZ;
+        positionArrayX[0] = startingPositionX;
+        positionArrayZ[0] = startingPositionZ;
+
+        nextPositionX[0] = startingPositionX;
+        nextPositionZ[0] = startingPositionZ;
 
         shapeRenderer = new ShapeRenderer();
 
@@ -638,11 +644,17 @@ public class PuttingGameScreen implements Screen {
             }
             camera.lookAt(ballPositionX, defineFunction(ballPositionX, ballPositionZ), ballPositionZ);
 
-            positionArrayX[countIndex] = newBallPositionX;
-            positionArrayZ[countIndex] = newBallPositionZ;
+            nextPositionX[1] = newBallPositionX;
+            nextPositionZ[1] = newBallPositionZ;
 
-            translateX[countIndex - 1] = sumX;
-            translateZ[countIndex - 1] = sumZ;
+            if (!name.equals("Q_agent")) {
+
+                positionArrayX[countIndex] = newBallPositionX;
+                positionArrayZ[countIndex] = newBallPositionZ;
+
+                translateX[countIndex - 1] = sumX;
+                translateZ[countIndex - 1] = sumZ;
+            }
 
             ballStop = false;
             sensorsReady = false;
@@ -1691,9 +1703,8 @@ public class PuttingGameScreen implements Screen {
                 }
             }*/
 
+            System.out.println("checkBridge = " + checkBridge);
             if (checkBridge) {
-
-                countIndex++;
 
                 newBallPositionX = sensorsOutput.get(action)[2];
                 newBallPositionZ = sensorsOutput.get(action)[3];
@@ -1702,12 +1713,15 @@ public class PuttingGameScreen implements Screen {
                     countTries++;
                 }
 
-                positionArrayX[countIndex] = newBallPositionX;
-                positionArrayZ[countIndex] = newBallPositionZ;
+                nextPositionX[0] = ballPositionX;
+                nextPositionZ[0] = ballPositionZ;
+
+                nextPositionX[1] = newBallPositionX;
+                nextPositionZ[1] = newBallPositionZ;
 
                 int ballStep = 100;
-                ballStepXmean = (positionArrayX[countIndex]-positionArrayX[countIndex -1])/ ballStep;
-                ballStepZmean = (positionArrayZ[countIndex]-positionArrayZ[countIndex -1])/ ballStep;
+                ballStepXmean = (nextPositionX[1]-nextPositionX[0])/ ballStep;
+                ballStepZmean = (nextPositionZ[1]-nextPositionZ[0])/ ballStep;
 
                 sumX = 0;
                 sumZ = 0;
@@ -1717,6 +1731,8 @@ public class PuttingGameScreen implements Screen {
                 canReset = true;
 
                 checkBridge = false;
+
+                //countIndex++;
             }
         }
     }
