@@ -61,10 +61,12 @@ public class SolverScreen implements Screen {
         rk4Button.setSize(200, 60);
         stage.addActor(rk4Button);
 
+        /*
         verletButton = new TextButton("Verlet", skin);
         verletButton.setPosition(400, 300);
         verletButton.setSize(200, 60);
         stage.addActor(verletButton);
+        */
 
         class RK4Listener extends ChangeListener {
 
@@ -87,6 +89,7 @@ public class SolverScreen implements Screen {
         }
         rk4Button.addListener(new RK4Listener(game, this));
 
+        /*
         class verletListener extends ChangeListener {
 
             private Game game;
@@ -107,6 +110,7 @@ public class SolverScreen implements Screen {
             }
         }
         verletButton.addListener(new verletListener(game, this));
+        */
     }
 
     public static String getSolverName() {

@@ -30,7 +30,6 @@ public class LinkAgentNN {
         sensorsOutput = agent.getOutputData();
         //System.out.println(sensorsOutput.getClass().getSimpleName());
         // Simple float[] that contains data you need for that specific action
-        // System.out.println("Size returned outputs" + sensorsOutput.size());
         constructorCalc(sensorsOutput.get(action));
         System.out.println(Arrays.toString(sensorsOutput.get(action)));
         PuttingGameScreen.checkBridge = true;
@@ -78,14 +77,4 @@ public class LinkAgentNN {
         return sensors;
     }
 
-    /*    public LinkAgentNN(ArrayList<boolean[]> booleansOutput, ArrayList<float[]> dataOutput) {
-
-        boolean[] checkOutputBooleanStep = booleansOutput.get(action);
-        float[] checkOutputDataStep = dataOutput.get(action);
-
-        collision = checkOutputBooleanStep[0];
-        win_position = checkOutputBooleanStep[1];
-        xPosition = checkOutputDataStep[3];
-        yPosition = checkOutputDataStep[4];
-    }*/
 }

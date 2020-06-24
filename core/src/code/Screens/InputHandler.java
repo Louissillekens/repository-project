@@ -74,17 +74,10 @@ public class InputHandler {
 
             // Some key pressed input to rotate the camera and also zoom in zoom out
             if(Gdx.input.isKeyPressed(Input.Keys.RIGHT)) {
-                game.cameraRotation(-1);
-                System.out.println("dir x = " + game.getCamera().direction.x);
-                System.out.println("dir z = " + game.getCamera().direction.z);
-                System.out.println();
+                PuttingGameScreen.cameraRotation(-1);
             }
             if(Gdx.input.isKeyPressed(Input.Keys.LEFT)) {
-                game.cameraRotation(1);
-
-                System.out.println("dir x = " + game.getCamera().direction.x);
-                System.out.println("dir z = " + game.getCamera().direction.z);
-                System.out.println();
+                PuttingGameScreen.cameraRotation(1);
             }
             if(Gdx.input.isKeyPressed(Input.Keys.UP)) {
                 //round the shot power to two decimal places to avoid errors where the power would get above max power

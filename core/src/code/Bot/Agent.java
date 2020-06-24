@@ -14,7 +14,7 @@ public class Agent {
     public Agent() {
         PuttingGameScreen.freeToGo = false;
 
-        startAgent();
+            startAgent();
 
         PuttingGameScreen.freeToGo = true;
 

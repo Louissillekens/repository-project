@@ -56,7 +56,6 @@ public class PuttingGameScreen implements Screen {
     private static float ballStepXmean;
     private static float ballStepZmean;
 
-    //QSHIT
     public static boolean freeToGo = false;
 
     private Model flatField;
@@ -198,7 +197,7 @@ public class PuttingGameScreen implements Screen {
     public static int action;
 
     private static int sandPitSize = 5;
-    private static int amountOfSandPit = 30;
+    private static int amountOfSandPit = 10;
 
     private static float[] sandPitX1 = new float[amountOfSandPit];
     private static float[] sandPitZ1 = new float[amountOfSandPit];
@@ -1106,9 +1105,6 @@ public class PuttingGameScreen implements Screen {
 
             countForFlag++;
 
-            //System.out.println("final arrow x = " + euclideanDistFlag(finalPositionArrowX, finalPositionArrowZ));
-            //System.out.println("minDistanceArrowFlag = " + minDistanceArrowFlag);
-
             if (euclideanDistFlag(finalPositionArrowX, finalPositionArrowZ) < minDistanceArrowFlag) {
 
                 cameraRotation(0.5f);
@@ -1258,9 +1254,11 @@ public class PuttingGameScreen implements Screen {
 
         if (botReady) {
 
+            /*
             for (int i = 0; i < sensorsOutput.size(); i++) {
                 System.out.println("sensorsOutput = " + Arrays.toString(sensorsOutput.get(i)));
             }
+            */
 
             finishAgent = true;
 
@@ -1306,13 +1304,6 @@ public class PuttingGameScreen implements Screen {
 
                 resetValues();
             }
-
-            /*
-            if (BotScreen.getBotName().equals("Q_agent")) {
-
-
-            }
-            */
         }
     }
 
@@ -1380,17 +1371,7 @@ public class PuttingGameScreen implements Screen {
         if (!checkCollisionMessage && !readyToTrain) {
 
             ballMovement();
-
-            //System.out.println("ballPositionX = " + ballPositionX);
-            //System.out.println("ballPositionZ = " + ballPositionZ);
-            //System.out.println("newBallPositionX = " + newBallPositionX);
-            //System.out.println("newBallPositionZ = " + newBallPositionZ);
-            //System.out.println();
         }
-
-        //if (!checkAStar) {
-            //ballMovement();
-        //}
 
         // Condition used when the ball is out of the field
         if (outOfField(ballPositionX, ballPositionZ)) {
@@ -1489,13 +1470,7 @@ public class PuttingGameScreen implements Screen {
                 }
             }
             if (BotScreen.getBotName().equals("aStar")) {
-
-                //System.out.println("aStarReady = " + aStarReady);
-
                 if (aStarReady) {
-
-                    //System.out.println("ok");
-
                     if (countAStarIterations > 0) {
 
                         ballPositionX = startingPositionX;
@@ -1548,10 +1523,6 @@ public class PuttingGameScreen implements Screen {
                     checkAStar = true;
                 }
 
-                //System.out.println("checkAStar = " + checkAStar);
-                //System.out.println("nodeIndex = " + nodeIndex);
-                //System.out.println("countIndex = " + countIndex);
-
                 if (checkAStar && nodeIndex < nodes.size()) {
 
                     countIndex++;
@@ -1569,18 +1540,8 @@ public class PuttingGameScreen implements Screen {
                         countTries++;
                     }
 
-                    System.out.println("newPosX = " + newBallPositionX);
-                    System.out.println("newPosZ = " + newBallPositionZ);
-                    System.out.println();
-
                     positionArrayX[countIndex] = newBallPositionX;
                     positionArrayZ[countIndex] = newBallPositionZ;
-
-                    //ballPositionX = positionArrayX[countIndex-1];
-                    //ballPositionZ = positionArrayZ[countIndex-1];
-
-                    //System.out.println("positionArrayX = " + Arrays.toString(positionArrayX));
-                    //System.out.println("positionArrayZ = " + Arrays.toString(positionArrayZ));
 
                     int ballStep = 100;
                     ballStepXmean = (positionArrayX[countIndex]-positionArrayX[countIndex -1])/ ballStep;
@@ -1596,7 +1557,6 @@ public class PuttingGameScreen implements Screen {
                     checkAStar = false;
                     nodeIndex++;
                 }
-                //System.out.println("checkAStar = " + checkAStar);
             }
         }
 
@@ -1612,7 +1572,6 @@ public class PuttingGameScreen implements Screen {
                     if (lgbabe.gm.isDone()) {
                         lgbabe.gm.reset();
                         lgbabe.setDestination(false);
-                        //Si jarrive a calc ici dabord un sensor check if underneed always sensot
                         LinkAgentNN straight = new LinkAgentNN(70);
                         // TAKE ACTION GET SENSORS INPUT TO GETSTATE
                         lgbabe.setState(straight.getSensors());
@@ -1624,11 +1583,9 @@ public class PuttingGameScreen implements Screen {
                     int reward = lgbabe.gm.takeAction(action); //Get the reward from that action
                     lgbabe.setState(lgbabe.gm.getState());
                     float[] next_state = lgbabe.gm.getState(); // Get the new state (has been updated in takeAction)
-                    //System.out.println("experiences = " + e + " state " + Arrays.toString(lgbabe.state));
 
                     lgbabe.memory.push(new Experience(lgbabe.state, action, next_state, reward)); // Add a new experience of this step
                     lgbabe.setState(next_state); //Update the new position numerically
-                   // System.out.println("lgbabe.memory.push_count = " + lgbabe.memory.push_count);
                     // If the number of experiences in the memory is >= batch size we need
                     if (lgbabe.memory.canProvideSample(lgbabe.batch_size)) {
                         List<Experience> experiences = lgbabe.memory.getSample(lgbabe.batch_size);
@@ -1661,56 +1618,6 @@ public class PuttingGameScreen implements Screen {
                 freeToGo = true;
             counterFirstIter++;
 
-
-            /*if (LinkAgentNN.newAgent) {
-                if (ballMoved) {
-                    finishAgent = false;
-                }
-                if (!finishAgent) {
-                    startAgent();
-                }
-                else {
-
-                    int sensorNum = (int) Math.ceil(action/10f);
-
-                    stepData = sensorsOutput.get(action);
-
-                    if (stepData[0]==1) {
-                        ballMoved = false;
-                    }
-                    else {
-                        float power = evaluatePowerRK4(ballPositionX, ballPositionZ, stepData[3], stepData[4], sensorsAngleX[sensorNum], sensorsAngleZ[sensorNum]);
-
-                        Rungekuttasolver RK4 = new Rungekuttasolver();
-
-                        RK4.setValues(ballPositionX, ballPositionZ, sensorsAngleX[sensorNum]*power, sensorsAngleZ[sensorNum]*power);
-                        RK4.RK4();
-
-                        newBallPositionX = (float) RK4.getX();
-                        newBallPositionZ = (float) RK4.getY();
-
-                        canTranslateCam = true;
-
-                        positionArrayX[countIndex] = newBallPositionX;
-                        positionArrayZ[countIndex] = newBallPositionZ;
-
-                        ballPositionX = positionArrayX[countIndex - 1];
-                        ballPositionZ = positionArrayZ[countIndex - 1];
-
-                        int ballStep = 100;
-                        ballStepXmean = (positionArrayX[countIndex] - positionArrayX[countIndex - 1]) / ballStep;
-                        ballStepZmean = (positionArrayZ[countIndex] - positionArrayZ[countIndex - 1]) / ballStep;
-
-                        ballMoved = true;
-                        ballStop = false;
-                    }
-                }
-                if (finishAgent && ballStop) {
-                    isReadyToTrain = true;
-                }
-            }*/
-
-            System.out.println("checkBridge = " + checkBridge);
             if (checkBridge) {
 
                 newBallPositionX = sensorsOutput.get(action)[2];
@@ -1738,8 +1645,6 @@ public class PuttingGameScreen implements Screen {
                 canReset = true;
 
                 checkBridge = false;
-
-                //countIndex++;
             }
         }
     }
@@ -1946,13 +1851,4 @@ public class PuttingGameScreen implements Screen {
     public GameMode getGameMode() {
         return gameMode;
     }
-
-    public float getGridWidth() {
-        return gridWidth;
-    }
-
-    public float getGridDepth() {
-        return gridDepth;
-    }
-
 }

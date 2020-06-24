@@ -233,7 +233,6 @@ public class GameModeScreen implements Screen {
         displayMessage("Top and Bottom arrow - increase or decrease the power of the shot", 100, 170);
         displayMessage("Space - take a shot with the chosen power and angle ", 100, 130);
         displayMessage("R - reset the ball location to its previous position", 100, 90);
-        displayMessage("B - return to the game mode menu selector", 100, 50);
     }
 
     @Override
